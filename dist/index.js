@@ -1,5 +1,6 @@
 import { jsxs, jsx, Fragment } from 'react/jsx-runtime';
 import { Position, Handle, NodeToolbar, MarkerType, useReactFlow, getBezierPath, BaseEdge, EdgeLabelRenderer, useStore } from '@xyflow/react';
+import clsx from 'clsx';
 import React, { useMemo, useState, useCallback } from 'react';
 
 /******************************************************************************
@@ -53,9 +54,10 @@ var NodeBase = function (_a) {
     return (jsxs("div", { className: "node-base min-w-5 min-h-5 w-full h-full", children: [jsx("div", { className: "node-base__toolbar" }), children, jsx("div", { className: "node-base__label absolute top-full w-full mt-2 flex flex-col items-center", children: jsx("div", { className: "text-xs text-center line-clamp-3", children: String(data === null || data === void 0 ? void 0 : data.label) }) })] }));
 };
 
-function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e)){var o=e.length;for(t=0;t<o;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);}else for(f in e)e[f]&&(n&&(n+=" "),n+=f);return n}function clsx(){for(var e,t,f=0,n="",o=arguments.length;f<o;f++)(e=arguments[f])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
-
-var InPointX='w-1\x20h-1\x20rounded-md\x20!bg-teal-500';var InPointY='w-1\x20h-1\x20rounded-md\x20!bg-teal-500';var OutPointX='w-1\x20h-1\x20rounded-md\x20!bg-teal-500';var OutPointY='w-1\x20h-1\x20rounded-md\x20!bg-teal-500';
+var InPointX = "w-1 h-1 rounded-md !bg-teal-500";
+var InPointY = "w-1 h-1 rounded-md !bg-teal-500";
+var OutPointX = "w-1 h-1 rounded-md !bg-teal-500";
+var OutPointY = "w-1 h-1 rounded-md !bg-teal-500";
 
 var DEFAULT_HANDLE_STYLE = {
     width: 10,
@@ -211,9 +213,38 @@ var NodeMenu = function (_a) {
     return (jsxs("div", { children: [jsx("p", { style: { margin: "0.5em" }, children: jsxs("small", { children: ["node: ", nodeId] }) }), jsx("button", { onClick: duplicateNode, className: "hover:bg-slate-200 duration-300", children: "duplicate" }), jsx("button", { onClick: deleteNode, className: "hover:bg-slate-200 duration-300", children: "delete" })] }));
 };
 
-var _a$1;var NODES;(function(_0x27d16a){_0x27d16a['task']='task',_0x27d16a['start']='start',_0x27d16a['end']='end',_0x27d16a['e-gateway']='exclusive-gateway';}(NODES||(NODES={})));var nodeTypes=(_a$1={},_a$1[NODES['task']]=Task,_a$1[NODES['start']]=StartEvent,_a$1[NODES['end']]=EndEvent,_a$1[NODES['e-gateway']]=ExclusiveGateway,_a$1);
+var _a$1;
+var NODES;
+(function (NODES) {
+    NODES["task"] = "task";
+    NODES["start"] = "start";
+    NODES["end"] = "end";
+    NODES["e-gateway"] = "exclusive-gateway";
+})(NODES || (NODES = {}));
+var nodeTypes = (_a$1 = {},
+    _a$1[NODES.task] = Task,
+    _a$1[NODES.start] = StartEvent,
+    _a$1[NODES.end] = EndEvent,
+    _a$1[NODES["e-gateway"]] = ExclusiveGateway,
+    _a$1);
 
-var _a;var connectionStyle={'straight':'straight','step':'step','smoothstep':'smoothstep','bezier':'bezier'};var EDGES;(function(_0x1b9de2){_0x1b9de2['bezier']='bezier',_0x1b9de2['connection']='connection',_0x1b9de2['straight']='straight';}(EDGES||(EDGES={})));var connnectionTypes=(_a={},_a[EDGES['bezier']]=BezierEdgeConnectionLine,_a[EDGES['connection']]=CustomEdge,_a);
+var _a;
+var connectionStyle = {
+    straight: "straight",
+    step: "step",
+    smoothstep: "smoothstep",
+    bezier: "bezier",
+};
+var EDGES;
+(function (EDGES) {
+    EDGES["bezier"] = "bezier";
+    EDGES["connection"] = "connection";
+    EDGES["straight"] = "straight";
+})(EDGES || (EDGES = {}));
+var connnectionTypes = (_a = {},
+    _a[EDGES.bezier] = BezierEdgeConnectionLine,
+    _a[EDGES.connection] = CustomEdge,
+    _a);
 
 var EdgeMenu = function (_a) {
     var edgeId = _a.edgeId;
@@ -378,33 +409,3 @@ var HelperLines = function (_a) {
 };
 
 export { CustomEdge as ConnectionLine, BezierEdgeConnectionLine as ConnectionLineStyle, ContextMenu, EDGES, EndEvent, HelperLines, NODES, StartEvent, Task, connnectionTypes, nodeTypes };
-turn (jsxRuntime.jsx("div", { className: "helper-line horizontal", style: {
-                    top: line * zoom + y,
-                    left: 0,
-                    width: "100%",
-                    height: "1px",
-                    background: "#ff0071",
-                    position: "absolute",
-                    pointerEvents: "none",
-                    zIndex: 1000,
-                } }, "h-".concat(i))); }), verticalLines.map(function (line, i) { return (jsxRuntime.jsx("div", { className: "helper-line vertical", style: {
-                    left: line * zoom + x,
-                    top: 0,
-                    width: "1px",
-                    height: "100%",
-                    background: "#ff0071",
-                    position: "absolute",
-                    pointerEvents: "none",
-                    zIndex: 1000,
-                } }, "v-".concat(i))); })] }));
-};
-
-exports.ConnectionLine = CustomEdge;
-exports.ConnectionLineStyle = BezierEdgeConnectionLine;
-exports.ContextMenu = ContextMenu;
-exports.EndEvent = EndEvent;
-exports.HelperLines = HelperLines;
-exports.StartEvent = StartEvent;
-exports.Task = Task;
-exports.connnectionTypes = connnectionTypes;
-exports.nodeTypes = nodeTypes;
