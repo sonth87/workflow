@@ -1,0 +1,26 @@
+{
+  "name": "bpm-core",
+  "private": true,
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": "./dist",
+    "./styles.css": "./dist/styles.css",
+    "./tailwind.config.js": "./dist/tailwind.config.js"
+  },
+  "files": [
+    "dist/*",
+    "dist/styles.css",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@xyflow/react": "^12",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  }
+}
