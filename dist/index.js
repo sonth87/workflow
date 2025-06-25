@@ -211,9 +211,9 @@ var NodeMenu = function (_a) {
     return (jsxs("div", { children: [jsx("p", { style: { margin: "0.5em" }, children: jsxs("small", { children: ["node: ", nodeId] }) }), jsx("button", { onClick: duplicateNode, className: "hover:bg-slate-200 duration-300", children: "duplicate" }), jsx("button", { onClick: deleteNode, className: "hover:bg-slate-200 duration-300", children: "delete" })] }));
 };
 
-var _a$1;var NODES;(function(_0x541ede){_0x541ede['task']='task',_0x541ede['start']='start',_0x541ede['end']='end',_0x541ede['e-gateway']='exclusive-gateway';}(NODES||(NODES={})));var nodeTypes=(_a$1={},_a$1[NODES['task']]=Task,_a$1[NODES['start']]=StartEvent,_a$1[NODES['end']]=EndEvent,_a$1[NODES['e-gateway']]=ExclusiveGateway,_a$1);
+var _a$1;var NODES;(function(_0x23b965){_0x23b965['task']='task',_0x23b965['start']='start',_0x23b965['end']='end',_0x23b965['e-gateway']='exclusive-gateway';}(NODES||(NODES={})));var nodeTypes=(_a$1={},_a$1[NODES['task']]=Task,_a$1[NODES['start']]=StartEvent,_a$1[NODES['end']]=EndEvent,_a$1[NODES['e-gateway']]=ExclusiveGateway,_a$1);
 
-var _a;var connectionStyle={'straight':'straight','step':'step','smoothstep':'smoothstep','bezier':'bezier'};var EDGES;(function(_0x30142f){_0x30142f['bezier']='bezier',_0x30142f['connection']='connection',_0x30142f['straight']='straight';}(EDGES||(EDGES={})));var connnectionTypes=(_a={},_a[EDGES['bezier']]=BezierEdgeConnectionLine,_a[EDGES['connection']]=CustomEdge,_a);
+var _a;var connectionStyle={'straight':'straight','step':'step','smoothstep':'smoothstep','bezier':'bezier'};var EDGES;(function(_0x132478){_0x132478['bezier']='bezier',_0x132478['connection']='connection',_0x132478['straight']='straight';}(EDGES||(EDGES={})));var connnectionTypes=(_a={},_a[EDGES['bezier']]=BezierEdgeConnectionLine,_a[EDGES['connection']]=CustomEdge,_a);
 
 var EdgeMenu = function (_a) {
     var edgeId = _a.edgeId;
@@ -378,33 +378,3 @@ var HelperLines = function (_a) {
 };
 
 export { CustomEdge as ConnectionLine, BezierEdgeConnectionLine as ConnectionLineStyle, ContextMenu, EDGES, EndEvent, HelperLines, NODES, StartEvent, Task, connnectionTypes, nodeTypes };
-turn (jsxRuntime.jsx("div", { className: "helper-line horizontal", style: {
-                    top: line * zoom + y,
-                    left: 0,
-                    width: "100%",
-                    height: "1px",
-                    background: "#ff0071",
-                    position: "absolute",
-                    pointerEvents: "none",
-                    zIndex: 1000,
-                } }, "h-".concat(i))); }), verticalLines.map(function (line, i) { return (jsxRuntime.jsx("div", { className: "helper-line vertical", style: {
-                    left: line * zoom + x,
-                    top: 0,
-                    width: "1px",
-                    height: "100%",
-                    background: "#ff0071",
-                    position: "absolute",
-                    pointerEvents: "none",
-                    zIndex: 1000,
-                } }, "v-".concat(i))); })] }));
-};
-
-exports.ConnectionLine = CustomEdge;
-exports.ConnectionLineStyle = BezierEdgeConnectionLine;
-exports.ContextMenu = ContextMenu;
-exports.EndEvent = EndEvent;
-exports.HelperLines = HelperLines;
-exports.StartEvent = StartEvent;
-exports.Task = Task;
-exports.connnectionTypes = connnectionTypes;
-exports.nodeTypes = nodeTypes;
