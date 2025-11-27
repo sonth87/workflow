@@ -81,6 +81,19 @@ export interface EndEventNode extends BaseNode {
   type: NodeType.END_EVENT
 }
 
+export interface PoolNode extends BaseNode {
+  type: NodeType.POOL
+  rows: Array<{ id: string; label: string; height: number }>
+  columns: Array<{ id: string; label: string; width: number }>
+}
+
+export interface NoteNode extends BaseNode {
+  type: NodeType.NOTE
+  content: string
+  color?: 'yellow' | 'blue' | 'green' | 'pink' | 'purple' | 'orange'
+  fontSize?: 'sm' | 'base' | 'lg'
+}
+
 export interface WorkflowEdge {
   id?: string
   source: string
@@ -99,6 +112,8 @@ export type WorkflowNode =
   | ParallelGatewayNode
   | ParallelGatewayJoinNode
   | SubflowNode
+  | PoolNode
+  | NoteNode
 
 export interface WorkflowDefinition {
   id: string

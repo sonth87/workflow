@@ -12,6 +12,9 @@ export enum NodeType {
   PARALLEL_GATEWAY_JOIN = 'parallelGatewayJoin',
 
   SUBFLOW = 'subflow',
+  
+  POOL = 'pool',
+  NOTE = 'note',
 }
 
 export enum NotificationChannel {

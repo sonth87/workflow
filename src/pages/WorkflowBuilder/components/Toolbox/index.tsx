@@ -50,7 +50,11 @@ const DEFAULT_CATEGORIES: NodeCategory[] = [
   {
     name: 'Advanced',
     isOpen: false,
-    nodes: [{ type: NodeType.SUBFLOW, label: 'Subflow' }],
+    nodes: [
+      { type: NodeType.SUBFLOW, label: 'Subflow' },
+      { type: NodeType.POOL, label: 'Pool / Region' },
+      { type: NodeType.NOTE, label: 'Note' },
+    ],
   },
 ]
 

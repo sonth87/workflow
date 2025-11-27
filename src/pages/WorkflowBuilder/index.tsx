@@ -144,13 +144,34 @@ export default function WorkflowBuilder() {
   }
 
   const handleNodeDrop = (nodeType: string, position: { x: number; y: number }) => {
+    const isPool = nodeType === 'pool'
+    const isNote = nodeType === 'note'
+    
     const newNode: Node = {
       id: `${nodeType}-${Date.now()}`,
       type: nodeType,
-      data: { label: nodeType },
+      data: isPool
+        ? {
+            label: 'Pool',
+            rows: [{ id: '1', label: 'Lane 1', height: 150 }],
+            columns: [{ id: '1', label: 'Phase 1', width: 400 }],
+          }
+        : isNote
+        ? {
+            label: 'Note',
+            content: 'Double click to edit note...',
+            color: 'yellow',
+            fontSize: 'base',
+          }
+        : { label: nodeType },
       position,
       sourcePosition: layoutDirection === 'vertical' ? Position.Bottom : Position.Right,
       targetPosition: layoutDirection === 'vertical' ? Position.Top : Position.Left,
+      ...(isPool && {
+        style: { zIndex: -1 },
+        draggable: true,
+        selectable: true,
+      }),
     }
     setNodes((nds) => [...nds, newNode])
   }
