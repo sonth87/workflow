@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
+    "@types/dagre": "^0.7.53",
     "@xyflow/react": "^12.9.3",
+    "dagre": "^0.8.5",
     "install": "^0.13.0",
     "lodash": "^4.17.21",
     "react": "^19.2.0",
