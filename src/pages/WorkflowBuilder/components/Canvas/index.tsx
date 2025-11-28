@@ -1,8 +1,9 @@
+import { NodeType } from '@/enum/workflow.enum'
+import { validateConnection } from '@/utils/validation'
 import type { Edge, Node } from '@xyflow/react'
 import {
   Background,
   ConnectionLineType,
-  Controls,
   ReactFlow,
   SelectionMode,
   useReactFlow,
@@ -11,8 +12,6 @@ import {
   type NodeChange,
 } from '@xyflow/react'
 import { useCallback } from 'react'
-import { NodeType } from '@/enum/workflow.enum'
-import { validateConnection } from '@/utils/validation'
 import { edgeTypes } from './edges'
 import { nodeTypes } from './nodes'
 
@@ -137,19 +136,8 @@ export function Canvas({
           fitView
           minZoom={0.2}
           maxZoom={3}
-          className='
-            [&_.react-flow__edge]:transition-all!
-            [&_.react-flow__edge]:duration-300!
-            [&_.react-flow__node.selected]:shadow-[0_0_0_3px_hsl(var(--primary))]!
-            [&_.react-flow__node.selected_.react-flow__handle]:opacity-100!
-            [&_.react-flow__node.selected_.react-flow__handle]:w-3!
-            [&_.react-flow__node.selected_.react-flow__handle]:h-3!
-            [&_.react-flow__node.selected_.react-flow__handle]:bg-primary!
-            [&_.react-flow__node.selected_.react-flow__handle]:border-primary!
-          '
         >
           <Background gap={15} />
-          <Controls position='bottom-right' showInteractive={false} />
         </ReactFlow>
       )}
     </main>

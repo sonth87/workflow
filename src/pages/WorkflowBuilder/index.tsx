@@ -6,9 +6,9 @@ import { validateWorkflow } from '@/utils/validation'
 import type { Connection, Edge, Node } from '@xyflow/react'
 import {
   addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
   Position,
-  useEdgesState,
-  useNodesState,
   useReactFlow,
   useUpdateNodeInternals,
 } from '@xyflow/react'
@@ -20,6 +20,7 @@ import { Toolbar } from './components/Toolbar'
 import { Toolbox } from './components/Toolbox'
 import { ValidationPanel } from './components/ValidationPanel'
 import { getLayoutedElements } from './utils/layout'
+import { useFlowHistory } from './hooks/useFlowHistory'
 
 const initialNodes: WorkflowNode[] = [
   {
@@ -104,7 +105,7 @@ const initialEdges: Edge[] = [
     source: 'gateway-1',
     target: 'task-3',
     type: 'smooth',
-    animated: true,
+    animated: false,
     label: 'No',
   },
   {
@@ -112,22 +113,24 @@ const initialEdges: Edge[] = [
     source: 'task-2',
     target: 'end-1',
     type: 'smooth',
-    animated: true,
+    animated: false,
   },
   {
     id: 'e5-6',
     source: 'task-3',
     target: 'end-1',
     type: 'smooth',
-    animated: true,
+    animated: false,
   },
 ]
 
 export default function WorkflowBuilder() {
   const [workflowName, setWorkflowName] = useState('Untitled Workflow')
   const [selectedNode, setSelectedNode] = useState<Node>()
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(initialEdges)
+  const { nodes, edges, setNodes, setEdges, redo, undo } = useFlowHistory(
+    initialNodes,
+    initialEdges
+  )
   const [layoutDirection, setLayoutDirection] = useState<LayoutDirection>('vertical')
   const [validationErrors, setValidationErrors] = useState<
     Array<{ nodeId: string; message: string; type: 'error' | 'warning' }>
@@ -153,14 +156,6 @@ export default function WorkflowBuilder() {
   useCallback(() => {
     handleValidateWorkflow()
   }, [nodes, edges, handleValidateWorkflow])
-
-  const handleUndo = () => {
-    console.log('Undo action')
-  }
-
-  const handleRedo = () => {
-    console.log('Redo action')
-  }
 
   const handleRun = () => {
     handleValidateWorkflow()
@@ -261,8 +256,8 @@ export default function WorkflowBuilder() {
         <Header
           workflowName={workflowName}
           onWorkflowNameChange={setWorkflowName}
-          onUndo={handleUndo}
-          onRedo={handleRedo}
+          onUndo={undo}
+          onRedo={redo}
           onRun={handleRun}
           onSave={handleSave}
           layoutDirection={layoutDirection}
@@ -278,8 +273,8 @@ export default function WorkflowBuilder() {
         nodes={nodes}
         edges={edges}
         onNodeDrop={handleNodeDrop}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
+        onNodesChange={(changes) => setNodes((nds) => applyNodeChanges(changes, nds))}
+        onEdgesChange={(changes) => setEdges((eds) => applyEdgeChanges(changes, eds))}
         onConnect={handleConnect}
         onNodeClick={handleNodeClick}
         onEdgeClick={handleEdgeClick}

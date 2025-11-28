@@ -10,7 +10,7 @@ interface Props {
 export default function TaskConfig({ taskNode }: Props) {
   const { updateNode } = useUpdateConfigFlow()
   const methods = useForm({
-    values: { ...taskNode.data },
+    defaultValues: { ...taskNode.data },
   })
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function TaskConfig({ taskNode }: Props) {
       updateNode(taskNode.id, { data: { ...value } })
     })
     return () => subscription.unsubscribe()
-  }, [taskNode.id])
+  }, [])
 
   return (
     <FormProvider {...methods}>

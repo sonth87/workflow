@@ -1,5 +1,6 @@
 import React from 'react'
-import type { CustomNodeProps } from '.'
+import { nodeStyle, type CustomNodeProps } from '.'
+import { cx } from '@/utils/cx'
 
 export interface Props extends CustomNodeProps {
   children?: React.ReactNode
@@ -8,5 +9,15 @@ export interface Props extends CustomNodeProps {
 export default function BaseNode(props: Props) {
   const { children } = props
 
-  return children || null
+  if (!children) return null
+
+  return (
+    <div
+      className={cx(nodeStyle, {
+        'border-primary': props.selected,
+      })}
+    >
+      {children}
+    </div>
+  )
 }

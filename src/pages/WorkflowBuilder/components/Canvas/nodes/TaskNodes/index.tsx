@@ -1,6 +1,6 @@
 import { Handle, Position } from '@xyflow/react'
-import { nodeStyle, handleStyle } from '../styles'
 import type { CustomNodeProps } from '..'
+import { handleStyle } from '../styles'
 
 export function TaskNode({
   data,
@@ -9,7 +9,7 @@ export function TaskNode({
   targetPosition = Position.Top,
 }: CustomNodeProps) {
   return (
-    <div className={`${nodeStyle} border-primary`}>
+    <>
       <div className='text-xs font-semibold'>👤 Task</div>
       <div className='text-xs text-muted-foreground truncate'>{data.label}</div>
       <Handle
@@ -26,7 +26,7 @@ export function TaskNode({
         isConnectable={!isConnecting}
         className={handleStyle}
       />
-    </div>
+    </>
   )
 }
 
@@ -37,7 +37,7 @@ export function ServiceTaskNode({
   targetPosition = Position.Top,
 }: CustomNodeProps) {
   return (
-    <div className={`${nodeStyle} border-secondary`}>
+    <>
       <div className='text-xs font-semibold'>⚙️ Service</div>
       <div className='text-xs text-muted-foreground truncate'>{data.label}</div>
       <Handle
@@ -54,7 +54,7 @@ export function ServiceTaskNode({
         isConnectable={!isConnecting}
         className={handleStyle}
       />
-    </div>
+    </>
   )
 }
 
@@ -65,7 +65,7 @@ export function NotificationNode({
   targetPosition = Position.Top,
 }: CustomNodeProps) {
   return (
-    <div className={`${nodeStyle} border-warning`}>
+    <>
       <div className='text-xs font-semibold'>🔔 Notification</div>
       <div className='text-xs text-muted-foreground truncate'>{data.label}</div>
       <Handle
@@ -82,7 +82,7 @@ export function NotificationNode({
         isConnectable={!isConnecting}
         className={handleStyle}
       />
-    </div>
+    </>
   )
 }
 
@@ -93,7 +93,7 @@ export function TimeDelayNode({
   targetPosition = Position.Top,
 }: CustomNodeProps) {
   return (
-    <div className={`${nodeStyle} border-input`}>
+    <>
       <div className='text-xs font-semibold'>⏱️ Timer</div>
       <div className='text-xs text-muted-foreground truncate'>{data.label}</div>
       <Handle
@@ -110,7 +110,7 @@ export function TimeDelayNode({
         isConnectable={!isConnecting}
         className={handleStyle}
       />
-    </div>
+    </>
   )
 }
 
@@ -121,7 +121,7 @@ export function SubflowNode({
   targetPosition = Position.Top,
 }: CustomNodeProps) {
   return (
-    <div className={`${nodeStyle} border-chart-3`}>
+    <>
       <div className='text-xs font-semibold'>📦 Subflow</div>
       <div className='text-xs text-muted-foreground truncate'>{data.label}</div>
       <Handle
@@ -138,6 +138,6 @@ export function SubflowNode({
         isConnectable={!isConnecting}
         className={handleStyle}
       />
-    </div>
+    </>
   )
 }

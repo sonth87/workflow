@@ -20,9 +20,9 @@ export function ConfigPanel({ selectedNode }: ConfigPanelProps) {
 
     switch (selectedNode.type) {
       case NodeType.TASK:
-        return <TaskConfig taskNode={selectedNode} />
+        return <TaskConfig key={selectedNode.id} taskNode={selectedNode} />
       case NodeType.EXCLUSIVE_GATEWAY:
-        return <GatewayConfig />
+        return <GatewayConfig key={selectedNode.id} />
       default:
         return (
           <p className='text-xs text-muted-foreground'>
