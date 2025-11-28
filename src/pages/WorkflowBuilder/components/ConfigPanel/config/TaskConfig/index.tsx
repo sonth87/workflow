@@ -1,6 +1,29 @@
+import { useUpdateConfigFlow } from '@/pages/WorkflowBuilder/hooks/useUpdateConfigFlow'
+import type { TaskNode } from '@/types/workflow.type'
+import { useEffect } from 'react'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 
-export default function TaskConfig() {
+interface Props {
+  taskNode: TaskNode
+}
+
+export default function TaskConfig({ taskNode }: Props) {
+  const { updateNode } = useUpdateConfigFlow()
+  const methods = useForm({
+    values: { ...taskNode.data },
+  })
+
+  useEffect(() => {
+    const subscription = methods.watch((value) => {
+      updateNode(taskNode.id, { data: { ...value } })
+    })
+    return () => subscription.unsubscribe()
+  }, [taskNode.id])
+
   return (
-    <div>TaskConfig</div>
+    <FormProvider {...methods}>
+      {taskNode?.data?.label}
+      <Controller name='label' render={({ field }) => <input {...field} className='border' />} />
+    </FormProvider>
   )
 }

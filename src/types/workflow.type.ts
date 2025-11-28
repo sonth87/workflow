@@ -30,7 +30,7 @@ export interface ConnectionRule {
   requiresConnection?: boolean
 }
 
-export interface BaseNode extends Node {
+export interface BaseNode extends Omit<Node, 'data'> {
   id: string
   type: NodeType
   label: string
@@ -43,6 +43,9 @@ export interface BaseNode extends Node {
 
   // Validation rules for connections
   connectionRules?: ConnectionRule
+  data: Record<string, unknown> & {
+    label?: string
+  }
 }
 
 export interface TaskNode extends BaseNode {

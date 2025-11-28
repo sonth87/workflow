@@ -1,5 +1,5 @@
 import { NodeType } from '@/enum/workflow.enum'
-import type { WorkflowNode } from '@/types/workflow.type'
+import type { WorkflowEdge, WorkflowNode } from '@/types/workflow.type'
 import { Settings, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import TaskConfig from './config/TaskConfig'
@@ -7,6 +7,7 @@ import GatewayConfig from './config/GatewayConfig'
 
 interface ConfigPanelProps {
   selectedNode?: WorkflowNode
+  selectedEdge?: WorkflowEdge
 }
 
 export function ConfigPanel({ selectedNode }: ConfigPanelProps) {
@@ -19,7 +20,7 @@ export function ConfigPanel({ selectedNode }: ConfigPanelProps) {
 
     switch (selectedNode.type) {
       case NodeType.TASK:
-        return <TaskConfig />
+        return <TaskConfig taskNode={selectedNode} />
       case NodeType.EXCLUSIVE_GATEWAY:
         return <GatewayConfig />
       default:
