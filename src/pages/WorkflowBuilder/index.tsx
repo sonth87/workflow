@@ -1,5 +1,8 @@
 'use client'
 
+import { NodeType } from '@/enum/workflow.enum'
+import type { WorkflowNode } from '@/types/workflow.type'
+import { validateWorkflow } from '@/utils/validation'
 import type { Connection, Edge, Node } from '@xyflow/react'
 import {
   addEdge,
@@ -15,54 +18,61 @@ import { ConfigPanel } from './components/ConfigPanel'
 import { Header, type LayoutDirection } from './components/Header'
 import { Toolbar } from './components/Toolbar'
 import { Toolbox } from './components/Toolbox'
+import { ValidationPanel } from './components/ValidationPanel'
 import { getLayoutedElements } from './utils/layout'
 
-const initialNodes: Node[] = [
+const initialNodes: WorkflowNode[] = [
   {
     id: 'start-1',
-    type: 'startEvent',
-    data: { label: 'Start' },
+    type: NodeType.START_EVENT,
+    label: 'Start',
     position: { x: 250, y: 50 },
     sourcePosition: Position.Bottom,
+    data: { label: 'Start' },
   },
   {
     id: 'task-1',
-    type: 'task',
-    data: { label: 'Process Request' },
+    type: NodeType.TASK,
+    label: 'Process Request',
     position: { x: 200, y: 150 },
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
+    data: { label: 'Process Request' },
   },
   {
     id: 'gateway-1',
-    type: 'exclusiveGateway',
-    data: { label: 'Approved?' },
+    type: NodeType.EXCLUSIVE_GATEWAY,
+    label: 'Approved?',
     position: { x: 225, y: 250 },
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
+    data: { label: 'Approved?' },
   },
   {
     id: 'task-2',
-    type: 'task',
-    data: { label: 'Send Approval' },
+    type: NodeType.TASK,
+    label: 'Send Approval',
     position: { x: 100, y: 350 },
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
+    data: { label: 'Send Approval' },
   },
   {
     id: 'task-3',
-    type: 'task',
-    data: { label: 'Send Rejection' },
+    type: NodeType.TASK,
+    label: 'Send Rejection',
     position: { x: 300, y: 350 },
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
+    data: { label: 'Send Rejection' },
   },
   {
     id: 'end-1',
-    type: 'endEvent',
-    data: { label: 'End' },
+    type: NodeType.END_EVENT,
+    label: 'End',
     position: { x: 225, y: 450 },
     targetPosition: Position.Top,
+    data: { label: 'End' },
   },
 ]
 
@@ -115,13 +125,34 @@ const initialEdges: Edge[] = [
 
 export default function WorkflowBuilder() {
   const [workflowName, setWorkflowName] = useState('Untitled Workflow')
-  const [selectedNode, setSelectedNode] = useState<string | null>(null)
+  const [selectedNode, setSelectedNode] = useState<Node>()
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(initialEdges)
   const [layoutDirection, setLayoutDirection] = useState<LayoutDirection>('vertical')
+  const [validationErrors, setValidationErrors] = useState<
+    Array<{ nodeId: string; message: string; type: 'error' | 'warning' }>
+  >([])
 
   const { fitView } = useReactFlow()
   const updateNodeInternals = useUpdateNodeInternals()
+
+  const handleValidateWorkflow = useCallback(() => {
+    const workflowNodes = nodes.map((n) => ({
+      id: n.id,
+      type: n.type as NodeType,
+    }))
+    const workflowEdges = edges.map((e) => ({
+      source: e.source,
+      target: e.target,
+    }))
+
+    const errors = validateWorkflow(workflowNodes, workflowEdges)
+    setValidationErrors(errors)
+  }, [nodes, edges])
+
+  useCallback(() => {
+    handleValidateWorkflow()
+  }, [nodes, edges, handleValidateWorkflow])
 
   const handleUndo = () => {
     console.log('Undo action')
@@ -132,11 +163,18 @@ export default function WorkflowBuilder() {
   }
 
   const handleRun = () => {
+    handleValidateWorkflow()
+    if (validationErrors.filter((e) => e.type === 'error').length > 0) {
+      alert('Please fix all errors before running the workflow')
+      return
+    }
     console.log('Run workflow')
   }
 
   const handleSave = () => {
+    handleValidateWorkflow()
     console.log('Save workflow:', workflowName)
+    console.log('Validation errors:', validationErrors)
   }
 
   const handleMenu = () => {
@@ -146,7 +184,7 @@ export default function WorkflowBuilder() {
   const handleNodeDrop = (nodeType: string, position: { x: number; y: number }) => {
     const isPool = nodeType === 'pool'
     const isNote = nodeType === 'note'
-    
+
     const newNode: Node = {
       id: `${nodeType}-${Date.now()}`,
       type: nodeType,
@@ -193,8 +231,7 @@ export default function WorkflowBuilder() {
   )
 
   const handleNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
-    console.log('🚀 ~ node:', node)
-    setSelectedNode(node.id)
+    setSelectedNode(node)
   }, [])
 
   const handleEdgeClick = useCallback((_event: React.MouseEvent, edge: Edge) => {
@@ -202,7 +239,7 @@ export default function WorkflowBuilder() {
   }, [])
 
   const handlePaneClick = useCallback(() => {
-    setSelectedNode(null)
+    setSelectedNode(undefined)
   }, [])
 
   const handleChangeLayoutDirection = (direction: LayoutDirection) => {
@@ -250,11 +287,24 @@ export default function WorkflowBuilder() {
         layoutDirection={layoutDirection}
       />
 
-      <div className='absolute top-24 right-4 bottom-20 z-10 h-[calc(100%-7rem)]'>
-        <ConfigPanel selectedNode={selectedNode} />
-      </div>
+      {selectedNode && (
+        <div className='absolute top-24 right-4 bottom-20 z-10 h-[calc(100%-7rem)]'>
+          <ConfigPanel selectedNode={selectedNode as WorkflowNode} />
+        </div>
+      )}
 
-      {/* Toolbar - Center bottom */}
+      <ValidationPanel
+        errors={validationErrors}
+        onClose={() => setValidationErrors([])}
+        onNodeSelect={(nodeId) => {
+          const node = nodes.find((n) => n.id === nodeId)
+          setSelectedNode(node)
+          if (node) {
+            fitView({ nodes: [node], duration: 300, padding: 0.3 })
+          }
+        }}
+      />
+
       <div className='absolute bottom-4 left-1/2 -translate-x-1/2 z-10'>
         <Toolbar onMenu={handleMenu} />
       </div>

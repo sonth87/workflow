@@ -11,6 +11,8 @@ import {
   type NodeChange,
 } from '@xyflow/react'
 import { useCallback } from 'react'
+import { NodeType } from '@/enum/workflow.enum'
+import { validateConnection } from '@/utils/validation'
 import { edgeTypes } from './edges'
 import { nodeTypes } from './nodes'
 
@@ -42,6 +44,39 @@ export function Canvas({
 }: CanvasProps) {
   const { screenToFlowPosition } = useReactFlow()
 
+  const handleConnect = useCallback(
+    (connection: Connection) => {
+      if (!connection.source || !connection.target) return
+
+      const sourceNode = nodes.find((n) => n.id === connection.source)
+      const targetNode = nodes.find((n) => n.id === connection.target)
+
+      if (!sourceNode || !targetNode) return
+
+      const sourceType = sourceNode.type as NodeType
+      const targetType = targetNode.type as NodeType
+
+      const existingSourceConnections = edges.filter((e) => e.source === connection.source).length
+      const existingTargetConnections = edges.filter((e) => e.target === connection.target).length
+
+      const validation = validateConnection(
+        sourceType,
+        targetType,
+        existingSourceConnections,
+        existingTargetConnections
+      )
+
+      if (!validation.valid) {
+        console.warn('Connection validation failed:', validation.message)
+        alert(`Cannot create connection: ${validation.message}`)
+        return
+      }
+
+      onConnect?.(connection)
+    },
+    [nodes, edges, onConnect]
+  )
+
   const handleDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'move'
@@ -64,7 +99,6 @@ export function Canvas({
         y: position.y - 35,
       }
 
-      console.log('Dropped node type:', nodeType, 'at position:', centeredPosition)
       onNodeDrop?.(nodeType, centeredPosition)
     },
     [screenToFlowPosition, onNodeDrop]
@@ -84,7 +118,7 @@ export function Canvas({
           edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
+          onConnect={handleConnect}
           onNodeClick={onNodeClick}
           onEdgeClick={onEdgeClick}
           onPaneClick={onPaneClick}

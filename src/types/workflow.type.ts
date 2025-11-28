@@ -1,3 +1,4 @@
+import type { Node } from '@xyflow/react'
 import type { HttpMethod, NodeType, NotificationChannel, RoleType } from '../enum/workflow.enum'
 
 export interface Position {
@@ -15,7 +16,21 @@ export interface DataMapping {
   output?: string[]
 }
 
-export interface BaseNode {
+// Connection validation rules
+export interface ConnectionRule {
+  // Maximum number of outgoing connections allowed
+  maxOutputConnections?: number
+  // Maximum number of incoming connections allowed
+  maxInputConnections?: number
+  // Allowed target node types for outgoing connections
+  allowedTargets?: NodeType[]
+  // Allowed source node types for incoming connections
+  allowedSources?: NodeType[]
+  // Whether the node requires at least one connection
+  requiresConnection?: boolean
+}
+
+export interface BaseNode extends Node {
   id: string
   type: NodeType
   label: string
@@ -25,11 +40,14 @@ export interface BaseNode {
   sla?: string
   loop?: boolean
   dataMapping?: DataMapping
+
+  // Validation rules for connections
+  connectionRules?: ConnectionRule
 }
 
 export interface TaskNode extends BaseNode {
   type: NodeType.TASK
-  role: RoleType | string
+  role?: RoleType | string
   form?: {
     fields: Array<{
       key: string
@@ -83,8 +101,8 @@ export interface EndEventNode extends BaseNode {
 
 export interface PoolNode extends BaseNode {
   type: NodeType.POOL
-  rows: Array<{ id: string; label: string; height: number }>
-  columns: Array<{ id: string; label: string; width: number }>
+  layout: 'horizontal' | 'vertical' // horizontal: 1 row + many columns, vertical: 1 column + many rows
+  lanes: Array<{ id: string; label: string; size: number }> // size = width for horizontal, height for vertical
 }
 
 export interface NoteNode extends BaseNode {
@@ -98,7 +116,22 @@ export interface WorkflowEdge {
   id?: string
   source: string
   target: string
-  condition?: string
+  sourceHandle?: string // For nodes with multiple output handles
+  targetHandle?: string // For nodes with multiple input handles
+  condition?: string // Condition expression for conditional edges
+  label?: string // Display label for the edge
+}
+
+// Validation result for connections
+export interface ValidationResult {
+  valid: boolean
+  message?: string
+  type?: 'error' | 'warning'
+}
+
+// Helper type for node validation rules by type
+export type NodeValidationRules = {
+  [K in NodeType]?: ConnectionRule
 }
 
 export type WorkflowNode =
@@ -124,4 +157,7 @@ export interface WorkflowDefinition {
 
   nodes: WorkflowNode[]
   edges: WorkflowEdge[]
+
+  // Global validation rules that override node-specific rules
+  validationRules?: NodeValidationRules
 }

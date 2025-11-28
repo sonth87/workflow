@@ -85,3 +85,7 @@
     --color-sidebar-border: #262626;
     --color-sidebar-ring: #525252;
 }
+
+body {
+    color: var(--color-muted-foreground);
+}

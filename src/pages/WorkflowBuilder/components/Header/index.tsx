@@ -1,4 +1,15 @@
-import { Play, Redo2, Save, Undo2, ArrowRightLeft, ArrowUpDown } from 'lucide-react'
+import {
+  Play,
+  Redo2,
+  Save,
+  Undo2,
+  ArrowRightLeft,
+  ArrowUpDown,
+  Sun,
+  Moon,
+  Monitor,
+} from 'lucide-react'
+import { useTheme } from '@/hooks/useTheme'
 
 export type LayoutDirection = 'vertical' | 'horizontal'
 
@@ -23,6 +34,8 @@ export function Header({
   layoutDirection,
   onLayoutDirectionChange,
 }: HeaderProps) {
+  const { theme, setLightMode, setDarkMode, setSystemMode } = useTheme()
+
   return (
     <header className='w-full border border-border bg-card px-6 py-3 shadow-md rounded-lg'>
       <div className='flex items-center justify-between'>
@@ -36,6 +49,40 @@ export function Header({
         </div>
 
         <div className='flex items-center gap-2'>
+          {/* Theme Switcher */}
+          <div className='flex items-center gap-1 rounded border border-border bg-muted p-1'>
+            <button
+              title='Light Mode'
+              onClick={setLightMode}
+              className={`rounded p-2 transition-colors ${
+                theme === 'light' ? 'bg-primary text-primary-foreground' : 'hover:bg-background'
+              }`}
+            >
+              <Sun size={16} />
+            </button>
+            <button
+              title='Dark Mode'
+              onClick={setDarkMode}
+              className={`rounded p-2 transition-colors ${
+                theme === 'dark' ? 'bg-primary text-primary-foreground' : 'hover:bg-background'
+              }`}
+            >
+              <Moon size={16} />
+            </button>
+            <button
+              title='System Mode'
+              onClick={setSystemMode}
+              className={`rounded p-2 transition-colors ${
+                theme === 'system' ? 'bg-primary text-primary-foreground' : 'hover:bg-background'
+              }`}
+            >
+              <Monitor size={16} />
+            </button>
+          </div>
+
+          <div className='mx-1 h-6 w-px bg-border' />
+
+          {/* Layout Direction */}
           <div className='flex items-center gap-1 rounded border border-border bg-muted p-1'>
             <button
               title='Vertical Layout (Top to Bottom)'
