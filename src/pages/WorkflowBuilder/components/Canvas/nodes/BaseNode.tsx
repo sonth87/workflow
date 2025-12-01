@@ -20,7 +20,7 @@ export default function BaseNode(props: Props) {
 
   return (
     <div
-      className={cx(nodeStyle, {
+      className={cx(nodeStyle, 'min-w-[280px]', {
         'border-primary ring-4 ring-primary/25': props.selected,
       })}
     >
