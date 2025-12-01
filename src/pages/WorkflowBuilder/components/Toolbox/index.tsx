@@ -1,11 +1,11 @@
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import { NodeType } from '@/enum/workflow.enum'
+import { getIconConfig } from '@/pages/WorkflowBuilder/hooks/useGetIconByType'
 
 interface NodeItem {
   type: NodeType
   label: string
-  icon?: string
 }
 
 interface NodeCategory {
@@ -115,16 +115,26 @@ export function Toolbox({ categories, onCategoryToggle }: ToolboxProps) {
 
                 {category.isOpen && (
                   <div className='space-y-1.5 border-t border-border/50 p-2 bg-background/30'>
-                    {category.nodes.map((node) => (
-                      <div
-                        key={node.type}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, node.type)}
-                        className='rounded-lg bg-card/80 backdrop-blur-sm border border-border/50 px-3 py-2.5 text-xs font-medium cursor-move hover:bg-primary/10 hover:border-primary hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-150'
-                      >
-                        {node.label}
-                      </div>
-                    ))}
+                    {category.nodes.map((node) => {
+                      const iconConfig = getIconConfig(node.type)
+                      const Icon = iconConfig.icon
+
+                      return (
+                        <div
+                          key={node.type}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, node.type)}
+                          className='flex items-center gap-2 rounded-lg bg-card/80 backdrop-blur-sm border border-border/50 px-3 py-2.5 text-xs font-medium cursor-move hover:bg-primary/10 hover:border-primary hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-150'
+                        >
+                          {typeof Icon === 'string' ? (
+                            <img src={Icon} alt={node.label} className='w-5 h-5' />
+                          ) : (
+                            <Icon size={18} style={{ color: iconConfig.color }} />
+                          )}
+                          <span>{node.label}</span>
+                        </div>
+                      )
+                    })}
                   </div>
                 )}
               </div>

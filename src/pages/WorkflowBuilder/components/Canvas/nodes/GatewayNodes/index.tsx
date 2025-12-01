@@ -13,7 +13,6 @@ export function ExclusiveGatewayNode({
 
   return (
     <>
-      <div className='text-xs font-bold text-center'>◇ Decision</div>
       <Handle
         type='target'
         position={targetPosition}
@@ -46,7 +45,6 @@ export function ParallelGatewayNode({
 }: CustomNodeProps) {
   return (
     <>
-      <div className='text-xs font-bold text-center'>═ Parallel</div>
       <Handle
         type='target'
         position={targetPosition}
@@ -75,7 +73,6 @@ export function ParallelGatewayJoinNode({
 
   return (
     <>
-      <div className='text-xs font-bold text-center'>═ Join</div>
       <Handle
         type='target'
         position={targetPosition}
