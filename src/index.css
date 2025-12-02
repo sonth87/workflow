@@ -41,6 +41,29 @@
     --color-sidebar-accent-foreground: #171717;
     --color-sidebar-border: #e5e5e5;
     --color-sidebar-ring: #a1a1a1;
+
+    --color-ink1000: #121742;
+    --color-ink900: #1c2337;
+    --color-ink800: #2e3a5b;
+    --color-ink700: #58617c;
+    --color-ink600: #777f94;
+    --color-ink500: #a1a6b5;
+    --color-ink400: #c0c4ce;
+    --color-ink300: #eaebef;
+    --color-ink200: #f5f5f7;
+    --color-ink100: #fbfbfc;
+
+    --color-blackOpacity1000: rgba(0, 0, 0, 1);
+    --color-blackOpacity980: rgba(0, 0, 0, 0.9);
+    --color-blackOpacity900: rgba(0, 0, 0, 0.8);
+    --color-blackOpacity800: rgba(0, 0, 0, 0.7);
+    --color-blackOpacity700: rgba(0, 0, 0, 0.6);
+    --color-blackOpacity600: rgba(0, 0, 0, 0.5);
+    --color-blackOpacity500: rgba(0, 0, 0, 0.4);
+    --color-blackOpacity400: rgba(0, 0, 0, 0.3);
+    --color-blackOpacity300: rgba(0, 0, 0, 0.2);
+    --color-blackOpacity200: rgba(0, 0, 0, 0.1);
+    --color-blackOpacity100: rgba(0, 0, 0, 0.05);
 }
 
 :root.dark {
@@ -84,8 +107,13 @@
     --color-sidebar-accent-foreground: #fafafa;
     --color-sidebar-border: #262626;
     --color-sidebar-ring: #525252;
+
+
+    --color-ink800: #fbfbfc;
 }
 
 body {
     color: var(--color-muted-foreground);
+
+    --color-blackOpacity100: rgba(255, 255, 255, 0.05);
 }

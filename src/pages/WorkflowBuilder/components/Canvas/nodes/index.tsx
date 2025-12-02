@@ -36,15 +36,19 @@ const wrapWithBaseNode = (Component: React.ComponentType<CustomNodeProps>, nodeT
 }
 
 export const nodeTypes = {
-  [NodeType.START_EVENT]: wrapWithBaseNode(StartEventNode, NodeType.START_EVENT),
-  [NodeType.END_EVENT]: wrapWithBaseNode(EndEventNode, NodeType.END_EVENT),
-  [NodeType.TASK]: wrapWithBaseNode(TaskNode, NodeType.TASK),
+  [NodeType.START_EVENT_DEFAULT]: wrapWithBaseNode(StartEventNode, NodeType.START_EVENT_DEFAULT),
+  [NodeType.END_EVENT_DEFAULT]: wrapWithBaseNode(EndEventNode, NodeType.END_EVENT_DEFAULT),
+  [NodeType.END_EVENT_SEND_SIGNAL]: wrapWithBaseNode(EndEventNode, NodeType.END_EVENT_SEND_SIGNAL),
+  [NodeType.TASK_DEFAULT]: wrapWithBaseNode(TaskNode, NodeType.TASK_DEFAULT),
   [NodeType.SERVICE_TASK]: wrapWithBaseNode(ServiceTaskNode, NodeType.SERVICE_TASK),
   [NodeType.NOTIFICATION]: wrapWithBaseNode(NotificationNode, NodeType.NOTIFICATION),
   [NodeType.TIME_DELAY]: wrapWithBaseNode(TimeDelayNode, NodeType.TIME_DELAY),
   [NodeType.EXCLUSIVE_GATEWAY]: wrapWithBaseNode(ExclusiveGatewayNode, NodeType.EXCLUSIVE_GATEWAY),
   [NodeType.PARALLEL_GATEWAY]: wrapWithBaseNode(ParallelGatewayNode, NodeType.PARALLEL_GATEWAY),
-  [NodeType.PARALLEL_GATEWAY_JOIN]: wrapWithBaseNode(ParallelGatewayJoinNode, NodeType.PARALLEL_GATEWAY_JOIN),
+  [NodeType.PARALLEL_GATEWAY_JOIN]: wrapWithBaseNode(
+    ParallelGatewayJoinNode,
+    NodeType.PARALLEL_GATEWAY_JOIN
+  ),
   [NodeType.SUBFLOW]: wrapWithBaseNode(SubflowNode, NodeType.SUBFLOW),
   [NodeType.POOL]: PoolNode,
   [NodeType.NOTE]: NoteNode,

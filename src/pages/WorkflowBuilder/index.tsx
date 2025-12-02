@@ -25,7 +25,7 @@ import { useFlowHistory } from './hooks/useFlowHistory'
 const initialNodes: WorkflowNode[] = [
   {
     id: 'start-1',
-    type: NodeType.START_EVENT,
+    type: NodeType.START_EVENT_DEFAULT,
     label: 'Start',
     position: { x: 250, y: 50 },
     sourcePosition: Position.Bottom,
@@ -33,7 +33,7 @@ const initialNodes: WorkflowNode[] = [
   },
   {
     id: 'task-1',
-    type: NodeType.TASK,
+    type: NodeType.TASK_DEFAULT,
     label: 'Process Request',
     position: { x: 200, y: 150 },
     sourcePosition: Position.Bottom,
@@ -51,7 +51,7 @@ const initialNodes: WorkflowNode[] = [
   },
   {
     id: 'task-2',
-    type: NodeType.TASK,
+    type: NodeType.TASK_DEFAULT,
     label: 'Send Approval',
     position: { x: 100, y: 350 },
     sourcePosition: Position.Bottom,
@@ -60,7 +60,7 @@ const initialNodes: WorkflowNode[] = [
   },
   {
     id: 'task-3',
-    type: NodeType.TASK,
+    type: NodeType.TASK_DEFAULT,
     label: 'Send Rejection',
     position: { x: 300, y: 350 },
     sourcePosition: Position.Bottom,
@@ -69,7 +69,7 @@ const initialNodes: WorkflowNode[] = [
   },
   {
     id: 'end-1',
-    type: NodeType.END_EVENT,
+    type: NodeType.END_EVENT_DEFAULT,
     label: 'End',
     position: { x: 225, y: 450 },
     targetPosition: Position.Top,

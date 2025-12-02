@@ -1,7 +1,7 @@
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react'
-import { useState } from 'react'
 import { NodeType } from '@/enum/workflow.enum'
 import { getIconConfig } from '@/pages/WorkflowBuilder/hooks/useGetIconByType'
+import { X } from 'lucide-react'
+import React, { useState } from 'react'
 
 interface NodeItem {
   type: NodeType
@@ -12,11 +12,7 @@ interface NodeCategory {
   name: string
   isOpen: boolean
   nodes: NodeItem[]
-}
-
-interface ToolboxProps {
-  categories?: NodeCategory[]
-  onCategoryToggle?: (index: number) => void
+  icon?: React.ReactNode
 }
 
 const DEFAULT_CATEGORIES: NodeCategory[] = [
@@ -24,19 +20,66 @@ const DEFAULT_CATEGORIES: NodeCategory[] = [
     name: 'Event',
     isOpen: true,
     nodes: [
-      { type: NodeType.START_EVENT, label: 'Start Event' },
-      { type: NodeType.END_EVENT, label: 'End Event' },
+      { type: NodeType.START_EVENT_DEFAULT, label: 'Mặc định' },
+      { type: NodeType.START_EVENT_API, label: 'API' },
+      { type: NodeType.START_EVENT_TIMER, label: 'Hẹn giờ' },
+      { type: NodeType.START_EVENT_WEB, label: 'Web' },
+      { type: NodeType.START_EVENT_RECEIVE_SIGNAL, label: 'Nhận tín hiệu' },
     ],
+    icon: (
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        width='18'
+        height='18'
+        viewBox='0 0 18 18'
+        fill='none'
+      >
+        <path
+          d='M16.6667 8.95833C16.6667 4.70114 13.2155 1.25 8.95833 1.25C4.70114 1.25 1.25 4.70114 1.25 8.95833C1.25 13.2155 4.70114 16.6667 8.95833 16.6667C13.2155 16.6667 16.6667 13.2155 16.6667 8.95833ZM17.9167 8.95833C17.9167 13.9059 13.9059 17.9167 8.95833 17.9167C4.01078 17.9167 0 13.9059 0 8.95833C0 4.01078 4.01078 0 8.95833 0C13.9059 0 17.9167 4.01078 17.9167 8.95833Z'
+          fill='#39CC7E'
+        />
+      </svg>
+    ),
   },
   {
     name: 'Task',
     isOpen: true,
     nodes: [
-      { type: NodeType.TASK, label: 'Human Task' },
-      { type: NodeType.SERVICE_TASK, label: 'Service Task' },
-      { type: NodeType.NOTIFICATION, label: 'Notification' },
-      { type: NodeType.TIME_DELAY, label: 'Time Delay' },
+      { type: NodeType.TASK_DEFAULT, label: 'Mặc định' },
+      { type: NodeType.TASK_USER, label: 'Người dùng' },
+      { type: NodeType.TASK_SYSTEM, label: 'Hệ thống' },
+      { type: NodeType.TASK_SEND_NOTIFICATION, label: 'Gửi thông báo' },
+      { type: NodeType.TASK_SCRIPT, label: 'Script' },
+      { type: NodeType.TASK_MANUAL, label: 'Thủ công' },
+      { type: NodeType.TASK_BUSINESS_RULE, label: 'Quy tắc nghiệp vụ' },
+      { type: NodeType.TASK_AI, label: 'AI' },
     ],
+    icon: (
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        width='17'
+        height='18'
+        viewBox='0 0 17 18'
+        fill='none'
+      >
+        <path
+          d='M0 13.125V6.45833C1.0738e-07 3.81197 2.1453 1.66667 4.79167 1.66667V2.91667C2.83566 2.91667 1.25 4.50233 1.25 6.45833V13.125C1.25 15.081 2.83566 16.6667 4.79167 16.6667H11.4583C13.4143 16.6667 15 15.081 15 13.125V6.45833C15 4.50233 13.4143 2.91667 11.4583 2.91667V1.66667C14.1047 1.66667 16.25 3.81197 16.25 6.45833V13.125C16.25 15.7714 14.1047 17.9167 11.4583 17.9167H4.79167C2.1453 17.9167 1.07376e-07 15.7714 0 13.125Z'
+          fill='#24B0FB'
+        />
+        <path
+          d='M11.4583 7.91667C11.8035 7.91667 12.0833 8.19649 12.0833 8.54167C12.0833 8.88684 11.8035 9.16667 11.4583 9.16667H4.79167C4.44649 9.16667 4.16667 8.88684 4.16667 8.54167C4.16667 8.19649 4.44649 7.91667 4.79167 7.91667H11.4583Z'
+          fill='#24B0FB'
+        />
+        <path
+          d='M8.95833 11.25C9.30351 11.25 9.58333 11.5298 9.58333 11.875C9.58333 12.2202 9.30351 12.5 8.95833 12.5H4.79167C4.44649 12.5 4.16667 12.2202 4.16667 11.875C4.16667 11.5298 4.44649 11.25 4.79167 11.25H8.95833Z'
+          fill='#24B0FB'
+        />
+        <path
+          d='M10.8333 1.875C10.8333 1.52982 10.5535 1.25 10.2083 1.25H6.04167C5.69649 1.25 5.41667 1.52982 5.41667 1.875V2.70833C5.41667 3.05351 5.69649 3.33333 6.04167 3.33333H10.2083C10.5535 3.33333 10.8333 3.05351 10.8333 2.70833V1.875ZM12.0833 2.70833C12.0833 3.74387 11.2439 4.58333 10.2083 4.58333H6.04167C5.00613 4.58333 4.16667 3.74387 4.16667 2.70833V1.875C4.16667 0.839466 5.00613 0 6.04167 0H10.2083C11.2439 0 12.0833 0.839466 12.0833 1.875V2.70833Z'
+          fill='#24B0FB'
+        />
+      </svg>
+    ),
   },
   {
     name: 'Gateway',
@@ -44,35 +87,64 @@ const DEFAULT_CATEGORIES: NodeCategory[] = [
     nodes: [
       { type: NodeType.EXCLUSIVE_GATEWAY, label: 'Exclusive Gateway' },
       { type: NodeType.PARALLEL_GATEWAY, label: 'Parallel Gateway' },
-      { type: NodeType.PARALLEL_GATEWAY_JOIN, label: 'Parallel Join' },
+      { type: NodeType.EVENT_BASED_GATEWAY, label: 'Event Based Gateway' },
     ],
+    icon: (
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        width='18'
+        height='18'
+        viewBox='0 0 18 18'
+        fill='none'
+      >
+        <path
+          d='M16.6667 8.95833C16.6667 4.70114 13.2155 1.25 8.95833 1.25C4.70114 1.25 1.25 4.70114 1.25 8.95833C1.25 13.2155 4.70114 16.6667 8.95833 16.6667C13.2155 16.6667 16.6667 13.2155 16.6667 8.95833ZM17.9167 8.95833C17.9167 13.9059 13.9059 17.9167 8.95833 17.9167C4.01078 17.9167 0 13.9059 0 8.95833C0 4.01078 4.01078 0 8.95833 0C13.9059 0 17.9167 4.01078 17.9167 8.95833Z'
+          fill='#FFD67A'
+        />
+        <path
+          d='M13.3333 8.95833C13.3333 6.54209 11.3746 4.58333 8.95833 4.58333C6.54209 4.58333 4.58333 6.54209 4.58333 8.95833C4.58333 11.3746 6.54209 13.3333 8.95833 13.3333C11.3746 13.3333 13.3333 11.3746 13.3333 8.95833ZM14.5833 8.95833C14.5833 12.0649 12.0649 14.5833 8.95833 14.5833C5.85173 14.5833 3.33333 12.0649 3.33333 8.95833C3.33333 5.85173 5.85173 3.33333 8.95833 3.33333C12.0649 3.33333 14.5833 5.85173 14.5833 8.95833Z'
+          fill='#FFD67A'
+        />
+      </svg>
+    ),
   },
   {
-    name: 'Advanced',
-    isOpen: false,
+    name: 'End',
+    isOpen: true,
     nodes: [
-      { type: NodeType.SUBFLOW, label: 'Subflow' },
-      { type: NodeType.POOL, label: 'Pool / Region' },
-      { type: NodeType.NOTE, label: 'Note' },
+      { type: NodeType.END_EVENT_DEFAULT, label: 'Kết thúc' },
+      { type: NodeType.END_EVENT_SEND_SIGNAL, label: 'Gửi tín hiệu' },
     ],
+    icon: (
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        width='18'
+        height='18'
+        viewBox='0 0 18 18'
+        fill='none'
+      >
+        <path
+          fill-rule='evenodd'
+          clip-rule='evenodd'
+          d='M8.95833 17.9167C13.9059 17.9167 17.9167 13.9059 17.9167 8.95833C17.9167 4.01078 13.9059 0 8.95833 0C4.01078 0 0 4.01078 0 8.95833C0 13.9059 4.01078 17.9167 8.95833 17.9167ZM8.95833 2.49984C12.5251 2.49984 15.4166 5.39136 15.4167 8.95817C15.4167 12.525 12.5252 15.4165 8.95833 15.4165C5.3915 15.4165 2.5 12.525 2.5 8.95817C2.50004 5.39136 5.39153 2.49984 8.95833 2.49984Z'
+          fill='#FF6262'
+        />
+      </svg>
+    ),
   },
+  // {
+  //   name: 'Advanced',
+  //   isOpen: false,
+  //   nodes: [
+  //     { type: NodeType.SUBFLOW, label: 'Subflow' },
+  //     { type: NodeType.POOL, label: 'Pool / Region' },
+  //     { type: NodeType.NOTE, label: 'Note' },
+  //   ],
+  // },
 ]
 
-export function Toolbox({ categories, onCategoryToggle }: ToolboxProps) {
-  const [isOpen, setIsOpen] = useState(true)
-  const [localCategories, setLocalCategories] = useState<NodeCategory[]>(
-    categories || DEFAULT_CATEGORIES
-  )
-
-  const handleToggle = (index: number) => {
-    if (onCategoryToggle) {
-      onCategoryToggle(index)
-    } else {
-      setLocalCategories((prev) =>
-        prev.map((cat, i) => (i === index ? { ...cat, isOpen: !cat.isOpen } : cat))
-      )
-    }
-  }
+export function Toolbox() {
+  const [selectedCategory, setSelectedCategory] = useState<NodeCategory>()
 
   const handleDragStart = (e: React.DragEvent, nodeType: NodeType) => {
     e.dataTransfer.effectAllowed = 'move'
@@ -80,87 +152,54 @@ export function Toolbox({ categories, onCategoryToggle }: ToolboxProps) {
   }
 
   return (
-    <>
-      {isOpen && (
-        <aside className='w-64 h-full border border-border/50 bg-card/95 backdrop-blur-sm p-4 overflow-y-auto rounded-xl shadow-xl flex flex-col animate-in slide-in-from-left duration-200'>
-          <h2 className='mb-4 text-sm font-semibold uppercase tracking-wide shrink-0 text-foreground/80'>
-            Node Types
-          </h2>
-
-          <div className='space-y-2 flex-1 overflow-y-auto pr-1'>
-            {localCategories.map((category, index) => (
-              <div
-                key={category.name}
-                className='rounded-lg border border-border/50 overflow-hidden bg-background/50 backdrop-blur-sm'
-              >
-                <button
-                  onClick={() => handleToggle(index)}
-                  className='flex w-full items-center justify-between bg-muted/50 px-3 py-2.5 hover:bg-muted transition-all duration-150 group'
-                >
-                  <span className='text-sm font-medium group-hover:text-primary transition-colors'>
-                    {category.name}
-                  </span>
-                  {category.isOpen ? (
-                    <ChevronUp
-                      size={16}
-                      className='text-muted-foreground group-hover:text-primary transition-colors'
-                    />
-                  ) : (
-                    <ChevronDown
-                      size={16}
-                      className='text-muted-foreground group-hover:text-primary transition-colors'
-                    />
-                  )}
-                </button>
-
-                {category.isOpen && (
-                  <div className='space-y-1.5 border-t border-border/50 p-2 bg-background/30'>
-                    {category.nodes.map((node) => {
-                      const iconConfig = getIconConfig(node.type)
-                      const Icon = iconConfig.icon
-
-                      return (
-                        <div
-                          key={node.type}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, node.type)}
-                          className='flex items-center gap-2 rounded-lg bg-card/80 backdrop-blur-sm border border-border/50 px-3 py-2.5 text-xs font-medium cursor-move hover:bg-primary/10 hover:border-primary hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-150'
-                        >
-                          {typeof Icon === 'string' ? (
-                            <img src={Icon} alt={node.label} className='w-5 h-5' />
-                          ) : (
-                            <Icon size={18} style={{ color: iconConfig.color }} />
-                          )}
-                          <span>{node.label}</span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
+    <aside className='h-full border border-border/50 bg-card overflow-y-auto rounded-2xl shadow-xl flex'>
+      <div className='px-2.5 py-4 space-y-1 flex-1 overflow-y-auto flex flex-col items-center'>
+        {DEFAULT_CATEGORIES.map((category, index) => (
+          <div
+            key={`${category.name}-${index}`}
+            className='p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center'
+            onClick={() => setSelectedCategory(category)}
+          >
+            {category.icon}
           </div>
-        </aside>
-      )}
+        ))}
+        <div className='h-px w-6 bg-border my-4' />
+      </div>
+      {selectedCategory && (
+        <div className='min-w-[320px] border-l border-border'>
+          <div className='flex items-center justify-between px-4 py-3 border-b border-border p-4'>
+            <h2 className='text-base text-ink800 font-medium flex-1'>{selectedCategory?.name}</h2>
+            <button
+              onClick={() => setSelectedCategory(undefined)}
+              className='p-2 rounded-lg hover:bg-foreground/10'
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div className='p-4 space-y-1'>
+            {selectedCategory.nodes.map((node) => {
+              const iconConfig = getIconConfig(node.type)
+              const Icon = iconConfig.icon
 
-      {/* Floating Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className='absolute -right-2 top-1/2 -translate-y-1/2 z-30 w-6 h-16 bg-background/95 backdrop-blur-sm border border-border rounded-r-lg shadow-md hover:w-8 hover:bg-primary/10 hover:border-primary transition-all duration-200 group flex items-center justify-center'
-        title={isOpen ? 'Hide Toolbox' : 'Show Toolbox'}
-      >
-        {isOpen ? (
-          <ChevronLeft
-            size={14}
-            className='text-muted-foreground group-hover:text-primary transition-colors'
-          />
-        ) : (
-          <ChevronRight
-            size={14}
-            className='text-muted-foreground group-hover:text-primary transition-colors'
-          />
-        )}
-      </button>
-    </>
+              return (
+                <div
+                  key={node.type}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, node.type)}
+                  className='flex items-center gap-2 rounded-lg bg-card/80 backdrop-blur-sm p-3 font-medium cursor-move hover:bg-foreground/10 hover:border-primary hover:scale-[1.02] active:scale-95 transition-all duration-150'
+                >
+                  {typeof Icon === 'string' ? (
+                    <img src={Icon} alt={node.label} className='w-6 h-6' />
+                  ) : (
+                    <Icon size={24} style={{ color: iconConfig.color }} />
+                  )}
+                  <span className='text-sm font-medium text-ink800'>{node.label}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </aside>
   )
 }

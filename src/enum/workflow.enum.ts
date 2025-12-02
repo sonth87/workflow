@@ -1,18 +1,32 @@
 export enum NodeType {
-  START_EVENT = 'startEvent',
-  END_EVENT = 'endEvent',
+  START_EVENT_DEFAULT = 'startEventDefault',
+  START_EVENT_API = 'startEventApi',
+  START_EVENT_TIMER = 'startEventTimer',
+  START_EVENT_WEB = 'startEventWeb',
+  START_EVENT_RECEIVE_SIGNAL = 'startEventReceiveSignal',
 
-  TASK = 'task', // human task
-  SERVICE_TASK = 'serviceTask', // API, system task
-  NOTIFICATION = 'notification', // email/sms/slack
-  TIME_DELAY = 'timeDelay', // timer, wait
+  TASK_DEFAULT = 'taskDefault',
+  TASK_USER = 'taskUser',
+  TASK_SYSTEM = 'taskSystem',
+  TASK_SEND_NOTIFICATION = 'taskSendNotification',
+  TASK_SCRIPT = 'taskScript',
+  TASK_MANUAL = 'taskManual',
+  TASK_BUSINESS_RULE = 'taskBusinessRule',
+  TASK_AI = 'taskAi',
+
+  SERVICE_TASK = 'serviceTask',
+  NOTIFICATION = 'notification',
+  TIME_DELAY = 'timeDelay',
 
   EXCLUSIVE_GATEWAY = 'exclusiveGateway',
   PARALLEL_GATEWAY = 'parallelGateway',
   PARALLEL_GATEWAY_JOIN = 'parallelGatewayJoin',
+  EVENT_BASED_GATEWAY = 'eventBasedGateway',
+
+  END_EVENT_DEFAULT = 'endEventDefault',
+  END_EVENT_SEND_SIGNAL = 'endEventSendSignal',
 
   SUBFLOW = 'subflow',
-  
   POOL = 'pool',
   NOTE = 'note',
 }
