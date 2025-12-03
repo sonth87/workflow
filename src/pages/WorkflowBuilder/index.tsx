@@ -95,6 +95,7 @@ const initialEdges: Edge[] = [
   {
     id: 'e3-4',
     source: 'gateway-1',
+    sourceHandle: 'out-1',
     target: 'task-2',
     type: 'smooth',
     animated: true,
@@ -104,6 +105,7 @@ const initialEdges: Edge[] = [
     id: 'e3-5',
     source: 'gateway-1',
     target: 'task-3',
+    sourceHandle: 'out-2',
     type: 'smooth',
     animated: false,
     label: 'No',

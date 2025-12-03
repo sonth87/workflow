@@ -105,7 +105,7 @@ export function Canvas({
 
   return (
     <main
-      className='absolute inset-0 w-full h-full overflow-hidden bg-background'
+      className='absolute inset-0 w-full h-full overflow-hidden bg-whiteOpacity100'
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >

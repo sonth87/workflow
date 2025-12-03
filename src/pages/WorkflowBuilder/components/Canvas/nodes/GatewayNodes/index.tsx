@@ -8,8 +8,8 @@ export function ExclusiveGatewayNode({
   targetPosition = Position.Top,
 }: CustomNodeProps) {
   const isHorizontal = sourcePosition === Position.Right
-  const out1Position = isHorizontal ? Position.Top : Position.Right
-  const out2Position = isHorizontal ? Position.Bottom : Position.Left
+  const out1Position = isHorizontal ? Position.Top : Position.Left
+  const out2Position = isHorizontal ? Position.Bottom : Position.Right
 
   return (
     <>

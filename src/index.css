@@ -64,6 +64,8 @@
     --color-blackOpacity300: rgba(0, 0, 0, 0.2);
     --color-blackOpacity200: rgba(0, 0, 0, 0.1);
     --color-blackOpacity100: rgba(0, 0, 0, 0.05);
+
+    --color-whiteOpacity100: #F5F9FD;
 }
 
 :root.dark {
@@ -110,6 +112,7 @@
 
 
     --color-ink800: #fbfbfc;
+    --color-whiteOpacity100: #303841;
 }
 
 body {

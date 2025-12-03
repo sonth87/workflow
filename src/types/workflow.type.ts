@@ -11,11 +11,6 @@ export interface ApiConfig {
   auth?: 'service_account' | 'jwt' | 'none'
 }
 
-export interface DataMapping {
-  input?: string[]
-  output?: string[]
-}
-
 // Connection validation rules
 export interface ConnectionRule {
   // Maximum number of outgoing connections allowed
@@ -30,98 +25,130 @@ export interface ConnectionRule {
   requiresConnection?: boolean
 }
 
-export interface BaseNode extends Omit<Node, 'data'> {
+export interface BaseNode extends Node {
   id: string
   type: NodeType
   label: string
   position: Position
 
-  // Optional metadata
-  sla?: string
-  loop?: boolean
-  dataMapping?: DataMapping
-
   // Validation rules for connections
   connectionRules?: ConnectionRule
-  data: Record<string, unknown> & {
+}
+
+export type BaseConfig = Omit<BaseNode, 'data'>
+
+export interface TaskNode extends BaseConfig {
+  type: NodeType.TASK_DEFAULT
+  role?: RoleType | string
+  data: {
+    form?: {
+      fields: Array<{
+        key: string
+        label: string
+        type: 'text' | 'textarea' | 'number' | 'select' | 'date'
+        options?: string[]
+      }>
+    }
     label?: string
   }
 }
 
-export interface TaskNode extends BaseNode {
-  type: NodeType.TASK
-  role?: RoleType | string
-  form?: {
-    fields: Array<{
-      key: string
-      label: string
-      type: 'text' | 'textarea' | 'number' | 'select' | 'date'
-      options?: string[]
-    }>
+export interface ServiceTaskNode extends BaseConfig {
+  type: NodeType.SERVICE_TASK
+  data: {
+    api: ApiConfig
+    label?: string
   }
 }
 
-export interface ServiceTaskNode extends BaseNode {
-  type: NodeType.SERVICE_TASK
-  api: ApiConfig
-}
-
-export interface TimeDelayNode extends BaseNode {
+export interface TimeDelayNode extends BaseConfig {
   type: NodeType.TIME_DELAY
-  duration: string // "2h", "30m", "1d"
+  data: {
+    duration: string // "2h", "30m", "1d"
+    label?: string
+  }
 }
 
-export interface ExclusiveGatewayNode extends BaseNode {
+export interface ExclusiveGatewayNode extends BaseConfig {
   type: NodeType.EXCLUSIVE_GATEWAY
+  data: {
+    label?: string
+  }
 }
 
-export interface ParallelGatewayNode extends BaseNode {
+export interface ParallelGatewayNode extends BaseConfig {
   type: NodeType.PARALLEL_GATEWAY
+  data: {
+    label?: string
+  }
 }
 
-export interface ParallelGatewayJoinNode extends BaseNode {
+export interface ParallelGatewayJoinNode extends BaseConfig {
   type: NodeType.PARALLEL_GATEWAY_JOIN
+  data: {
+    label?: string
+  }
 }
 
-export interface SubflowNode extends BaseNode {
+export interface SubflowNode extends BaseConfig {
   type: NodeType.SUBFLOW
-  subflowId: string
+  data: {
+    label?: string
+    subflowId: string
+  }
 }
 
-export interface NotificationNode extends BaseNode {
+export interface NotificationNode extends BaseConfig {
   type: NodeType.NOTIFICATION
-  channel: NotificationChannel
-  template: string // template ID
+  data: {
+    label?: string
+    channel: NotificationChannel
+    template: string // template ID
+  }
 }
 
-export interface StartEventNode extends BaseNode {
-  type: NodeType.START_EVENT
+export interface StartEventNode extends BaseConfig {
+  type: NodeType.START_EVENT_DEFAULT
+  data: {
+    label?: string
+  }
 }
 
-export interface EndEventNode extends BaseNode {
-  type: NodeType.END_EVENT
+export interface EndEventNode extends BaseConfig {
+  type: NodeType.END_EVENT_DEFAULT
+  data: {
+    label?: string
+  }
 }
 
-export interface PoolNode extends BaseNode {
+export interface PoolNode extends BaseConfig {
   type: NodeType.POOL
-  layout: 'horizontal' | 'vertical' // horizontal: 1 row + many columns, vertical: 1 column + many rows
-  lanes: Array<{ id: string; label: string; size: number }> // size = width for horizontal, height for vertical
+  data: {
+    layout: 'horizontal' | 'vertical' // horizontal: 1 row + many columns, vertical: 1 column + many rows
+    lanes: Array<{ id: string; label: string; size: number }> // size = width for horizontal, height for vertical
+    label?: string
+  }
 }
 
-export interface NoteNode extends BaseNode {
+export interface NoteNode extends BaseConfig {
   type: NodeType.NOTE
-  content: string
-  color?: 'yellow' | 'blue' | 'green' | 'pink' | 'purple' | 'orange'
-  fontSize?: 'sm' | 'base' | 'lg'
+  data: {
+    label?: string
+    content: string
+    color?: 'yellow' | 'blue' | 'green' | 'pink' | 'purple' | 'orange'
+    fontSize?: 'sm' | 'base' | 'lg'
+  }
 }
 
 export interface WorkflowEdge {
   id?: string
-  source: string
-  target: string
-  sourceHandle?: string // For nodes with multiple output handles
-  targetHandle?: string // For nodes with multiple input handles
+  source: string // id node nguồn
+  sourceHandle?: string // id handle nguồn (out-1 hoặc out-2)
+
+  target: string // id node đích
+  targetHandle?: string // id handle input node B hoặc C
   condition?: string // Condition expression for conditional edges
+
   label?: string // Display label for the edge
 }
 

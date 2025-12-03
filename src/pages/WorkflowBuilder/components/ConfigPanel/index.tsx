@@ -19,7 +19,7 @@ export function ConfigPanel({ selectedNode }: ConfigPanelProps) {
     }
 
     switch (selectedNode.type) {
-      case NodeType.TASK:
+      case NodeType.TASK_DEFAULT:
         return <TaskConfig key={selectedNode.id} taskNode={selectedNode} />
       case NodeType.EXCLUSIVE_GATEWAY:
         return <GatewayConfig key={selectedNode.id} />
