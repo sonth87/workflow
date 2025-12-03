@@ -19,8 +19,8 @@ import { Header, type LayoutDirection } from './components/Header'
 import { Toolbar } from './components/Toolbar'
 import { Toolbox } from './components/Toolbox'
 import { ValidationPanel } from './components/ValidationPanel'
-import { getLayoutedElements } from './utils/layout'
 import { useFlowHistory } from './hooks/useFlowHistory'
+import { getLayoutedElements } from './utils/layout'
 
 const initialNodes: WorkflowNode[] = [
   {
@@ -170,7 +170,7 @@ export default function WorkflowBuilder() {
 
   const handleSave = () => {
     handleValidateWorkflow()
-    console.log('Save workflow:', workflowName)
+    console.log('Save workflow:', workflowName, nodes, edges)
     console.log('Validation errors:', validationErrors)
   }
 

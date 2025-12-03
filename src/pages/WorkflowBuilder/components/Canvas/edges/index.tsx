@@ -118,7 +118,7 @@ export function SmoothEdge({
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 autoFocus
-                className='px-2 py-1 text-xs border rounded bg-background focus:outline-none focus:ring-2 focus:ring-primary'
+                className='px-2 py-1 text-xs rounded bg-background focus:outline-none focus:ring-2 focus:ring-primaryA-500'
               />
             ) : (
               <div
@@ -126,7 +126,7 @@ export function SmoothEdge({
                   e.stopPropagation()
                   setIsEditing(true)
                 }}
-                className='px-2 py-1 text-xs bg-background border rounded cursor-pointer hover:bg-accent transition-colors'
+                className='px-2 py-1 text-xs bg-primaryA-200 text-primaryA-500 border rounded-full cursor-pointer hover:bg-accent transition-colors'
               >
                 {labelText}
               </div>

@@ -11,7 +11,7 @@ import {
   type EdgeChange,
   type NodeChange,
 } from '@xyflow/react'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { edgeTypes } from './edges'
 import { nodeTypes } from './nodes'
 
@@ -42,6 +42,7 @@ export function Canvas({
   onPaneClick,
 }: CanvasProps) {
   const { screenToFlowPosition } = useReactFlow()
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null)
 
   const handleConnect = useCallback(
     (connection: Connection) => {
@@ -103,6 +104,12 @@ export function Canvas({
     [screenToFlowPosition, onNodeDrop]
   )
 
+  useEffect(() => {
+    const handleClick = () => setContextMenu(null)
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [])
+
   return (
     <main
       className='absolute inset-0 w-full h-full overflow-hidden bg-whiteOpacity100'
@@ -136,9 +143,33 @@ export function Canvas({
           fitView
           minZoom={0.2}
           maxZoom={3}
+          onPaneContextMenu={(e) => {
+            e.preventDefault()
+            setContextMenu({
+              x: e.clientX,
+              y: e.clientY,
+            })
+          }}
         >
           <Background gap={15} />
         </ReactFlow>
+      )}
+      {contextMenu && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'fixed',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            background: '#fff',
+            border: '1px solid #ccc',
+            padding: 8,
+            borderRadius: 6,
+            zIndex: 999,
+          }}
+        >
+          <div>Context Menu</div>
+        </div>
       )}
     </main>
   )
