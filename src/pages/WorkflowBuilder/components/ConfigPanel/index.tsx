@@ -4,16 +4,17 @@ import { Settings, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import TaskConfig from './config/TaskConfig'
 import GatewayConfig from './config/GatewayConfig'
+import EdgeConfig from './config/EdgeConfig'
 
 interface ConfigPanelProps {
   selectedNode?: WorkflowNode
   selectedEdge?: WorkflowEdge
 }
 
-export function ConfigPanel({ selectedNode }: ConfigPanelProps) {
+export function ConfigPanel({ selectedNode, selectedEdge }: ConfigPanelProps) {
   const [isOpen, setIsOpen] = useState(true)
 
-  const renderConfigContent = () => {
+  const renderConfigNodeContent = () => {
     if (!selectedNode) {
       return <p className='text-xs text-muted-foreground'>Select a node to configure</p>
     }
@@ -32,6 +33,13 @@ export function ConfigPanel({ selectedNode }: ConfigPanelProps) {
     }
   }
 
+  const renderConfigEdgeContent = () => {
+    if (!selectedEdge) {
+      return <p className='text-xs text-muted-foreground'>Select an edge to configure</p>
+    }
+    return <EdgeConfig key={selectedEdge.id} edgeData={selectedEdge} />
+  }
+
   return (
     <>
       {isOpen && (
@@ -45,7 +53,12 @@ export function ConfigPanel({ selectedNode }: ConfigPanelProps) {
             </div>
           </div>
 
-          <div className='space-y-4 flex-1 overflow-y-auto pr-1'>{renderConfigContent()}</div>
+          {selectedNode && (
+            <div className='space-y-4 flex-1 overflow-y-auto pr-1'>{renderConfigNodeContent()}</div>
+          )}
+          {selectedEdge && (
+            <div className='space-y-4 flex-1 overflow-y-auto pr-1'>{renderConfigEdgeContent()}</div>
+          )}
         </aside>
       )}
 

@@ -1,5 +1,11 @@
-import type { Node } from '@xyflow/react'
-import type { HttpMethod, NodeType, NotificationChannel, RoleType } from '../enum/workflow.enum'
+import type { Edge, Node } from '@xyflow/react'
+import type {
+  EdgeType,
+  HttpMethod,
+  NodeType,
+  NotificationChannel,
+  RoleType,
+} from '../enum/workflow.enum'
 
 export interface Position {
   x: number
@@ -140,8 +146,8 @@ export interface NoteNode extends BaseConfig {
   }
 }
 
-export interface WorkflowEdge {
-  id?: string
+export interface WorkflowEdge extends Edge {
+  id: string
   source: string // id node nguồn
   sourceHandle?: string // id handle nguồn (out-1 hoặc out-2)
 
@@ -150,6 +156,7 @@ export interface WorkflowEdge {
   condition?: string // Condition expression for conditional edges
 
   label?: string // Display label for the edge
+  type?: EdgeType
 }
 
 // Validation result for connections

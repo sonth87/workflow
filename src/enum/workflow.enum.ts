@@ -1,3 +1,4 @@
+
 export enum NodeType {
   START_EVENT_DEFAULT = 'startEventDefault',
   START_EVENT_API = 'startEventApi',
@@ -53,4 +54,13 @@ export enum RoleType {
   DIRECTOR = 'Director',
   CUSTOMER = 'Customer',
   SYSTEM = 'System',
+}
+
+export enum EdgeType {
+  Default = 'default',
+  Straight = 'straight',
+  Step = 'step',
+  SmoothStep = 'smoothstep',
+  Bezier = 'bezier',
+  SimpleBezier = 'simplebezier',
 }

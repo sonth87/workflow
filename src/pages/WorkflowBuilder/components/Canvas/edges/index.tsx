@@ -1,11 +1,5 @@
-import {
-  BaseEdge,
-  EdgeLabelRenderer,
-  getSmoothStepPath,
-  useReactFlow,
-  type EdgeProps,
-} from '@xyflow/react'
-import { useState } from 'react'
+import { EdgeType } from '@/enum/workflow.enum'
+import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 
 export function SmoothEdge({
   id,
@@ -28,31 +22,6 @@ export function SmoothEdge({
     targetY,
     targetPosition,
   })
-
-  const { setEdges } = useReactFlow()
-  const [isEditing, setIsEditing] = useState(false)
-  const [labelText, setLabelText] = useState((label as string) || '')
-
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsEditing(true)
-  }
-
-  const handleBlur = () => {
-    setIsEditing(false)
-    setEdges((edges) =>
-      edges.map((edge) => (edge.id === id ? { ...edge, label: labelText } : edge))
-    )
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleBlur()
-    } else if (e.key === 'Escape') {
-      setLabelText((label as string) || '')
-      setIsEditing(false)
-    }
-  }
 
   return (
     <>
@@ -96,12 +65,11 @@ export function SmoothEdge({
         stroke='transparent'
         strokeWidth={20}
         style={{ cursor: 'pointer' }}
-        onDoubleClick={handleDoubleClick}
         pointerEvents='stroke'
       />
 
       <EdgeLabelRenderer>
-        {(labelText || isEditing) && (
+        {label && (
           <div
             style={{
               position: 'absolute',
@@ -110,27 +78,9 @@ export function SmoothEdge({
             }}
             className='nodrag nopan'
           >
-            {isEditing ? (
-              <input
-                type='text'
-                value={labelText}
-                onChange={(e) => setLabelText(e.target.value)}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                autoFocus
-                className='px-2 py-1 text-xs rounded bg-background focus:outline-none focus:ring-2 focus:ring-primaryA-500'
-              />
-            ) : (
-              <div
-                onDoubleClick={(e) => {
-                  e.stopPropagation()
-                  setIsEditing(true)
-                }}
-                className='px-2 py-1 text-xs bg-primaryA-200 text-primaryA-500 border rounded-full cursor-pointer hover:bg-accent transition-colors'
-              >
-                {labelText}
-              </div>
-            )}
+            <div className='px-2 py-1 text-xs bg-primaryA-200 text-primaryA-500 border rounded-full cursor-pointer hover:bg-accent transition-colors'>
+              {label}
+            </div>
           </div>
         )}
       </EdgeLabelRenderer>
@@ -139,5 +89,8 @@ export function SmoothEdge({
 }
 
 export const edgeTypes = {
-  smooth: SmoothEdge,
+  [EdgeType.SmoothStep]: SmoothEdge,
+  [EdgeType.Default]: SmoothEdge,
+  [EdgeType.Straight]: SmoothEdge,
+  [EdgeType.Bezier]: SmoothEdge,
 }

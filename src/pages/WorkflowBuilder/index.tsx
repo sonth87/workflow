@@ -1,7 +1,7 @@
 'use client'
 
-import { NodeType } from '@/enum/workflow.enum'
-import type { WorkflowNode } from '@/types/workflow.type'
+import { EdgeType, NodeType } from '@/enum/workflow.enum'
+import type { WorkflowEdge, WorkflowNode } from '@/types/workflow.type'
 import { validateWorkflow } from '@/utils/validation'
 import type { Connection, Edge, Node } from '@xyflow/react'
 import {
@@ -82,7 +82,7 @@ const initialEdges: Edge[] = [
     id: 'e1-2',
     source: 'start-1',
     target: 'task-1',
-    type: 'smooth',
+    type: EdgeType.SmoothStep,
     animated: true,
   },
   {
@@ -97,7 +97,7 @@ const initialEdges: Edge[] = [
     source: 'gateway-1',
     sourceHandle: 'out-1',
     target: 'task-2',
-    type: 'smooth',
+    type: EdgeType.SmoothStep,
     animated: true,
     label: 'Yes',
   },
@@ -106,7 +106,7 @@ const initialEdges: Edge[] = [
     source: 'gateway-1',
     target: 'task-3',
     sourceHandle: 'out-2',
-    type: 'smooth',
+    type: EdgeType.SmoothStep,
     animated: false,
     label: 'No',
   },
@@ -114,14 +114,14 @@ const initialEdges: Edge[] = [
     id: 'e4-6',
     source: 'task-2',
     target: 'end-1',
-    type: 'smooth',
+    type: EdgeType.SmoothStep,
     animated: false,
   },
   {
     id: 'e5-6',
     source: 'task-3',
     target: 'end-1',
-    type: 'smooth',
+    type: EdgeType.SmoothStep,
     animated: false,
   },
 ]
@@ -129,6 +129,7 @@ const initialEdges: Edge[] = [
 export default function WorkflowBuilder() {
   const [workflowName, setWorkflowName] = useState('Untitled Workflow')
   const [selectedNode, setSelectedNode] = useState<Node>()
+  const [selectedEdge, setSelectedEdge] = useState<Edge>()
   const { nodes, edges, setNodes, setEdges, redo, undo } = useFlowHistory(
     initialNodes,
     initialEdges
@@ -217,7 +218,7 @@ export default function WorkflowBuilder() {
         addEdge(
           {
             ...connection,
-            type: 'smooth',
+            type: EdgeType.SmoothStep,
             animated: true,
           },
           eds
@@ -229,14 +230,17 @@ export default function WorkflowBuilder() {
 
   const handleNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     setSelectedNode(node)
+    setSelectedEdge(undefined)
   }, [])
 
   const handleEdgeClick = useCallback((_event: React.MouseEvent, edge: Edge) => {
-    console.log('🚀 ~ edge:', edge)
+    setSelectedEdge(edge)
+    setSelectedNode(undefined)
   }, [])
 
   const handlePaneClick = useCallback(() => {
     setSelectedNode(undefined)
+    setSelectedEdge(undefined)
   }, [])
 
   const handleChangeLayoutDirection = (direction: LayoutDirection) => {
@@ -290,6 +294,11 @@ export default function WorkflowBuilder() {
         </div>
       )}
 
+      {selectedEdge && (
+        <div className='absolute top-24 right-4 bottom-20 z-10 h-[calc(100%-7rem)]'>
+          <ConfigPanel selectedEdge={selectedEdge as WorkflowEdge} />
+        </div>
+      )}
       <ValidationPanel
         errors={validationErrors}
         onClose={() => setValidationErrors([])}
