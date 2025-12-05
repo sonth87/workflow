@@ -257,8 +257,8 @@ export default function WorkflowBuilder() {
   }
 
   return (
-    <div className='relative h-screen w-screen bg-background overflow-hidden'>
-      <div className='absolute top-4 left-4 right-4 z-10'>
+    <div className='flex flex-col h-screen w-screen'>
+      <div className=''>
         <Header
           workflowName={workflowName}
           onWorkflowNameChange={setWorkflowName}
@@ -270,49 +270,56 @@ export default function WorkflowBuilder() {
           onLayoutDirectionChange={handleChangeLayoutDirection}
         />
       </div>
-
-      <div className='absolute top-24 left-4 bottom-20 z-10 h-[calc(100%-7rem)]'>
-        <Toolbox />
-      </div>
-
-      <Canvas
-        nodes={nodes}
-        edges={edges}
-        onNodeDrop={handleNodeDrop}
-        onNodesChange={(changes) => setNodes((nds) => applyNodeChanges(changes, nds))}
-        onEdgesChange={(changes) => setEdges((eds) => applyEdgeChanges(changes, eds))}
-        onConnect={handleConnect}
-        onNodeClick={handleNodeClick}
-        onEdgeClick={handleEdgeClick}
-        onPaneClick={handlePaneClick}
-        layoutDirection={layoutDirection}
-      />
-
-      {selectedNode && (
-        <div className='absolute top-24 right-4 bottom-20 z-10 h-[calc(100%-7rem)]'>
-          <ConfigPanel selectedNode={selectedNode as WorkflowNode} />
+      <div className='relative h-screen w-screen bg-background overflow-hidden'>
+        <div className='absolute top-4 left-4 bottom-20 z-10 h-[calc(100%-2rem)]'>
+          <Toolbox />
         </div>
-      )}
 
-      {selectedEdge && (
-        <div className='absolute top-24 right-4 bottom-20 z-10 h-[calc(100%-7rem)]'>
-          <ConfigPanel selectedEdge={selectedEdge as WorkflowEdge} />
+        <Canvas
+          nodes={nodes}
+          edges={edges}
+          onNodeDrop={handleNodeDrop}
+          onNodesChange={(changes) => setNodes((nds) => applyNodeChanges(changes, nds))}
+          onEdgesChange={(changes) => setEdges((eds) => applyEdgeChanges(changes, eds))}
+          onConnect={handleConnect}
+          onNodeClick={handleNodeClick}
+          onEdgeClick={handleEdgeClick}
+          onPaneClick={handlePaneClick}
+          layoutDirection={layoutDirection}
+        />
+
+        {selectedNode && (
+          <div className='absolute top-4 right-4 bottom-20 z-10 h-[calc(100%-2rem)]'>
+            <ConfigPanel
+              selectedNode={selectedNode as WorkflowNode}
+              onClose={() => setSelectedNode(undefined)}
+            />
+          </div>
+        )}
+
+        {selectedEdge && (
+          <div className='absolute top-4 right-4 bottom-20 z-10 h-[calc(100%-2rem)]'>
+            <ConfigPanel
+              selectedEdge={selectedEdge as WorkflowEdge}
+              onClose={() => setSelectedEdge(undefined)}
+            />
+          </div>
+        )}
+        <ValidationPanel
+          errors={validationErrors}
+          onClose={() => setValidationErrors([])}
+          onNodeSelect={(nodeId) => {
+            const node = nodes.find((n) => n.id === nodeId)
+            setSelectedNode(node)
+            if (node) {
+              fitView({ nodes: [node], duration: 300, padding: 0.3 })
+            }
+          }}
+        />
+
+        <div className='absolute bottom-4 left-1/2 -translate-x-1/2 z-10'>
+          <Toolbar onMenu={handleMenu} />
         </div>
-      )}
-      <ValidationPanel
-        errors={validationErrors}
-        onClose={() => setValidationErrors([])}
-        onNodeSelect={(nodeId) => {
-          const node = nodes.find((n) => n.id === nodeId)
-          setSelectedNode(node)
-          if (node) {
-            fitView({ nodes: [node], duration: 300, padding: 0.3 })
-          }
-        }}
-      />
-
-      <div className='absolute bottom-4 left-1/2 -translate-x-1/2 z-10'>
-        <Toolbar onMenu={handleMenu} />
       </div>
     </div>
   )

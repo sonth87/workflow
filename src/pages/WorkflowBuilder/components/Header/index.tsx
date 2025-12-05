@@ -37,7 +37,7 @@ export function Header({
   const { theme, setLightMode, setDarkMode, setSystemMode } = useTheme()
 
   return (
-    <header className='w-full border border-border bg-card p-3 shadow-md rounded-2xl'>
+    <header className='w-full bg-card p-3'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <div className=''>

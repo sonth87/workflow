@@ -28,7 +28,7 @@ export function Toolbox() {
       </div>
       {selectedCategory && (
         <div className='min-w-[320px] border-l border-border'>
-          <div className='flex items-center justify-between px-4 py-3 border-b border-border p-4'>
+          <div className='flex items-center justify-between px-4 py-3 border-b border-border'>
             <h2 className='text-base text-ink800 font-medium flex-1'>{selectedCategory?.name}</h2>
             <button
               onClick={() => setSelectedCategory(undefined)}
