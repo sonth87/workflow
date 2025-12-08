@@ -1,11 +1,6 @@
 import type { Edge, Node } from '@xyflow/react'
-import type {
-  EdgeType,
-  HttpMethod,
-  NodeType,
-  NotificationChannel,
-  RoleType,
-} from '../enum/workflow.enum'
+import type { CategoryType, EdgeType, HttpMethod, NodeType } from '../enum/workflow.enum'
+import type { InputComponent } from './dynamic-bpm.type'
 
 export interface Position {
   x: number
@@ -34,6 +29,7 @@ export interface ConnectionRule {
 export interface BaseNode extends Node {
   id: string
   type: NodeType
+  category_type: CategoryType
   label: string
   position: Position
 
@@ -43,107 +39,35 @@ export interface BaseNode extends Node {
 
 export type BaseConfig = Omit<BaseNode, 'data'>
 
+export interface CommonConfig {
+  category_type?: CategoryType
+  label?: string
+  nodeType: NodeType
+  form_configs?: {
+    fields: InputComponent[]
+  }
+}
+
+export type DynamicConfig = Record<string, unknown> & CommonConfig
+
 export interface TaskNode extends BaseConfig {
-  type: NodeType.TASK_DEFAULT
-  role?: RoleType | string
-  data: {
-    form?: {
-      fields: Array<{
-        key: string
-        label: string
-        type: 'text' | 'textarea' | 'number' | 'select' | 'date'
-        options?: string[]
-      }>
-    }
-    label?: string
-  }
+  category_type: CategoryType.TASK
+  data: DynamicConfig
 }
 
-export interface ServiceTaskNode extends BaseConfig {
-  type: NodeType.SERVICE_TASK
-  data: {
-    api: ApiConfig
-    label?: string
-  }
+export interface StartNode extends BaseConfig {
+  category_type: CategoryType.START
+  data: DynamicConfig
 }
 
-export interface TimeDelayNode extends BaseConfig {
-  type: NodeType.TIME_DELAY
-  data: {
-    duration: string // "2h", "30m", "1d"
-    label?: string
-  }
+export interface GateWayNode extends BaseConfig {
+  category_type: CategoryType.GATEWAY
+  data: DynamicConfig
 }
 
-export interface ExclusiveGatewayNode extends BaseConfig {
-  type: NodeType.EXCLUSIVE_GATEWAY
-  data: {
-    label?: string
-  }
-}
-
-export interface ParallelGatewayNode extends BaseConfig {
-  type: NodeType.PARALLEL_GATEWAY
-  data: {
-    label?: string
-  }
-}
-
-export interface ParallelGatewayJoinNode extends BaseConfig {
-  type: NodeType.PARALLEL_GATEWAY_JOIN
-  data: {
-    label?: string
-  }
-}
-
-export interface SubflowNode extends BaseConfig {
-  type: NodeType.SUBFLOW
-  data: {
-    label?: string
-    subflowId: string
-  }
-}
-
-export interface NotificationNode extends BaseConfig {
-  type: NodeType.NOTIFICATION
-  data: {
-    label?: string
-    channel: NotificationChannel
-    template: string // template ID
-  }
-}
-
-export interface StartEventNode extends BaseConfig {
-  type: NodeType.START_EVENT_DEFAULT
-  data: {
-    label?: string
-  }
-}
-
-export interface EndEventNode extends BaseConfig {
-  type: NodeType.END_EVENT_DEFAULT
-  data: {
-    label?: string
-  }
-}
-
-export interface PoolNode extends BaseConfig {
-  type: NodeType.POOL
-  data: {
-    layout: 'horizontal' | 'vertical' // horizontal: 1 row + many columns, vertical: 1 column + many rows
-    lanes: Array<{ id: string; label: string; size: number }> // size = width for horizontal, height for vertical
-    label?: string
-  }
-}
-
-export interface NoteNode extends BaseConfig {
-  type: NodeType.NOTE
-  data: {
-    label?: string
-    content: string
-    color?: 'yellow' | 'blue' | 'green' | 'pink' | 'purple' | 'orange'
-    fontSize?: 'sm' | 'base' | 'lg'
-  }
+export interface EndNode extends BaseConfig {
+  category_type: CategoryType.END
+  data: DynamicConfig
 }
 
 export interface WorkflowEdge extends Edge {
@@ -171,19 +95,7 @@ export type NodeValidationRules = {
   [K in NodeType]?: ConnectionRule
 }
 
-export type WorkflowNode =
-  | StartEventNode
-  | EndEventNode
-  | TaskNode
-  | ServiceTaskNode
-  | NotificationNode
-  | TimeDelayNode
-  | ExclusiveGatewayNode
-  | ParallelGatewayNode
-  | ParallelGatewayJoinNode
-  | SubflowNode
-  | PoolNode
-  | NoteNode
+export type WorkflowNode = StartNode | EndNode | TaskNode | GateWayNode
 
 export interface WorkflowDefinition {
   id: string

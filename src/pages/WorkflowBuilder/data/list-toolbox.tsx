@@ -1,5 +1,4 @@
-import { NodeType } from '@/enum/workflow.enum'
-
+import { CategoryType, NodeType } from '@/enum/workflow.enum'
 export interface NodeItem {
   type: NodeType
   label: string
@@ -10,18 +9,20 @@ export interface NodeCategory {
   isOpen: boolean
   nodes: NodeItem[]
   icon?: React.ReactNode
+  categoryType?: CategoryType
 }
 
 export const NODES_BY_CATEGORIES: NodeCategory[] = [
   {
-    name: 'Event',
+    name: 'Start',
     isOpen: true,
+    categoryType: CategoryType.START,
     nodes: [
-      { type: NodeType.START_EVENT_DEFAULT, label: 'Mặc định' },
-      { type: NodeType.START_EVENT_API, label: 'API' },
-      { type: NodeType.START_EVENT_TIMER, label: 'Hẹn giờ' },
-      { type: NodeType.START_EVENT_WEB, label: 'Web' },
-      { type: NodeType.START_EVENT_RECEIVE_SIGNAL, label: 'Nhận tín hiệu' },
+      // { type: NodeType.START_EVENT_DEFAULT, label: 'Mặc định' },
+      // { type: NodeType.START_EVENT_API, label: 'API' },
+      // { type: NodeType.START_EVENT_TIMER, label: 'Hẹn giờ' },
+      // { type: NodeType.START_EVENT_WEB, label: 'Web' },
+      // { type: NodeType.START_EVENT_RECEIVE_SIGNAL, label: 'Nhận tín hiệu' },
     ],
     icon: (
       <svg
@@ -41,15 +42,16 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
   {
     name: 'Task',
     isOpen: true,
+    categoryType: CategoryType.TASK,
     nodes: [
-      { type: NodeType.TASK_DEFAULT, label: 'Mặc định' },
-      { type: NodeType.TASK_USER, label: 'Người dùng' },
-      { type: NodeType.TASK_SYSTEM, label: 'Hệ thống' },
-      { type: NodeType.TASK_SEND_NOTIFICATION, label: 'Gửi thông báo' },
-      { type: NodeType.TASK_SCRIPT, label: 'Script' },
-      { type: NodeType.TASK_MANUAL, label: 'Thủ công' },
-      { type: NodeType.TASK_BUSINESS_RULE, label: 'Quy tắc nghiệp vụ' },
-      { type: NodeType.TASK_AI, label: 'AI' },
+      // { type: NodeType.TASK_DEFAULT, label: 'Mặc định' },
+      // { type: NodeType.TASK_USER, label: 'Người dùng' },
+      // { type: NodeType.TASK_SYSTEM, label: 'Hệ thống' },
+      // { type: NodeType.TASK_SEND_NOTIFICATION, label: 'Gửi thông báo' },
+      // { type: NodeType.TASK_SCRIPT, label: 'Script' },
+      // { type: NodeType.TASK_MANUAL, label: 'Thủ công' },
+      // { type: NodeType.TASK_BUSINESS_RULE, label: 'Quy tắc nghiệp vụ' },
+      // { type: NodeType.TASK_AI, label: 'AI' },
     ],
     icon: (
       <svg
@@ -81,10 +83,11 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
   {
     name: 'Gateway',
     isOpen: false,
+    categoryType: CategoryType.GATEWAY,
     nodes: [
-      { type: NodeType.EXCLUSIVE_GATEWAY, label: 'Exclusive Gateway' },
-      { type: NodeType.PARALLEL_GATEWAY, label: 'Parallel Gateway' },
-      { type: NodeType.EVENT_BASED_GATEWAY, label: 'Event Based Gateway' },
+      // { type: NodeType.EXCLUSIVE_GATEWAY, label: 'Exclusive Gateway' },
+      // { type: NodeType.PARALLEL_GATEWAY, label: 'Parallel Gateway' },
+      // { type: NodeType.EVENT_BASED_GATEWAY, label: 'Event Based Gateway' },
     ],
     icon: (
       <svg
@@ -108,9 +111,10 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
   {
     name: 'End',
     isOpen: true,
+    categoryType: CategoryType.END,
     nodes: [
-      { type: NodeType.END_EVENT_DEFAULT, label: 'Kết thúc' },
-      { type: NodeType.END_EVENT_SEND_SIGNAL, label: 'Gửi tín hiệu' },
+      // { type: NodeType.END_EVENT_DEFAULT, label: 'Kết thúc' },
+      // { type: NodeType.END_EVENT_SEND_SIGNAL, label: 'Gửi tín hiệu' },
     ],
     icon: (
       <svg
@@ -121,9 +125,11 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
         fill='none'
       >
         <path
-          fill-rule='evenodd'
-          clip-rule='evenodd'
-          d='M8.95833 17.9167C13.9059 17.9167 17.9167 13.9059 17.9167 8.95833C17.9167 4.01078 13.9059 0 8.95833 0C4.01078 0 0 4.01078 0 8.95833C0 13.9059 4.01078 17.9167 8.95833 17.9167ZM8.95833 2.49984C12.5251 2.49984 15.4166 5.39136 15.4167 8.95817C15.4167 12.525 12.5252 15.4165 8.95833 15.4165C5.3915 15.4165 2.5 12.525 2.5 8.95817C2.50004 5.39136 5.39153 2.49984 8.95833 2.49984Z'
+          d='M16.6667 8.95833C16.6667 4.70114 13.2155 1.25 8.95833 1.25C4.70114 1.25 1.25 4.70114 1.25 8.95833C1.25 13.2155 4.70114 16.6667 8.95833 16.6667C13.2155 16.6667 16.6667 13.2155 16.6667 8.95833ZM17.9167 8.95833C17.9167 13.9059 13.9059 17.9167 8.95833 17.9167C4.01078 17.9167 0 13.9059 0 8.95833C0 4.01078 4.01078 0 8.95833 0C13.9059 0 17.9167 4.01078 17.9167 8.95833Z'
+          fill='#FF6262'
+        />
+        <path
+          d='M14.5833 8.95833C14.5833 12.0649 12.0649 14.5833 8.95833 14.5833C5.85173 14.5833 3.33333 12.0649 3.33333 8.95833C3.33333 5.85173 5.85173 3.33333 8.95833 3.33333C12.0649 3.33333 14.5833 5.85173 14.5833 8.95833Z'
           fill='#FF6262'
         />
       </svg>

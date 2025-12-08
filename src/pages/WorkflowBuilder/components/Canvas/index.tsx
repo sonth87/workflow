@@ -19,7 +19,7 @@ interface CanvasProps {
   children?: React.ReactNode
   nodes?: Node[]
   edges?: Edge[]
-  onNodeDrop?: (nodeType: string, position: { x: number; y: number }) => void
+  onNodeDrop?: (nodeType: NodeType, position: { x: number; y: number }) => void
   onNodesChange?: (changes: NodeChange<Node>[]) => void
   onEdgesChange?: (changes: EdgeChange<Edge>[]) => void
   onConnect?: (connection: Connection) => void
@@ -99,7 +99,7 @@ export function Canvas({
         y: position.y - 35,
       }
 
-      onNodeDrop?.(nodeType, centeredPosition)
+      onNodeDrop?.(nodeType as NodeType, centeredPosition)
     },
     [screenToFlowPosition, onNodeDrop]
   )

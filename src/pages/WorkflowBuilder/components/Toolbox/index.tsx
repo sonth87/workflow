@@ -1,25 +1,75 @@
-import { NodeType } from '@/enum/workflow.enum'
+import { CategoryType, NodeType } from '@/enum/workflow.enum'
 import { getIconConfig } from '@/pages/WorkflowBuilder/hooks/useGetIconByType'
 import { X } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { type NodeCategory, NODES_BY_CATEGORIES } from '../../data/list-toolbox'
+import { type DynamicWorkflowDefinition } from '@/types/dynamic-bpm.type'
 
-export function Toolbox() {
-  const [selectedCategory, setSelectedCategory] = useState<NodeCategory>()
+interface Props {
+  dynamicBpm?: DynamicWorkflowDefinition
+}
+
+export function Toolbox(props: Props) {
+  const { dynamicBpm } = props
+  const [selectedCategoryType, setSelectedCategoryType] = useState<CategoryType>()
 
   const handleDragStart = (e: React.DragEvent, nodeType: NodeType) => {
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.setData('application/reactflow', nodeType)
   }
 
+  const builderCategories = useMemo(() => {
+    if (!dynamicBpm) return NODES_BY_CATEGORIES
+
+    const categories = NODES_BY_CATEGORIES.map((category) => ({
+      ...category,
+      nodes: [...category.nodes],
+    }))
+
+    const ensureCategory = (categoryType: CategoryType): NodeCategory => {
+      let existing = categories.find((cat) => cat.categoryType === categoryType)
+      if (!existing) {
+        existing = {
+          name: categoryType,
+          isOpen: true,
+          categoryType,
+          nodes: [],
+        }
+        categories.push(existing)
+      }
+      return existing
+    }
+
+    dynamicBpm.nodes?.forEach((node) => {
+      const normalizedType = (Object.values(CategoryType) as string[]).includes(
+        node.category_type as string
+      )
+        ? (node.category_type as CategoryType)
+        : CategoryType.OTHER
+
+      const targetCategory = ensureCategory(normalizedType)
+
+      if (!targetCategory.nodes.some((item) => item?.type === node?.data?.nodeType)) {
+        targetCategory.nodes.push({ type: node.data.nodeType, label: node.label })
+      }
+    })
+
+    return categories
+  }, [dynamicBpm])
+
+  const selectedCategory = useMemo(
+    () => builderCategories.find((category) => category.categoryType === selectedCategoryType),
+    [builderCategories, selectedCategoryType]
+  )
+
   return (
     <aside className='h-full border border-border/50 bg-card overflow-y-auto rounded-2xl shadow-xl flex'>
       <div className='px-2.5 py-4 space-y-1 flex-1 overflow-y-auto flex flex-col items-center'>
-        {NODES_BY_CATEGORIES.map((category, index) => (
+        {builderCategories.map((category, index) => (
           <div
             key={`${category.name}-${index}`}
             className='p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center'
-            onClick={() => setSelectedCategory(category)}
+            onClick={() => setSelectedCategoryType(category.categoryType)}
           >
             {category.icon}
           </div>
@@ -31,7 +81,7 @@ export function Toolbox() {
           <div className='flex items-center justify-between px-4 py-3 border-b border-border'>
             <h2 className='text-base text-ink800 font-medium flex-1'>{selectedCategory?.name}</h2>
             <button
-              onClick={() => setSelectedCategory(undefined)}
+              onClick={() => setSelectedCategoryType(undefined)}
               className='p-2 rounded-lg hover:bg-foreground/10'
             >
               <X size={16} />

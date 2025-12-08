@@ -1,4 +1,3 @@
-
 export enum NodeType {
   START_EVENT_DEFAULT = 'startEventDefault',
   START_EVENT_API = 'startEventApi',
@@ -63,4 +62,29 @@ export enum EdgeType {
   SmoothStep = 'smoothstep',
   Bezier = 'bezier',
   SimpleBezier = 'simplebezier',
+}
+
+export enum CategoryType {
+  START = 'start',
+  END = 'end',
+  TASK = 'task',
+  GATEWAY = 'gateway',
+  SUBFLOW = 'subflow',
+  OTHER = 'other',
+}
+
+export enum FieldType {
+  TEXT = 'text',
+  NUMBER = 'number',
+  OPTION = 'option',
+  DATE = 'date',
+  DATE_TIME = 'date_time',
+  TIME = 'time',
+  FILE = 'file',
+  EMAIL = 'email',
+  IMAGE = 'image',
+  TEXTAREA = 'textarea',
+  RADIO = 'radio',
+  CHECKBOX = 'checkbox',
+  GROUP_FIELD = 'group_field',
 }

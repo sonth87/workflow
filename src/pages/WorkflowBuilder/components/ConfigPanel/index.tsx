@@ -1,9 +1,10 @@
-import { NodeType } from '@/enum/workflow.enum'
+import { CategoryType } from '@/enum/workflow.enum'
 import type { WorkflowEdge, WorkflowNode } from '@/types/workflow.type'
 import { X } from 'lucide-react'
 import EdgeConfig from './config/EdgeConfig'
 import GatewayConfig from './config/GatewayConfig'
 import TaskConfig from './config/TaskConfig'
+import { memo } from 'react'
 
 interface ConfigPanelProps {
   selectedNode?: WorkflowNode
@@ -11,16 +12,16 @@ interface ConfigPanelProps {
   onClose?: () => void
 }
 
-export function ConfigPanel({ selectedNode, selectedEdge, onClose }: ConfigPanelProps) {
+function ConfigPanel({ selectedNode, selectedEdge, onClose }: ConfigPanelProps) {
   const renderConfigNodeContent = () => {
     if (!selectedNode) {
       return <p className='text-xs text-muted-foreground'>Select a node to configure</p>
     }
 
-    switch (selectedNode.type) {
-      case NodeType.TASK_DEFAULT:
+    switch (selectedNode?.category_type) {
+      case CategoryType.TASK:
         return <TaskConfig key={selectedNode.id} taskNode={selectedNode} />
-      case NodeType.EXCLUSIVE_GATEWAY:
+      case CategoryType.GATEWAY:
         return <GatewayConfig key={selectedNode.id} />
       default:
         return (
@@ -60,3 +61,5 @@ export function ConfigPanel({ selectedNode, selectedEdge, onClose }: ConfigPanel
     </aside>
   )
 }
+
+export default memo(ConfigPanel)

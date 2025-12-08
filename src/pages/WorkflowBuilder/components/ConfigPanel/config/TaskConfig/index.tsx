@@ -1,3 +1,4 @@
+import useBuildDefaultValue from '@/pages/WorkflowBuilder/hooks/useBuildDefaultValue'
 import { useUpdateConfigFlow } from '@/pages/WorkflowBuilder/hooks/useUpdateConfigFlow'
 import type { TaskNode } from '@/types/workflow.type'
 import { useEffect } from 'react'
@@ -9,8 +10,12 @@ interface Props {
 
 export default function TaskConfig({ taskNode }: Props) {
   const { updateNode } = useUpdateConfigFlow()
+  const defaultValues = useBuildDefaultValue({
+    fields: taskNode.data?.form_configs?.fields || [],
+    responseData: taskNode.data,
+  })
   const methods = useForm({
-    defaultValues: { ...taskNode.data },
+    defaultValues,
   })
 
   useEffect(() => {

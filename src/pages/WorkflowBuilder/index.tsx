@@ -1,7 +1,7 @@
 'use client'
 
 import { EdgeType, NodeType } from '@/enum/workflow.enum'
-import type { WorkflowEdge, WorkflowNode } from '@/types/workflow.type'
+import type { BaseNode, WorkflowEdge, WorkflowNode } from '@/types/workflow.type'
 import { validateWorkflow } from '@/utils/validation'
 import type { Connection, Edge, Node } from '@xyflow/react'
 import {
@@ -14,126 +14,25 @@ import {
 } from '@xyflow/react'
 import { useCallback, useState } from 'react'
 import { Canvas } from './components/Canvas'
-import { ConfigPanel } from './components/ConfigPanel'
+import ConfigPanel from './components/ConfigPanel'
 import { Header, type LayoutDirection } from './components/Header'
 import { Toolbar } from './components/Toolbar'
 import { Toolbox } from './components/Toolbox'
 import { ValidationPanel } from './components/ValidationPanel'
 import { useFlowHistory } from './hooks/useFlowHistory'
 import { getLayoutedElements } from './utils/layout'
+import type { DynamicWorkflowDefinition } from '@/types/dynamic-bpm.type'
 
-const initialNodes: WorkflowNode[] = [
-  {
-    id: 'start-1',
-    type: NodeType.START_EVENT_DEFAULT,
-    label: 'Start',
-    position: { x: 250, y: 50 },
-    sourcePosition: Position.Bottom,
-    data: { label: 'Start' },
-  },
-  {
-    id: 'task-1',
-    type: NodeType.TASK_DEFAULT,
-    label: 'Process Request',
-    position: { x: 200, y: 150 },
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
-    data: { label: 'Process Request' },
-  },
-  {
-    id: 'gateway-1',
-    type: NodeType.EXCLUSIVE_GATEWAY,
-    label: 'Approved?',
-    position: { x: 225, y: 250 },
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
-    data: { label: 'Approved?' },
-  },
-  {
-    id: 'task-2',
-    type: NodeType.TASK_DEFAULT,
-    label: 'Send Approval',
-    position: { x: 100, y: 350 },
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
-    data: { label: 'Send Approval' },
-  },
-  {
-    id: 'task-3',
-    type: NodeType.TASK_DEFAULT,
-    label: 'Send Rejection',
-    position: { x: 300, y: 350 },
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
-    data: { label: 'Send Rejection' },
-  },
-  {
-    id: 'end-1',
-    type: NodeType.END_EVENT_DEFAULT,
-    label: 'End',
-    position: { x: 225, y: 450 },
-    targetPosition: Position.Top,
-    data: { label: 'End' },
-  },
-]
+interface Props {
+  dynamicBpm?: DynamicWorkflowDefinition
+}
 
-const initialEdges: Edge[] = [
-  {
-    id: 'e1-2',
-    source: 'start-1',
-    target: 'task-1',
-    type: EdgeType.SmoothStep,
-    animated: true,
-  },
-  {
-    id: 'e2-3',
-    source: 'task-1',
-    target: 'gateway-1',
-    type: 'smooth',
-    animated: true,
-  },
-  {
-    id: 'e3-4',
-    source: 'gateway-1',
-    sourceHandle: 'out-1',
-    target: 'task-2',
-    type: EdgeType.SmoothStep,
-    animated: true,
-    label: 'Yes',
-  },
-  {
-    id: 'e3-5',
-    source: 'gateway-1',
-    target: 'task-3',
-    sourceHandle: 'out-2',
-    type: EdgeType.SmoothStep,
-    animated: false,
-    label: 'No',
-  },
-  {
-    id: 'e4-6',
-    source: 'task-2',
-    target: 'end-1',
-    type: EdgeType.SmoothStep,
-    animated: false,
-  },
-  {
-    id: 'e5-6',
-    source: 'task-3',
-    target: 'end-1',
-    type: EdgeType.SmoothStep,
-    animated: false,
-  },
-]
-
-export default function WorkflowBuilder() {
+export default function WorkflowBuilder(props: Props) {
+  const { dynamicBpm } = props
   const [workflowName, setWorkflowName] = useState('Untitled Workflow')
   const [selectedNode, setSelectedNode] = useState<Node>()
   const [selectedEdge, setSelectedEdge] = useState<Edge>()
-  const { nodes, edges, setNodes, setEdges, redo, undo } = useFlowHistory(
-    initialNodes,
-    initialEdges
-  )
+  const { nodes, edges, setNodes, setEdges, redo, undo } = useFlowHistory([], [])
   const [layoutDirection, setLayoutDirection] = useState<LayoutDirection>('vertical')
   const [validationErrors, setValidationErrors] = useState<
     Array<{ nodeId: string; message: string; type: 'error' | 'warning' }>
@@ -179,35 +78,22 @@ export default function WorkflowBuilder() {
     console.log('Menu options')
   }
 
-  const handleNodeDrop = (nodeType: string, position: { x: number; y: number }) => {
-    const isPool = nodeType === 'pool'
-    const isNote = nodeType === 'note'
+  const handleNodeDrop = (nodeType: NodeType, position: { x: number; y: number }) => {
+    const nodeConfig = dynamicBpm?.nodes?.find((n) => n.data?.nodeType === nodeType)
 
-    const newNode: Node = {
+    const newNode: BaseNode = {
       id: `${nodeType}-${Date.now()}`,
       type: nodeType,
-      data: isPool
-        ? {
-            label: 'Pool',
-            rows: [{ id: '1', label: 'Lane 1', height: 150 }],
-            columns: [{ id: '1', label: 'Phase 1', width: 400 }],
-          }
-        : isNote
-        ? {
-            label: 'Note',
-            content: 'Double click to edit note...',
-            color: 'yellow',
-            fontSize: 'base',
-          }
-        : { label: nodeType },
+      data: {
+        category_type: nodeConfig?.category_type!,
+        label: nodeConfig?.data?.label || nodeConfig?.label || 'New Node',
+        ...nodeConfig?.data,
+      },
       position,
+      category_type: nodeConfig?.category_type!,
+      label: nodeConfig?.label!,
       sourcePosition: layoutDirection === 'vertical' ? Position.Bottom : Position.Right,
       targetPosition: layoutDirection === 'vertical' ? Position.Top : Position.Left,
-      ...(isPool && {
-        style: { zIndex: -1 },
-        draggable: true,
-        selectable: true,
-      }),
     }
     setNodes((nds) => [...nds, newNode])
   }
@@ -272,7 +158,7 @@ export default function WorkflowBuilder() {
       </div>
       <div className='relative h-screen w-screen bg-background overflow-hidden'>
         <div className='absolute top-4 left-4 bottom-20 z-10 h-[calc(100%-2rem)]'>
-          <Toolbox />
+          <Toolbox dynamicBpm={dynamicBpm} />
         </div>
 
         <Canvas

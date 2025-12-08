@@ -38,9 +38,7 @@ export default function BaseNode(props: Props) {
                 <Icon size={18} style={{ color: iconConfig.color }} />
               </div>
             ) : null}
-            <span className='text-sm font-semibold text-foreground truncate'>
-              {iconConfig.label}
-            </span>
+            <span className='text-sm font-semibold text-foreground truncate'>{data?.label}</span>
           </div>
 
           <button
