@@ -8,7 +8,7 @@ import {
   SubflowNode,
 } from './TaskNodes'
 import { ExclusiveGatewayNode, ParallelGatewayNode, ParallelGatewayJoinNode } from './GatewayNodes'
-import { PoolNode } from './PoolNode'
+import PoolNode from './PoolNode'
 import { NoteNode } from './NoteNode'
 import BaseNode from './BaseNode'
 import type { Position } from '@xyflow/react'

@@ -4,11 +4,11 @@ import type { ConnectionRule, NodeValidationRules } from '@/types/workflow.type'
 // Default validation rules for each node type
 export const DEFAULT_VALIDATION_RULES: NodeValidationRules = {
   // Start Event: Only 1 outgoing connection, no incoming
-  [NodeType.START_EVENT]: {
+  [NodeType.START_EVENT_DEFAULT]: {
     maxOutputConnections: 1,
     maxInputConnections: 0,
     allowedTargets: [
-      NodeType.TASK,
+      NodeType.TASK_DEFAULT,
       NodeType.SERVICE_TASK,
       NodeType.NOTIFICATION,
       NodeType.TIME_DELAY,
@@ -18,14 +18,14 @@ export const DEFAULT_VALIDATION_RULES: NodeValidationRules = {
   },
 
   // End Event: Only incoming connections, no outgoing
-  [NodeType.END_EVENT]: {
+  [NodeType.END_EVENT_DEFAULT]: {
     maxOutputConnections: 0,
     maxInputConnections: undefined, // No limit
     requiresConnection: true,
   },
 
   // Task: 1 input, 1 output
-  [NodeType.TASK]: {
+  [NodeType.TASK_DEFAULT]: {
     maxOutputConnections: 1,
     maxInputConnections: 1,
   },
@@ -178,7 +178,10 @@ export function validateWorkflow(
     }
 
     // Check max connections
-    if (rules.maxOutputConnections !== undefined && outgoingConnections > rules.maxOutputConnections) {
+    if (
+      rules.maxOutputConnections !== undefined &&
+      outgoingConnections > rules.maxOutputConnections
+    ) {
       errors.push({
         nodeId: node.id,
         message: `Too many outgoing connections (max: ${rules.maxOutputConnections})`,
@@ -186,7 +189,10 @@ export function validateWorkflow(
       })
     }
 
-    if (rules.maxInputConnections !== undefined && incomingConnections > rules.maxInputConnections) {
+    if (
+      rules.maxInputConnections !== undefined &&
+      incomingConnections > rules.maxInputConnections
+    ) {
       errors.push({
         nodeId: node.id,
         message: `Too many incoming connections (max: ${rules.maxInputConnections})`,
