@@ -22,6 +22,7 @@ import {
 } from "./CustomNodes";
 import BaseNode from "./BaseNode";
 import type { Position } from "@xyflow/react";
+import type { NodeVisualConfig } from "@/core/types/base.types";
 
 // Export shared styles
 export { nodeStyle, handleStyle } from "./styles";
@@ -29,7 +30,11 @@ export { nodeStyle, handleStyle } from "./styles";
 export interface CustomNodeProps {
   id: string;
   type?: NodeType;
-  data: { label: string };
+  data: {
+    label: string;
+    visualConfig?: NodeVisualConfig;
+    [key: string]: unknown;
+  };
   isConnecting?: boolean;
   selected?: boolean;
   sourcePosition?: Position;
@@ -123,7 +128,7 @@ export const nodeTypes = {
   [NodeType.SUBFLOW]: wrapWithBaseNode(SubflowNode, NodeType.SUBFLOW),
   [NodeType.POOL]: PoolNode,
   [NodeType.NOTE]: NoteNode,
-  
+
   // Custom plugin nodes
   aiAssistant: AIAssistantNode,
   dataProcessor: DataProcessorNode,

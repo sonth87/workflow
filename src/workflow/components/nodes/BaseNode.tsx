@@ -4,7 +4,9 @@ import { cx } from "@/utils/cx";
 import { getIconConfig } from "@/workflow/utils/iconConfig";
 import { NodeType } from "@/enum/workflow.enum";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import type { NodeVisualConfig } from "@/core/types/base.types";
 
+// Deprecated: Use NodeVisualConfig from core types instead
 export interface NodeColorConfig {
   backgroundColor?: string;
   borderColor?: string;
@@ -19,27 +21,82 @@ export interface Props extends CustomNodeProps {
   children?: React.ReactNode;
   type?: NodeType;
   showHeader?: boolean;
-  colorConfig?: NodeColorConfig;
+  colorConfig?: NodeColorConfig; // Deprecated
+  visualConfig?: NodeVisualConfig; // New: Use this instead
+}
+
+/**
+ * Convert border style to CSS border style string
+ */
+function getBorderStyleValue(
+  style?: "solid" | "dashed" | "dotted" | "double"
+): string {
+  switch (style) {
+    case "dashed":
+      return "2px dashed";
+    case "dotted":
+      return "2px dotted";
+    case "double":
+      return "3px double";
+    case "solid":
+    default:
+      return "2px solid";
+  }
 }
 
 export default function BaseNode(props: Props) {
-  const { children, type, data, showHeader = true, colorConfig } = props;
+  const {
+    children,
+    type,
+    data,
+    showHeader = true,
+    colorConfig,
+    visualConfig,
+  } = props;
   const [isExpanded, setIsExpanded] = useState(true);
 
   const iconConfig = type ? getIconConfig(type) : null;
   const Icon = iconConfig?.icon;
 
-  // Build dynamic styles
-  const containerStyle: React.CSSProperties = {
-    ...(colorConfig?.backgroundColor && {
-      backgroundColor: colorConfig.backgroundColor,
-    }),
-    ...(colorConfig?.borderColor && { borderColor: colorConfig.borderColor }),
+  // Merge colorConfig (deprecated) with visualConfig (new)
+  const finalVisualConfig: NodeVisualConfig = visualConfig || {
+    backgroundColor: colorConfig?.backgroundColor,
+    borderColor: colorConfig?.borderColor,
+    ringColor: colorConfig?.ringColor,
+    textColor: colorConfig?.titleColor,
+    descriptionColor: colorConfig?.descriptionColor,
+    iconBackgroundColor: colorConfig?.iconBgColor,
+    iconColor: colorConfig?.iconColor,
   };
 
-  const ringClasses = colorConfig?.ringColor ? "" : "ring-primary/25";
-  const ringStyle = colorConfig?.ringColor
-    ? { boxShadow: `0 0 0 4px ${colorConfig.ringColor}` }
+  // Build dynamic styles with border support
+  const borderStyle = getBorderStyleValue(finalVisualConfig.borderStyle);
+  const borderWidth = finalVisualConfig.borderWidth || 2;
+
+  const containerStyle: React.CSSProperties = {
+    ...(finalVisualConfig.backgroundColor && {
+      backgroundColor: finalVisualConfig.backgroundColor,
+    }),
+    ...(finalVisualConfig.borderColor && {
+      borderColor: finalVisualConfig.borderColor,
+      borderStyle: finalVisualConfig.borderStyle || "solid",
+      borderWidth: `${borderWidth}px`,
+    }),
+    ...(finalVisualConfig.borderRadius && {
+      borderRadius: `${finalVisualConfig.borderRadius}px`,
+    }),
+    ...(finalVisualConfig.opacity && {
+      opacity: finalVisualConfig.opacity,
+    }),
+    ...(finalVisualConfig.boxShadow && {
+      boxShadow: finalVisualConfig.boxShadow,
+    }),
+    ...finalVisualConfig.customStyles,
+  };
+
+  const ringClasses = finalVisualConfig.ringColor ? "" : "ring-primary/25";
+  const ringStyle = finalVisualConfig.ringColor
+    ? { boxShadow: `0 0 0 4px ${finalVisualConfig.ringColor}` }
     : {};
 
   return (
@@ -47,16 +104,16 @@ export default function BaseNode(props: Props) {
       className={cx(nodeStyle, "min-w-[280px]", {
         "border-primary ring-4":
           props.selected &&
-          !colorConfig?.borderColor &&
-          !colorConfig?.ringColor,
-        "ring-4": props.selected && colorConfig?.ringColor,
-        [ringClasses]: props.selected && !colorConfig?.ringColor,
+          !finalVisualConfig.borderColor &&
+          !finalVisualConfig.ringColor,
+        "ring-4": props.selected && finalVisualConfig.ringColor,
+        [ringClasses]: props.selected && !finalVisualConfig.ringColor,
       })}
       style={{
         ...containerStyle,
         ...(props.selected && ringStyle),
-        ...(colorConfig?.borderColor &&
-          props.selected && { borderColor: colorConfig.borderColor }),
+        ...(finalVisualConfig.borderColor &&
+          props.selected && { borderColor: finalVisualConfig.borderColor }),
       }}
     >
       {/* Header - always visible */}
@@ -74,13 +131,13 @@ export default function BaseNode(props: Props) {
                 className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                 style={{
                   backgroundColor:
-                    colorConfig?.iconBgColor || iconConfig.bgColor,
+                    finalVisualConfig.iconBackgroundColor || iconConfig.bgColor,
                 }}
               >
                 <Icon
                   size={18}
                   style={{
-                    color: colorConfig?.iconColor || iconConfig.color,
+                    color: finalVisualConfig.iconColor || iconConfig.color,
                   }}
                 />
               </div>
@@ -88,7 +145,7 @@ export default function BaseNode(props: Props) {
             <span
               className="text-sm font-semibold truncate"
               style={{
-                color: colorConfig?.titleColor,
+                color: finalVisualConfig.textColor,
               }}
             >
               {data?.label}
@@ -116,7 +173,7 @@ export default function BaseNode(props: Props) {
         <div
           className="text-xs mt-2"
           style={{
-            color: colorConfig?.descriptionColor,
+            color: finalVisualConfig.descriptionColor,
           }}
         >
           {data.label}

@@ -127,8 +127,8 @@ export function Example8_CompleteConfig() {
 
         // Additional custom plugins
         plugins: [
-          customPlugin,  // Custom components
-          aiMLPlugin,    // AI/ML workflow components
+          customPlugin, // Custom components
+          aiMLPlugin, // AI/ML workflow components
         ],
       }}
     />

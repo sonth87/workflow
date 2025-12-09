@@ -4,7 +4,7 @@
  */
 
 import type { Plugin } from "@/core/plugins/PluginManager";
-import type { BaseNodeConfig } from "@/core/types/base.types";
+import type { BaseNodeConfig, NodeVisualConfig } from "@/core/types/base.types";
 import { CategoryType } from "@/enum/workflow.enum";
 
 // Custom node types
@@ -15,10 +15,62 @@ export enum CustomNodeType {
   CUSTOM_VALIDATOR = "customValidator",
 }
 
+/**
+ * Visual configurations for custom nodes using color palettes
+ */
+const aiAssistantVisualConfig: NodeVisualConfig = {
+  backgroundColor: "#faf5ff",
+  borderColor: "#a855f7",
+  borderStyle: "solid",
+  borderWidth: 2,
+  ringColor: "rgba(168, 85, 247, 0.25)",
+  textColor: "#581c87",
+  descriptionColor: "#9333ea",
+  iconBackgroundColor: "#f3e8ff",
+  iconColor: "#9333ea",
+};
+
+const dataProcessorVisualConfig: NodeVisualConfig = {
+  backgroundColor: "#eff6ff",
+  borderColor: "#3b82f6",
+  borderStyle: "dashed",
+  borderWidth: 2,
+  ringColor: "rgba(59, 130, 246, 0.25)",
+  textColor: "#1e3a8a",
+  descriptionColor: "#2563eb",
+  iconBackgroundColor: "#dbeafe",
+  iconColor: "#2563eb",
+};
+
+const apiIntegratorVisualConfig: NodeVisualConfig = {
+  backgroundColor: "#f0fdf4",
+  borderColor: "#22c55e",
+  borderStyle: "solid",
+  borderWidth: 2,
+  ringColor: "rgba(34, 197, 94, 0.25)",
+  textColor: "#14532d",
+  descriptionColor: "#16a34a",
+  iconBackgroundColor: "#dcfce7",
+  iconColor: "#16a34a",
+};
+
+const customValidatorVisualConfig: NodeVisualConfig = {
+  backgroundColor: "#fff7ed",
+  borderColor: "#f97316",
+  borderStyle: "dotted",
+  borderWidth: 2,
+  ringColor: "rgba(249, 115, 22, 0.25)",
+  textColor: "#7c2d12",
+  descriptionColor: "#ea580c",
+  iconBackgroundColor: "#ffedd5",
+  iconColor: "#ea580c",
+};
+
 // Helper function to create custom node config
 const createCustomNodeConfig = (
   nodeType: CustomNodeType,
   category: CategoryType,
+  visualConfig: NodeVisualConfig,
   metadata: {
     title: string;
     description?: string;
@@ -27,9 +79,12 @@ const createCustomNodeConfig = (
   id: "",
   type: nodeType,
   position: { x: 0, y: 0 },
-  data: {},
+  data: {
+    visualConfig, // Include visual config in data
+  },
   nodeType: nodeType as any,
   category: category,
+  visualConfig, // Also set at node config level
   metadata: {
     id: nodeType,
     title: metadata.title,
@@ -106,6 +161,7 @@ export const customPlugin: Plugin = {
           ...createCustomNodeConfig(
             CustomNodeType.AI_ASSISTANT,
             CategoryType.CUSTOM,
+            aiAssistantVisualConfig,
             {
               title: "AI Assistant",
               description: "AI-powered task automation",
@@ -163,6 +219,7 @@ export const customPlugin: Plugin = {
           ...createCustomNodeConfig(
             CustomNodeType.DATA_PROCESSOR,
             CategoryType.CUSTOM,
+            dataProcessorVisualConfig,
             {
               title: "Data Processor",
               description: "Process and transform data",
@@ -218,6 +275,7 @@ export const customPlugin: Plugin = {
           ...createCustomNodeConfig(
             CustomNodeType.API_INTEGRATOR,
             CategoryType.CUSTOM,
+            apiIntegratorVisualConfig,
             {
               title: "API Integrator",
               description: "Integrate with external APIs",
@@ -272,6 +330,7 @@ export const customPlugin: Plugin = {
         config: createCustomNodeConfig(
           CustomNodeType.CUSTOM_VALIDATOR,
           CategoryType.CUSTOM,
+          customValidatorVisualConfig,
           {
             title: "Custom Validator",
             description: "Custom validation logic",

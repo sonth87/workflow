@@ -114,14 +114,21 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
       });
 
       // DFS để phát hiện cycle
-      const hasCycle = (nodeId: string, visited: Set<string>, recStack: Set<string>): boolean => {
+      const hasCycle = (
+        nodeId: string,
+        visited: Set<string>,
+        recStack: Set<string>
+      ): boolean => {
         if (!visited.has(nodeId)) {
           visited.add(nodeId);
           recStack.add(nodeId);
 
           const neighbors = graph.get(nodeId) || [];
           for (const neighbor of neighbors) {
-            if (!visited.has(neighbor) && hasCycle(neighbor, visited, recStack)) {
+            if (
+              !visited.has(neighbor) &&
+              hasCycle(neighbor, visited, recStack)
+            ) {
               return true;
             } else if (recStack.has(neighbor)) {
               return true; // Cycle detected!
@@ -135,11 +142,13 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
       // Kiểm tra từ tất cả các nodes
       const visited = new Set<string>();
       const recStack = new Set<string>();
-      
+
       for (const node of nodes) {
         if (hasCycle(node.id, visited, recStack)) {
           console.warn("❌ Cycle detected! Cannot create this connection.");
-          alert("❌ Cannot create connection: This would create a circular loop in the workflow!");
+          alert(
+            "❌ Cannot create connection: This would create a circular loop in the workflow!"
+          );
           return;
         }
       }
@@ -217,6 +226,54 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, []);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Delete or Backspace key
+      if (event.key === "Delete" || event.key === "Backspace") {
+        // Get selected nodes and edges
+        const selectedNodes = nodes.filter(node => node.selected);
+        const selectedEdges = edges.filter(edge => edge.selected);
+
+        // Delete selected nodes
+        if (selectedNodes.length > 0) {
+          const nodeIdsToDelete = selectedNodes
+            .filter(node => node.data?.deletable !== false)
+            .map(node => node.id);
+
+          if (nodeIdsToDelete.length > 0) {
+            setNodes(nodes.filter(node => !nodeIdsToDelete.includes(node.id)));
+            // Also delete connected edges
+            setEdges(
+              edges.filter(
+                edge =>
+                  !nodeIdsToDelete.includes(edge.source) &&
+                  !nodeIdsToDelete.includes(edge.target)
+              )
+            );
+          }
+        }
+
+        // Delete selected edges
+        if (selectedEdges.length > 0) {
+          const edgeIdsToDelete = selectedEdges
+            .filter(edge => edge.data?.deletable !== false)
+            .map(edge => edge.id);
+
+          if (edgeIdsToDelete.length > 0) {
+            setEdges(edges.filter(edge => !edgeIdsToDelete.includes(edge.id)));
+          }
+        }
+
+        // Prevent default behavior
+        event.preventDefault();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [nodes, edges, setNodes, setEdges]);
 
   return (
     <main

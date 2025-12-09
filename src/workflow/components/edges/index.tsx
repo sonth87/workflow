@@ -5,6 +5,23 @@ import {
   getSmoothStepPath,
   type EdgeProps,
 } from "@xyflow/react";
+import type { EdgeVisualConfig } from "@/core/types/base.types";
+
+/**
+ * Get stroke dash array based on border style
+ */
+function getStrokeDashArray(
+  style?: "solid" | "dashed" | "dotted" | "double"
+): string | undefined {
+  switch (style) {
+    case "dashed":
+      return "5,5";
+    case "dotted":
+      return "2,2";
+    default:
+      return undefined;
+  }
+}
 
 export function SmoothEdge({
   id,
@@ -18,6 +35,7 @@ export function SmoothEdge({
   style,
   label,
   selected,
+  data,
 }: EdgeProps) {
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
@@ -28,11 +46,24 @@ export function SmoothEdge({
     targetPosition,
   });
 
+  // Get visual config from edge data
+  const visualConfig = data?.visualConfig as EdgeVisualConfig | undefined;
+
+  // Determine colors and styles
+  const strokeColor = selected
+    ? visualConfig?.selectedStrokeColor || "#3b82f6"
+    : visualConfig?.strokeColor;
+  const strokeWidth = selected
+    ? visualConfig?.selectedStrokeWidth || 3
+    : visualConfig?.strokeWidth || 2;
+  const strokeDashArray = getStrokeDashArray(visualConfig?.strokeStyle);
+  const markerColor = visualConfig?.markerColor || strokeColor || "#3b82f6";
+
   return (
     <>
       <defs>
         <marker
-          id={`arrow-selected-${id}`}
+          id={`arrow-${id}`}
           markerWidth="12.5"
           markerHeight="12.5"
           viewBox="-10 -10 20 20"
@@ -41,11 +72,11 @@ export function SmoothEdge({
           refY="0"
         >
           <polyline
-            stroke="#3b82f6"
+            stroke={markerColor}
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="1"
-            fill="#3b82f6"
+            fill={markerColor}
             points="-5,-4 0,0 -5,4 -5,-4"
           />
         </marker>
@@ -53,17 +84,20 @@ export function SmoothEdge({
 
       <BaseEdge
         path={edgePath}
-        markerEnd={selected ? `url(#arrow-selected-${id})` : markerEnd}
+        markerEnd={`url(#arrow-${id})`}
         style={{
-          strokeWidth: selected ? 3 : 2,
-          stroke: selected ? "#3b82f6" : undefined,
+          strokeWidth,
+          stroke: strokeColor,
+          strokeDasharray: strokeDashArray,
+          opacity: visualConfig?.opacity,
           transition: "stroke-width 0.2s ease, stroke 0.2s ease",
+          ...visualConfig?.customStyles,
           ...style,
         }}
         interactionWidth={20}
       />
 
-      {/* Invisible path for double-click */}
+      {/* Invisible path for interaction */}
       <path
         d={edgePath}
         fill="none"
@@ -83,7 +117,15 @@ export function SmoothEdge({
             }}
             className="nodrag nopan"
           >
-            <div className="px-2 py-1 text-xs bg-primaryA-200 text-primaryA-500 border rounded-full cursor-pointer hover:bg-accent transition-colors">
+            <div
+              className="px-2 py-1 text-xs border rounded-full cursor-pointer hover:bg-accent transition-colors"
+              style={{
+                backgroundColor:
+                  visualConfig?.labelBackgroundColor || "#e0f2fe",
+                color: visualConfig?.labelTextColor || "#0369a1",
+                borderColor: visualConfig?.labelBorderColor || "#7dd3fc",
+              }}
+            >
               {label}
             </div>
           </div>

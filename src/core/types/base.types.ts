@@ -47,7 +47,7 @@ export interface DynamicStyle {
   backgroundColor?: string;
   borderColor?: string;
   borderWidth?: number;
-  borderStyle?: "solid" | "dashed" | "dotted";
+  borderStyle?: "solid" | "dashed" | "dotted" | "double";
   borderRadius?: number;
   width?: number | string;
   height?: number | string;
@@ -62,6 +62,103 @@ export interface DynamicStyle {
   fontSize?: number;
   fontWeight?: string | number;
   [key: string]: unknown; // Custom CSS properties
+}
+
+/**
+ * Visual configuration cho Node
+ * Centralized styling configuration that can be provided by plugins
+ */
+export interface NodeVisualConfig {
+  // Colors
+  backgroundColor?: string;
+  borderColor?: string;
+  ringColor?: string;
+  textColor?: string;
+  descriptionColor?: string;
+
+  // Icon styling
+  iconBackgroundColor?: string;
+  iconColor?: string;
+
+  // Border styling
+  borderWidth?: number;
+  borderStyle?: "solid" | "dashed" | "dotted" | "double";
+  borderRadius?: number;
+
+  // Additional styles
+  opacity?: number;
+  boxShadow?: string;
+
+  // Custom CSS
+  customStyles?: CSSProperties;
+
+  [key: string]: unknown;
+}
+
+/**
+ * Visual configuration cho Edge
+ * Centralized styling configuration that can be provided by plugins
+ */
+export interface EdgeVisualConfig {
+  // Stroke/Path styling
+  strokeColor?: string;
+  strokeWidth?: number;
+  strokeStyle?: "solid" | "dashed" | "dotted" | "double";
+
+  // Selection/Highlight
+  selectedStrokeColor?: string;
+  selectedStrokeWidth?: number;
+
+  // Arrow/Marker styling
+  markerColor?: string;
+  markerSize?: number;
+
+  // Label styling
+  labelBackgroundColor?: string;
+  labelTextColor?: string;
+  labelBorderColor?: string;
+
+  // Animation
+  animated?: boolean;
+  animationDuration?: number;
+
+  // Additional styles
+  opacity?: number;
+
+  // Custom CSS
+  customStyles?: CSSProperties;
+
+  [key: string]: unknown;
+}
+
+/**
+ * Color Palette Definition
+ * Reusable color schemes for nodes and edges
+ */
+export interface ColorPalette {
+  id: string;
+  name: string;
+  description?: string;
+
+  // Primary colors
+  primary: string;
+  secondary?: string;
+  accent?: string;
+
+  // Semantic colors
+  success?: string;
+  warning?: string;
+  error?: string;
+  info?: string;
+
+  // UI colors
+  background?: string;
+  foreground?: string;
+  border?: string;
+  muted?: string;
+
+  // Additional custom colors
+  [key: string]: string | undefined;
 }
 
 /**
@@ -223,6 +320,7 @@ export interface BaseNodeConfig extends Node {
 
   // Visual & Styling
   icon?: IconConfig;
+  visualConfig?: NodeVisualConfig; // New: Centralized visual configuration
   style?: DynamicStyle;
   theme?: string; // Reference đến theme trong ThemeRegistry
   collapsible?: boolean;
@@ -280,6 +378,7 @@ export interface BaseEdgeConfig extends Edge {
   edgeType: string; // 'default', 'smoothstep', 'step', 'straight', 'bezier', 'custom'
 
   // Visual & Styling
+  visualConfig?: EdgeVisualConfig; // New: Centralized visual configuration
   labels?: EdgeLabel[]; // Nhiều labels cho start, center, end
   style?: DynamicStyle;
   pathStyle?: "solid" | "dashed" | "dotted";

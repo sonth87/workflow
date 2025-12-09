@@ -1,16 +1,56 @@
 /**
  * Theme Registry
- * Registry để quản lý themes
+ * Registry để quản lý themes và color palettes
  */
 
-import type { ThemeConfig } from "../types/base.types";
+import type { ThemeConfig, ColorPalette } from "../types/base.types";
 import { BaseRegistry } from "./BaseRegistry";
+import { DEFAULT_COLOR_PALETTES } from "../constants/colorPalettes";
 
 export class ThemeRegistry extends BaseRegistry<ThemeConfig> {
   private currentTheme: string = "default";
+  private colorPalettes: Map<string, ColorPalette> = new Map();
 
   constructor() {
     super("ThemeRegistry");
+    this.initializeColorPalettes();
+  }
+
+  /**
+   * Initialize default color palettes
+   */
+  private initializeColorPalettes(): void {
+    DEFAULT_COLOR_PALETTES.forEach(palette => {
+      this.colorPalettes.set(palette.id, palette);
+    });
+  }
+
+  /**
+   * Register a color palette
+   */
+  registerColorPalette(palette: ColorPalette): void {
+    this.colorPalettes.set(palette.id, palette);
+  }
+
+  /**
+   * Get a color palette by id
+   */
+  getColorPalette(id: string): ColorPalette | undefined {
+    return this.colorPalettes.get(id);
+  }
+
+  /**
+   * Get all color palettes
+   */
+  getAllColorPalettes(): ColorPalette[] {
+    return Array.from(this.colorPalettes.values());
+  }
+
+  /**
+   * Remove a color palette
+   */
+  removeColorPalette(id: string): boolean {
+    return this.colorPalettes.delete(id);
   }
 
   /**

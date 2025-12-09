@@ -11,7 +11,14 @@ import type {
   ThemeConfig,
 } from "@/core/types/base.types";
 import type { ContextMenuConfig } from "@/core/registry/ContextMenuRegistry";
+import type { ContextMenuContext } from "@/core/types/base.types";
 import { NodeType, CategoryType, EdgeType } from "@/enum/workflow.enum";
+import {
+  createDefaultNodeContextMenuItems,
+  createDefaultEdgeContextMenuItems,
+  paletteToNodeVisualConfig,
+  paletteToEdgeVisualConfig,
+} from "@/core/utils/contextMenuHelpers";
 
 // ============================================
 // Default Node Configurations
@@ -417,43 +424,24 @@ const defaultContextMenus: Array<{
       id: "node-context-menu",
       name: "Node Context Menu",
       targetType: "node",
-      items: [
-        {
-          id: "delete-node",
-          label: "Delete",
-          onClick: async context => {
+      items: createDefaultNodeContextMenuItems(
+        // On color change
+        async (paletteId: string, context: ContextMenuContext) => {
+          if (context.node) {
+            const visualConfig = paletteToNodeVisualConfig(paletteId);
+            // Update node visual config
+            // This will be handled by the workflow store/canvas
+            console.log("Change node color to:", paletteId, visualConfig);
+          }
+        },
+        // On delete
+        async (context: ContextMenuContext) => {
+          if (context.nodeId) {
             console.log("Delete node:", context.nodeId);
-          },
-        },
-        {
-          id: "duplicate-node",
-          label: "Duplicate",
-          onClick: async context => {
-            console.log("Duplicate node:", context.nodeId);
-          },
-        },
-        {
-          id: "separator-1",
-          label: "",
-          separator: true,
-        },
-        {
-          id: "collapse-node",
-          label: "Collapse",
-          onClick: async context => {
-            console.log("Collapse node:", context.nodeId);
-          },
-          visible: context => !context.node?.collapsed,
-        },
-        {
-          id: "expand-node",
-          label: "Expand",
-          onClick: async context => {
-            console.log("Expand node:", context.nodeId);
-          },
-          visible: context => context.node?.collapsed === true,
-        },
-      ],
+            // This will be handled by the workflow store/canvas
+          }
+        }
+      ),
     },
   },
   {
@@ -464,22 +452,23 @@ const defaultContextMenus: Array<{
       id: "edge-context-menu",
       name: "Edge Context Menu",
       targetType: "edge",
-      items: [
-        {
-          id: "delete-edge",
-          label: "Delete",
-          onClick: async context => {
+      items: createDefaultEdgeContextMenuItems(
+        // On color change
+        async (paletteId: string, context: ContextMenuContext) => {
+          if (context.edge) {
+            const visualConfig = paletteToEdgeVisualConfig(paletteId);
+            console.log("Change edge color to:", paletteId, visualConfig);
+            // This will be handled by the workflow store/canvas
+          }
+        },
+        // On delete
+        async (context: ContextMenuContext) => {
+          if (context.edgeId) {
             console.log("Delete edge:", context.edgeId);
-          },
-        },
-        {
-          id: "add-label",
-          label: "Add Label",
-          onClick: async context => {
-            console.log("Add label to edge:", context.edgeId);
-          },
-        },
-      ],
+            // This will be handled by the workflow store/canvas
+          }
+        }
+      ),
     },
   },
 ];

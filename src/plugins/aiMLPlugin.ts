@@ -207,7 +207,7 @@ export const aiMLPlugin: Plugin = {
 
   onActivate: async () => {
     console.log("✅ AI/ML Plugin: Activated");
-    
+
     // Subscribe to workflow events
     globalEventBus.on(WorkflowEventTypes.NODE_ADDED, (event: any) => {
       if (
@@ -221,7 +221,7 @@ export const aiMLPlugin: Plugin = {
 
   onDeactivate: async () => {
     console.log("⏸️ AI/ML Plugin: Deactivated");
-    
+
     // Cleanup event listeners
     // globalEventBus.off would need the handler reference
   },
@@ -238,10 +238,10 @@ export const aiMLPlugin: Plugin = {
 
 /**
  * Usage Example:
- * 
+ *
  * import { aiMLPlugin } from "./plugins/aiMLPlugin";
  * import { customPlugin } from "./plugins/customPlugin";
- * 
+ *
  * <WorkflowBuilder
  *   pluginOptions={{
  *     plugins: [customPlugin, aiMLPlugin],
