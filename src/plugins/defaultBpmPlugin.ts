@@ -52,33 +52,37 @@ const defaultNodes: Array<{
 }> = [
   // Start Events
   {
-    id: NodeType.START_EVENT,
-    type: NodeType.START_EVENT,
+    id: NodeType.START_EVENT_DEFAULT,
+    type: NodeType.START_EVENT_DEFAULT,
     name: "Start Event",
-    config: createDefaultNodeConfig(NodeType.START_EVENT, CategoryType.START, {
-      title: "Start Event",
-      description: "Workflow start point",
-    }),
-  },
-  {
-    id: NodeType.MESSAGE_START_EVENT,
-    type: NodeType.MESSAGE_START_EVENT,
-    name: "Message Start Event",
     config: createDefaultNodeConfig(
-      NodeType.MESSAGE_START_EVENT,
+      NodeType.START_EVENT_DEFAULT,
       CategoryType.START,
       {
-        title: "Message Start Event",
-        description: "Start workflow on message receipt",
+        title: "Start Event",
+        description: "Workflow start point",
       }
     ),
   },
   {
-    id: NodeType.TIMER_START_EVENT,
-    type: NodeType.TIMER_START_EVENT,
+    id: NodeType.START_EVENT_API,
+    type: NodeType.START_EVENT_API,
+    name: "API Start Event",
+    config: createDefaultNodeConfig(
+      NodeType.START_EVENT_API,
+      CategoryType.START,
+      {
+        title: "API Start Event",
+        description: "Start workflow via API",
+      }
+    ),
+  },
+  {
+    id: NodeType.START_EVENT_TIMER,
+    type: NodeType.START_EVENT_TIMER,
     name: "Timer Start Event",
     config: createDefaultNodeConfig(
-      NodeType.TIMER_START_EVENT,
+      NodeType.START_EVENT_TIMER,
       CategoryType.START,
       {
         title: "Timer Start Event",
@@ -86,24 +90,68 @@ const defaultNodes: Array<{
       }
     ),
   },
+  {
+    id: NodeType.START_EVENT_WEB,
+    type: NodeType.START_EVENT_WEB,
+    name: "Web Start Event",
+    config: createDefaultNodeConfig(
+      NodeType.START_EVENT_WEB,
+      CategoryType.START,
+      {
+        title: "Web Start Event",
+        description: "Start workflow from web",
+      }
+    ),
+  },
+  {
+    id: NodeType.START_EVENT_RECEIVE_SIGNAL,
+    type: NodeType.START_EVENT_RECEIVE_SIGNAL,
+    name: "Receive Signal Start Event",
+    config: createDefaultNodeConfig(
+      NodeType.START_EVENT_RECEIVE_SIGNAL,
+      CategoryType.START,
+      {
+        title: "Receive Signal Start Event",
+        description: "Start workflow on signal receipt",
+      }
+    ),
+  },
 
   // Tasks
   {
-    id: NodeType.TASK,
-    type: NodeType.TASK,
+    id: NodeType.TASK_DEFAULT,
+    type: NodeType.TASK_DEFAULT,
     name: "Task",
-    config: createDefaultNodeConfig(NodeType.TASK, CategoryType.TASK, {
+    config: createDefaultNodeConfig(NodeType.TASK_DEFAULT, CategoryType.TASK, {
       title: "Task",
       description: "Generic task",
     }),
   },
   {
-    id: NodeType.USER_TASK,
-    type: NodeType.USER_TASK,
+    id: NodeType.TASK_USER,
+    type: NodeType.TASK_USER,
     name: "User Task",
-    config: createDefaultNodeConfig(NodeType.USER_TASK, CategoryType.TASK, {
+    config: createDefaultNodeConfig(NodeType.TASK_USER, CategoryType.TASK, {
       title: "User Task",
       description: "Task requiring user interaction",
+    }),
+  },
+  {
+    id: NodeType.TASK_SYSTEM,
+    type: NodeType.TASK_SYSTEM,
+    name: "System Task",
+    config: createDefaultNodeConfig(NodeType.TASK_SYSTEM, CategoryType.TASK, {
+      title: "System Task",
+      description: "Automated system task",
+    }),
+  },
+  {
+    id: NodeType.TASK_SCRIPT,
+    type: NodeType.TASK_SCRIPT,
+    name: "Script Task",
+    config: createDefaultNodeConfig(NodeType.TASK_SCRIPT, CategoryType.TASK, {
+      title: "Script Task",
+      description: "Execute script",
     }),
   },
   {
@@ -112,16 +160,7 @@ const defaultNodes: Array<{
     name: "Service Task",
     config: createDefaultNodeConfig(NodeType.SERVICE_TASK, CategoryType.TASK, {
       title: "Service Task",
-      description: "Automated service task",
-    }),
-  },
-  {
-    id: NodeType.SCRIPT_TASK,
-    type: NodeType.SCRIPT_TASK,
-    name: "Script Task",
-    config: createDefaultNodeConfig(NodeType.SCRIPT_TASK, CategoryType.TASK, {
-      title: "Script Task",
-      description: "Execute script",
+      description: "Service integration task",
     }),
   },
 
@@ -153,28 +192,45 @@ const defaultNodes: Array<{
     ),
   },
   {
-    id: NodeType.INCLUSIVE_GATEWAY,
-    type: NodeType.INCLUSIVE_GATEWAY,
-    name: "Inclusive Gateway",
+    id: NodeType.EVENT_BASED_GATEWAY,
+    type: NodeType.EVENT_BASED_GATEWAY,
+    name: "Event Based Gateway",
     config: createDefaultNodeConfig(
-      NodeType.INCLUSIVE_GATEWAY,
+      NodeType.EVENT_BASED_GATEWAY,
       CategoryType.GATEWAY,
       {
-        title: "Inclusive Gateway",
-        description: "Execute one or more paths (OR)",
+        title: "Event Based Gateway",
+        description: "Wait for events",
       }
     ),
   },
 
   // End Events
   {
-    id: NodeType.END_EVENT,
-    type: NodeType.END_EVENT,
+    id: NodeType.END_EVENT_DEFAULT,
+    type: NodeType.END_EVENT_DEFAULT,
     name: "End Event",
-    config: createDefaultNodeConfig(NodeType.END_EVENT, CategoryType.END, {
-      title: "End Event",
-      description: "Workflow end point",
-    }),
+    config: createDefaultNodeConfig(
+      NodeType.END_EVENT_DEFAULT,
+      CategoryType.END,
+      {
+        title: "End Event",
+        description: "Workflow end point",
+      }
+    ),
+  },
+  {
+    id: NodeType.END_EVENT_SEND_SIGNAL,
+    type: NodeType.END_EVENT_SEND_SIGNAL,
+    name: "Send Signal End Event",
+    config: createDefaultNodeConfig(
+      NodeType.END_EVENT_SEND_SIGNAL,
+      CategoryType.END,
+      {
+        title: "Send Signal End Event",
+        description: "End workflow and send signal",
+      }
+    ),
   },
 ];
 

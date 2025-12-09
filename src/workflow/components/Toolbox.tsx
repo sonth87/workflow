@@ -7,10 +7,7 @@ import { CategoryType, NodeType } from "@/enum/workflow.enum";
 import { getIconConfig } from "../utils/iconConfig";
 import { X } from "lucide-react";
 import React, { useMemo, useState } from "react";
-import {
-  type NodeCategory,
-  NODES_BY_CATEGORIES,
-} from "../data/toolboxData";
+import { type NodeCategory, NODES_BY_CATEGORIES } from "../data/toolboxData";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 
 export function Toolbox() {
@@ -45,10 +42,10 @@ export function Toolbox() {
 
     // Add nodes from registry
     const allNodes = nodeRegistry.getAll();
-console.log('nodeRegistry.getAll():', allNodes);
+
     allNodes.forEach(registryItem => {
       const nodeType = registryItem.type as NodeType;
-      const category = registryItem.config.metadata.category || "task";
+      const category = registryItem.config.category || "task";
 
       // Map category to CategoryType
       const categoryTypeMap: Record<string, CategoryType> = {

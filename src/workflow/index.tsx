@@ -19,6 +19,8 @@ import {
   useUpdateNodeInternals,
 } from "@xyflow/react";
 import { getLayoutedElements } from "./utils/layout";
+import { nodeRegistry, type BaseNodeConfig } from "@/core";
+import { NodeType } from "@/enum/workflow.enum";
 
 function WorkflowBuilderInner() {
   const { createNode } = useNodeOperations();
