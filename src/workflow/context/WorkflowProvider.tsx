@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { pluginManager } from "@/core/plugins/PluginManager";
+import { pluginManager, type Plugin } from "@/core/plugins/PluginManager";
 import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
 
 interface WorkflowContextValue {
@@ -31,25 +31,77 @@ export function useWorkflow() {
   return context;
 }
 
-interface WorkflowProviderProps {
-  children: ReactNode;
+/**
+ * Plugin configuration options
+ */
+export interface PluginOptions {
+  /**
+   * Enable/disable default BPM plugin
+   * @default true
+   */
+  enableDefaultPlugin?: boolean;
+
+  /**
+   * Auto-activate plugins after installation
+   * @default true
+   */
+  autoActivate?: boolean;
+
+  /**
+   * Additional plugins to install
+   */
+  plugins?: Plugin[];
 }
 
-export function WorkflowProvider({ children }: WorkflowProviderProps) {
+interface WorkflowProviderProps {
+  children: ReactNode;
+  /**
+   * Plugin configuration options
+   */
+  pluginOptions?: PluginOptions;
+}
+
+export function WorkflowProvider({
+  children,
+  pluginOptions = {},
+}: WorkflowProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  const {
+    enableDefaultPlugin = true,
+    autoActivate = true,
+    plugins = [],
+  } = pluginOptions;
 
   useEffect(() => {
     async function initializeWorkflow() {
       try {
         // Install default BPM plugin
-        if (!pluginManager.isInstalled("default-bpm-plugin")) {
-          await pluginManager.install(defaultBpmPlugin);
+        if (enableDefaultPlugin) {
+          if (!pluginManager.isInstalled("default-bpm-plugin")) {
+            await pluginManager.install(defaultBpmPlugin);
+          }
+
+          // Activate default plugin
+          if (autoActivate && !pluginManager.isActive("default-bpm-plugin")) {
+            await pluginManager.activate("default-bpm-plugin");
+          }
         }
 
-        // Activate plugin
-        if (!pluginManager.isActive("default-bpm-plugin")) {
-          await pluginManager.activate("default-bpm-plugin");
+        // Install and activate custom plugins
+        for (const plugin of plugins) {
+          const pluginId = plugin.metadata.id;
+
+          if (!pluginManager.isInstalled(pluginId)) {
+            await pluginManager.install(plugin);
+            console.log(`✅ Plugin installed: ${plugin.metadata.name}`);
+          }
+
+          if (autoActivate && !pluginManager.isActive(pluginId)) {
+            await pluginManager.activate(pluginId);
+            console.log(`✅ Plugin activated: ${plugin.metadata.name}`);
+          }
         }
 
         setIsInitialized(true);
@@ -61,7 +113,7 @@ export function WorkflowProvider({ children }: WorkflowProviderProps) {
     }
 
     initializeWorkflow();
-  }, []);
+  }, [enableDefaultPlugin, autoActivate, plugins]);
 
   if (error) {
     return (

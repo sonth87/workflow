@@ -4,7 +4,10 @@
  */
 
 import { useCallback, useState } from "react";
-import { WorkflowProvider } from "./context/WorkflowProvider";
+import {
+  WorkflowProvider,
+  type PluginOptions,
+} from "./context/WorkflowProvider";
 import { Canvas } from "./components/Canvas";
 import { Toolbox } from "./components/Toolbox";
 import { PropertiesPanel } from "./components/PropertiesPanel";
@@ -19,8 +22,6 @@ import {
   useUpdateNodeInternals,
 } from "@xyflow/react";
 import { getLayoutedElements } from "./utils/layout";
-import { nodeRegistry, type BaseNodeConfig } from "@/core";
-import { NodeType } from "@/enum/workflow.enum";
 
 function WorkflowBuilderInner() {
   const { createNode } = useNodeOperations();
@@ -150,9 +151,22 @@ function WorkflowBuilderInner() {
   );
 }
 
-export default function WorkflowBuilder() {
+/**
+ * Workflow Builder Props
+ */
+export interface WorkflowBuilderProps {
+  /**
+   * Plugin configuration options
+   * Configure which plugins to use and how to initialize them
+   */
+  pluginOptions?: PluginOptions;
+}
+
+export default function WorkflowBuilder({
+  pluginOptions,
+}: WorkflowBuilderProps = {}) {
   return (
-    <WorkflowProvider>
+    <WorkflowProvider pluginOptions={pluginOptions}>
       <ReactFlowProvider>
         <WorkflowBuilderInner />
       </ReactFlowProvider>

@@ -10,6 +10,30 @@ import React, { useMemo, useState } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../data/toolboxData";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 
+// Default icon for custom category
+const CustomCategoryIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="18"
+    height="18"
+    viewBox="0 0 18 18"
+    fill="none"
+  >
+    <path
+      d="M16.6667 8.95833C16.6667 4.70114 13.2155 1.25 8.95833 1.25C4.70114 1.25 1.25 4.70114 1.25 8.95833C1.25 13.2155 4.70114 16.6667 8.95833 16.6667C13.2155 16.6667 16.6667 13.2155 16.6667 8.95833ZM17.9167 8.95833C17.9167 13.9059 13.9059 17.9167 8.95833 17.9167C4.01078 17.9167 0 13.9059 0 8.95833C0 4.01078 4.01078 0 8.95833 0C13.9059 0 17.9167 4.01078 17.9167 8.95833Z"
+      fill="#9D6DFF"
+    />
+    <path
+      d="M9 12L6.5 9.5L9 7L11.5 9.5L9 12Z"
+      fill="#9D6DFF"
+    />
+    <path
+      d="M9 6L7 4L9 2L11 4L9 6Z"
+      fill="#9D6DFF"
+    />
+  </svg>
+);
+
 export function Toolbox() {
   const [selectedCategoryType, setSelectedCategoryType] =
     useState<CategoryType>();
@@ -29,11 +53,13 @@ export function Toolbox() {
     const ensureCategory = (categoryType: CategoryType): NodeCategory => {
       let existing = categories.find(cat => cat.categoryType === categoryType);
       if (!existing) {
+        // Create new category with default icon
         existing = {
-          name: categoryType,
+          name: categoryType.charAt(0).toUpperCase() + categoryType.slice(1),
           isOpen: true,
           categoryType,
           nodes: [],
+          icon: categoryType === CategoryType.CUSTOM ? <CustomCategoryIcon /> : undefined,
         };
         categories.push(existing);
       }
@@ -53,6 +79,9 @@ export function Toolbox() {
         end: CategoryType.END,
         task: CategoryType.TASK,
         gateway: CategoryType.GATEWAY,
+        custom: CategoryType.CUSTOM,
+        subflow: CategoryType.SUBFLOW,
+        other: CategoryType.OTHER,
       };
 
       const categoryType =
@@ -67,7 +96,8 @@ export function Toolbox() {
       }
     });
 
-    return categories;
+    // Filter out empty categories
+    return categories.filter(cat => cat.nodes.length > 0);
   }, []);
 
   const selectedCategory = useMemo(

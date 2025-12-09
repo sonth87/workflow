@@ -71,6 +71,7 @@ export enum CategoryType {
   TASK = "task",
   GATEWAY = "gateway",
   SUBFLOW = "subflow",
+  CUSTOM = "custom",
   OTHER = "other",
 }
 

@@ -14,6 +14,12 @@ import {
 } from "./GatewayNodes";
 import { PoolNode } from "./PoolNode";
 import { NoteNode } from "./NoteNode";
+import {
+  AIAssistantNode,
+  DataProcessorNode,
+  APIIntegratorNode,
+  CustomValidatorNode,
+} from "./CustomNodes";
 import BaseNode from "./BaseNode";
 import type { Position } from "@xyflow/react";
 
@@ -117,4 +123,10 @@ export const nodeTypes = {
   [NodeType.SUBFLOW]: wrapWithBaseNode(SubflowNode, NodeType.SUBFLOW),
   [NodeType.POOL]: PoolNode,
   [NodeType.NOTE]: NoteNode,
+  
+  // Custom plugin nodes
+  aiAssistant: AIAssistantNode,
+  dataProcessor: DataProcessorNode,
+  apiIntegrator: APIIntegratorNode,
+  customValidator: CustomValidatorNode,
 };
