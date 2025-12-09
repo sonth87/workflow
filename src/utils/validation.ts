@@ -1,5 +1,8 @@
-import { NodeType } from '@/enum/workflow.enum'
-import type { ConnectionRule, NodeValidationRules } from '@/types/workflow.type'
+import { NodeType } from "@/enum/workflow.enum";
+import type {
+  ConnectionRule,
+  NodeValidationRules,
+} from "@/types/workflow.type";
 
 // Default validation rules for each node type
 export const DEFAULT_VALIDATION_RULES: NodeValidationRules = {
@@ -86,11 +89,11 @@ export const DEFAULT_VALIDATION_RULES: NodeValidationRules = {
     maxOutputConnections: 0,
     maxInputConnections: 0,
   },
-}
+};
 
 // Get validation rules for a specific node type
 export function getNodeValidationRules(nodeType: NodeType): ConnectionRule {
-  return DEFAULT_VALIDATION_RULES[nodeType] || {}
+  return DEFAULT_VALIDATION_RULES[nodeType] || {};
 }
 
 // Validate if a connection is allowed
@@ -101,8 +104,10 @@ export function validateConnection(
   existingTargetConnections: number,
   customRules?: NodeValidationRules
 ): { valid: boolean; message?: string } {
-  const sourceRules = customRules?.[sourceType] || DEFAULT_VALIDATION_RULES[sourceType]
-  const targetRules = customRules?.[targetType] || DEFAULT_VALIDATION_RULES[targetType]
+  const sourceRules =
+    customRules?.[sourceType] || DEFAULT_VALIDATION_RULES[sourceType];
+  const targetRules =
+    customRules?.[targetType] || DEFAULT_VALIDATION_RULES[targetType];
 
   // Check source max output connections
   if (
@@ -112,7 +117,7 @@ export function validateConnection(
     return {
       valid: false,
       message: `Node can only have ${sourceRules.maxOutputConnections} outgoing connection(s)`,
-    }
+    };
   }
 
   // Check target max input connections
@@ -123,77 +128,93 @@ export function validateConnection(
     return {
       valid: false,
       message: `Node can only have ${targetRules.maxInputConnections} incoming connection(s)`,
-    }
+    };
   }
 
   // Check allowed targets
-  if (sourceRules?.allowedTargets && !sourceRules.allowedTargets.includes(targetType)) {
+  if (
+    sourceRules?.allowedTargets &&
+    !sourceRules.allowedTargets.includes(targetType)
+  ) {
     return {
       valid: false,
       message: `Cannot connect to ${targetType} node`,
-    }
+    };
   }
 
   // Check allowed sources
-  if (targetRules?.allowedSources && !targetRules.allowedSources.includes(sourceType)) {
+  if (
+    targetRules?.allowedSources &&
+    !targetRules.allowedSources.includes(sourceType)
+  ) {
     return {
       valid: false,
       message: `Cannot receive connection from ${sourceType} node`,
-    }
+    };
   }
 
-  return { valid: true }
+  return { valid: true };
 }
 
 // Validate entire workflow
 export function validateWorkflow(
   nodes: Array<{ id: string; type: NodeType }>,
   edges: Array<{ source: string; target: string }>
-): Array<{ nodeId: string; message: string; type: 'error' | 'warning' }> {
-  const errors: Array<{ nodeId: string; message: string; type: 'error' | 'warning' }> = []
+): Array<{ nodeId: string; message: string; type: "error" | "warning" }> {
+  const errors: Array<{
+    nodeId: string;
+    message: string;
+    type: "error" | "warning";
+  }> = [];
 
-  nodes.forEach((node) => {
-    const rules = DEFAULT_VALIDATION_RULES[node.type]
-    if (!rules) return
+  nodes.forEach(node => {
+    const rules = DEFAULT_VALIDATION_RULES[node.type];
+    if (!rules) return;
 
-    const outgoingConnections = edges.filter((e) => e.source === node.id).length
-    const incomingConnections = edges.filter((e) => e.target === node.id).length
+    const outgoingConnections = edges.filter(e => e.source === node.id).length;
+    const incomingConnections = edges.filter(e => e.target === node.id).length;
 
     // Check required connections
     if (rules.requiresConnection) {
       if (outgoingConnections === 0 && rules.maxOutputConnections !== 0) {
         errors.push({
           nodeId: node.id,
-          message: 'Node requires at least one outgoing connection',
-          type: 'error',
-        })
+          message: "Node requires at least one outgoing connection",
+          type: "error",
+        });
       }
       if (incomingConnections === 0 && rules.maxInputConnections !== 0) {
         errors.push({
           nodeId: node.id,
-          message: 'Node requires at least one incoming connection',
-          type: 'warning',
-        })
+          message: "Node requires at least one incoming connection",
+          type: "warning",
+        });
       }
     }
 
     // Check max connections
-    if (rules.maxOutputConnections !== undefined && outgoingConnections > rules.maxOutputConnections) {
+    if (
+      rules.maxOutputConnections !== undefined &&
+      outgoingConnections > rules.maxOutputConnections
+    ) {
       errors.push({
         nodeId: node.id,
         message: `Too many outgoing connections (max: ${rules.maxOutputConnections})`,
-        type: 'error',
-      })
+        type: "error",
+      });
     }
 
-    if (rules.maxInputConnections !== undefined && incomingConnections > rules.maxInputConnections) {
+    if (
+      rules.maxInputConnections !== undefined &&
+      incomingConnections > rules.maxInputConnections
+    ) {
       errors.push({
         nodeId: node.id,
         message: `Too many incoming connections (max: ${rules.maxInputConnections})`,
-        type: 'error',
-      })
+        type: "error",
+      });
     }
-  })
+  });
 
-  return errors
+  return errors;
 }

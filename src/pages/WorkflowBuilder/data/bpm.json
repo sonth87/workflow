@@ -67,7 +67,10 @@
               "order": 2,
               "value_option": [
                 { "value": "US", "label": { "en": "United States" } },
-                { "value": "VN", "label": { "en": "Vietnam", "vi": "Việt Nam" } },
+                {
+                  "value": "VN",
+                  "label": { "en": "Vietnam", "vi": "Việt Nam" }
+                },
                 { "value": "SG", "label": { "en": "Singapore" } }
               ]
             },

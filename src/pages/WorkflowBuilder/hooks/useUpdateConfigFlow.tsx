@@ -1,18 +1,18 @@
-import { useReactFlow, type Edge, type Node } from '@xyflow/react'
-import { useCallback } from 'react'
+import { useReactFlow, type Edge, type Node } from "@xyflow/react";
+import { useCallback } from "react";
 
 interface UseUpdateConfigFlowReturn {
-  updateNode: (nodeId: string, updates: Partial<Node>) => void
-  updateEdge: (edgeId: string, updates: Partial<Edge>) => void
+  updateNode: (nodeId: string, updates: Partial<Node>) => void;
+  updateEdge: (edgeId: string, updates: Partial<Edge>) => void;
 }
 
 export function useUpdateConfigFlow(): UseUpdateConfigFlowReturn {
-  const { setNodes, setEdges } = useReactFlow()
+  const { setNodes, setEdges } = useReactFlow();
 
   // Update entire node (any field)
   const updateNode = useCallback((nodeId: string, updates: Partial<Node>) => {
-    setNodes((nds) =>
-      nds.map((node) => {
+    setNodes(nds =>
+      nds.map(node => {
         if (node.id === nodeId) {
           return {
             ...node,
@@ -23,18 +23,18 @@ export function useUpdateConfigFlow(): UseUpdateConfigFlowReturn {
                   ...updates.data,
                 }
               : node.data,
-          }
+          };
         }
-        return node
+        return node;
       })
-    )
-  }, [])
+    );
+  }, []);
 
   // Update entire edge (any field)
   const updateEdge = useCallback(
     (edgeId: string, updates: Partial<Edge>) => {
-      setEdges((eds) =>
-        eds.map((edge) => {
+      setEdges(eds =>
+        eds.map(edge => {
           if (edge.id === edgeId) {
             return {
               ...edge,
@@ -45,17 +45,17 @@ export function useUpdateConfigFlow(): UseUpdateConfigFlowReturn {
                     ...updates.data,
                   }
                 : edge.data,
-            }
+            };
           }
-          return edge
+          return edge;
         })
-      )
+      );
     },
     [setEdges]
-  )
+  );
 
   return {
     updateNode,
     updateEdge,
-  }
+  };
 }

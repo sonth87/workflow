@@ -1,6 +1,6 @@
-import { Handle, Position } from '@xyflow/react'
-import type { CustomNodeProps } from '..'
-import { handleStyle } from '../styles'
+import { Handle, Position } from "@xyflow/react";
+import type { CustomNodeProps } from "..";
+import { handleStyle } from "../styles";
 
 export function TaskNode({
   isConnecting,
@@ -10,21 +10,21 @@ export function TaskNode({
   return (
     <>
       <Handle
-        type='target'
+        type="target"
         position={targetPosition}
-        id='in'
+        id="in"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
       <Handle
-        type='source'
+        type="source"
         position={sourcePosition}
-        id='out'
+        id="out"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
     </>
-  )
+  );
 }
 
 export function ServiceTaskNode({
@@ -35,21 +35,21 @@ export function ServiceTaskNode({
   return (
     <>
       <Handle
-        type='target'
+        type="target"
         position={targetPosition}
-        id='in'
+        id="in"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
       <Handle
-        type='source'
+        type="source"
         position={sourcePosition}
-        id='out'
+        id="out"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
     </>
-  )
+  );
 }
 
 export function NotificationNode({
@@ -60,21 +60,21 @@ export function NotificationNode({
   return (
     <>
       <Handle
-        type='target'
+        type="target"
         position={targetPosition}
-        id='in'
+        id="in"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
       <Handle
-        type='source'
+        type="source"
         position={sourcePosition}
-        id='out'
+        id="out"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
     </>
-  )
+  );
 }
 
 export function TimeDelayNode({
@@ -85,21 +85,21 @@ export function TimeDelayNode({
   return (
     <>
       <Handle
-        type='target'
+        type="target"
         position={targetPosition}
-        id='in'
+        id="in"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
       <Handle
-        type='source'
+        type="source"
         position={sourcePosition}
-        id='out'
+        id="out"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
     </>
-  )
+  );
 }
 
 export function SubflowNode({
@@ -110,19 +110,19 @@ export function SubflowNode({
   return (
     <>
       <Handle
-        type='target'
+        type="target"
         position={targetPosition}
-        id='in'
+        id="in"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
       <Handle
-        type='source'
+        type="source"
         position={sourcePosition}
-        id='out'
+        id="out"
         isConnectable={!isConnecting}
         className={handleStyle}
       />
     </>
-  )
+  );
 }
