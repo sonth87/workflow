@@ -1,9 +1,9 @@
 import { CategoryType, NodeType } from '@/enum/workflow.enum'
 import { getIconConfig } from '@/pages/WorkflowBuilder/hooks/useGetIconByType'
+import { type DynamicWorkflowDefinition } from '@/types/dynamic-bpm.type'
 import { X } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 import { type NodeCategory, NODES_BY_CATEGORIES } from '../../data/list-toolbox'
-import { type DynamicWorkflowDefinition } from '@/types/dynamic-bpm.type'
 
 interface Props {
   dynamicBpm?: DynamicWorkflowDefinition
@@ -49,8 +49,12 @@ export function Toolbox(props: Props) {
 
       const targetCategory = ensureCategory(normalizedType)
 
-      if (!targetCategory.nodes.some((item) => item?.type === node?.data?.nodeType)) {
-        targetCategory.nodes.push({ type: node.data.nodeType, label: node.label })
+      if (!targetCategory.nodes.some((item) => item?.nodeType === node?.nodeType)) {
+        targetCategory.nodes.push({
+          nodeType: node.nodeType,
+          label: node.label,
+          category_type: node.category_type,
+        })
       }
     })
 
@@ -89,14 +93,14 @@ export function Toolbox(props: Props) {
           </div>
           <div className='p-4 space-y-1'>
             {selectedCategory.nodes.map((node) => {
-              const iconConfig = getIconConfig(node.type)
+              const iconConfig = getIconConfig(node.nodeType)
               const Icon = iconConfig.icon
 
               return (
                 <div
-                  key={node.type}
+                  key={node.nodeType}
                   draggable
-                  onDragStart={(e) => handleDragStart(e, node.type)}
+                  onDragStart={(e) => handleDragStart(e, node.nodeType)}
                   className='flex items-center gap-2 rounded-lg bg-card/80 backdrop-blur-sm p-3 font-medium cursor-move hover:bg-foreground/10 hover:border-primary hover:scale-[1.02] active:scale-95 transition-all duration-150'
                 >
                   {typeof Icon === 'string' ? (

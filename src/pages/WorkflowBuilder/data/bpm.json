@@ -11,12 +11,11 @@
   "nodes": [
     {
       "id": "start-1",
-      "type": "startEventDefault",
+      "nodeType": "startEventDefault",
       "category_type": "start",
       "label": "Webhook Trigger",
       "position": { "x": 100, "y": 80 },
       "data": {
-        "nodeType": "startEventDefault",
         "form_configs": {
           "fields": [
             {
@@ -36,12 +35,11 @@
     },
     {
       "id": "task-collect",
-      "type": "taskDefault",
+      "nodeType": "taskDefault",
       "category_type": "task",
       "label": "Collect Profile",
       "position": { "x": 320, "y": 80 },
       "data": {
-        "nodeType": "taskDefault",
         "role": "Agent",
         "form_configs": {
           "fields": [
@@ -88,12 +86,11 @@
     },
     {
       "id": "service-risk",
-      "type": "serviceTask",
+      "nodeType": "serviceTask",
       "category_type": "task",
       "label": "Risk Scoring",
       "position": { "x": 560, "y": 80 },
       "data": {
-        "nodeType": "serviceTask",
         "api": {
           "url": "https://risk.internal/api/score",
           "method": "POST",
@@ -121,12 +118,11 @@
     },
     {
       "id": "notify-approved",
-      "type": "notification",
+      "nodeType": "notification",
       "category_type": "task",
       "label": "Notify Customer",
       "position": { "x": 780, "y": 80 },
       "data": {
-        "nodeType": "notification",
         "channel": "email",
         "template": "approval-template",
         "form_configs": {
@@ -154,13 +150,11 @@
     },
     {
       "id": "end-1",
-      "type": "endEventDefault",
+      "nodeType": "endEventDefault",
       "category_type": "end",
       "label": "Completion",
       "position": { "x": 980, "y": 80 },
-      "data": {
-        "nodeType": "endEventDefault"
-      }
+      "data": {}
     }
   ],
   "validationRules": {

@@ -79,7 +79,7 @@ export default function WorkflowBuilder(props: Props) {
   }
 
   const handleNodeDrop = (nodeType: NodeType, position: { x: number; y: number }) => {
-    const nodeConfig = dynamicBpm?.nodes?.find((n) => n.data?.nodeType === nodeType)
+    const nodeConfig = dynamicBpm?.nodes?.find((n) => n.nodeType === nodeType)
 
     const newNode: BaseNode = {
       id: `${nodeType}-${Date.now()}`,

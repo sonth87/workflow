@@ -1,4 +1,4 @@
-import type { CategoryType, FieldType, HttpMethod } from '@/enum/workflow.enum'
+import type { CategoryType, FieldType, HttpMethod, NodeType } from '@/enum/workflow.enum'
 import type { BaseConfig, DynamicConfig, NodeValidationRules } from './workflow.type'
 
 export type WorkflowStatus = 'draft' | 'active' | 'inactive' | 'archived' | string
@@ -21,6 +21,7 @@ export interface DynamicWorkflowDefinition {
 }
 
 export interface DynamicNode extends BaseConfig {
+  nodeType: NodeType
   category_type: CategoryType
   data: DynamicConfig
 }

@@ -1,13 +1,10 @@
-import { CategoryType, NodeType } from '@/enum/workflow.enum'
-export interface NodeItem {
-  type: NodeType
-  label: string
-}
+import { CategoryType } from '@/enum/workflow.enum'
+import type { CommonConfig } from '@/types/workflow.type'
 
 export interface NodeCategory {
   name: string
   isOpen: boolean
-  nodes: NodeItem[]
+  nodes: CommonConfig[]
   icon?: React.ReactNode
   categoryType?: CategoryType
 }
