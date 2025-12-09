@@ -90,6 +90,12 @@ const END_EVENT_ICONS: Record<EndEventVariant, string> = {
 
 // Node type to icon configuration
 const NODE_ICON_CONFIG: Record<NodeType, IconConfig> = {
+  [NodeType.START_EVENT]: {
+    icon: StartDefault,
+    color: "#39CC7E",
+    bgColor: "#E8F8EF",
+    label: "Start",
+  },
   [NodeType.START_EVENT_DEFAULT]: {
     icon: StartDefault,
     color: "#39CC7E",

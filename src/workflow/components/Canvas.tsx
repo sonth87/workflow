@@ -22,9 +22,9 @@ import { edgeRegistry } from "@/core/registry/EdgeRegistry";
 import { validateConnection } from "@/utils/validation";
 import { NodeType } from "@/enum/workflow.enum";
 
-// Import node/edge types from old workflow (temporary until we create new ones)
-import { nodeTypes } from "@/pages/WorkflowBuilder/components/Canvas/nodes";
-import { edgeTypes } from "@/pages/WorkflowBuilder/components/Canvas/edges";
+// Import node/edge types from workflow
+import { nodeTypes } from "./nodes";
+import { edgeTypes } from "./edges";
 
 interface CanvasProps {
   onNodeDrop?: (nodeType: string, position: { x: number; y: number }) => void;

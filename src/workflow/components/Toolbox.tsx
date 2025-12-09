@@ -45,6 +45,7 @@ export function Toolbox() {
 
     // Add nodes from registry
     const allNodes = nodeRegistry.getAll();
+console.log('nodeRegistry.getAll():', allNodes);
     allNodes.forEach(registryItem => {
       const nodeType = registryItem.type as NodeType;
       const category = registryItem.config.metadata.category || "task";

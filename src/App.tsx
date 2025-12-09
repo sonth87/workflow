@@ -2,7 +2,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import OldWorkflowBuilder from "./pages/WorkflowBuilder";
 import NewWorkflowBuilder from "./workflow";
-import dataBpm from "./pages/WorkflowBuilder/data/bpm.json";
+import dataBpm from "./workflow/data/bpm.json";
 import type { DynamicWorkflowDefinition } from "./types/dynamic-bpm.type";
 
 function App() {

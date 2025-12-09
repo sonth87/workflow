@@ -1,4 +1,5 @@
 export enum NodeType {
+  START_EVENT = "startEvent",
   START_EVENT_DEFAULT = "startEventDefault",
   START_EVENT_API = "startEventApi",
   START_EVENT_TIMER = "startEventTimer",
