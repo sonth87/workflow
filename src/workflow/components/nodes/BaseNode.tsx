@@ -5,24 +5,59 @@ import { getIconConfig } from "@/workflow/utils/iconConfig";
 import { NodeType } from "@/enum/workflow.enum";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
+export interface NodeColorConfig {
+  backgroundColor?: string;
+  borderColor?: string;
+  ringColor?: string;
+  titleColor?: string;
+  descriptionColor?: string;
+  iconBgColor?: string;
+  iconColor?: string;
+}
+
 export interface Props extends CustomNodeProps {
   children?: React.ReactNode;
   type?: NodeType;
   showHeader?: boolean;
+  colorConfig?: NodeColorConfig;
 }
 
 export default function BaseNode(props: Props) {
-  const { children, type, data, showHeader = true } = props;
+  const { children, type, data, showHeader = true, colorConfig } = props;
   const [isExpanded, setIsExpanded] = useState(true);
 
   const iconConfig = type ? getIconConfig(type) : null;
   const Icon = iconConfig?.icon;
 
+  // Build dynamic styles
+  const containerStyle: React.CSSProperties = {
+    ...(colorConfig?.backgroundColor && {
+      backgroundColor: colorConfig.backgroundColor,
+    }),
+    ...(colorConfig?.borderColor && { borderColor: colorConfig.borderColor }),
+  };
+
+  const ringClasses = colorConfig?.ringColor ? "" : "ring-primary/25";
+  const ringStyle = colorConfig?.ringColor
+    ? { boxShadow: `0 0 0 4px ${colorConfig.ringColor}` }
+    : {};
+
   return (
     <div
       className={cx(nodeStyle, "min-w-[280px]", {
-        "border-primary ring-4 ring-primary/25": props.selected,
+        "border-primary ring-4":
+          props.selected &&
+          !colorConfig?.borderColor &&
+          !colorConfig?.ringColor,
+        "ring-4": props.selected && colorConfig?.ringColor,
+        [ringClasses]: props.selected && !colorConfig?.ringColor,
       })}
+      style={{
+        ...containerStyle,
+        ...(props.selected && ringStyle),
+        ...(colorConfig?.borderColor &&
+          props.selected && { borderColor: colorConfig.borderColor }),
+      }}
     >
       {/* Header - always visible */}
       {showHeader && iconConfig && (
@@ -37,12 +72,25 @@ export default function BaseNode(props: Props) {
             ) : Icon ? (
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                style={{ backgroundColor: iconConfig.bgColor }}
+                style={{
+                  backgroundColor:
+                    colorConfig?.iconBgColor || iconConfig.bgColor,
+                }}
               >
-                <Icon size={18} style={{ color: iconConfig.color }} />
+                <Icon
+                  size={18}
+                  style={{
+                    color: colorConfig?.iconColor || iconConfig.color,
+                  }}
+                />
               </div>
             ) : null}
-            <span className="text-sm font-semibold text-foreground truncate">
+            <span
+              className="text-sm font-semibold truncate"
+              style={{
+                color: colorConfig?.titleColor,
+              }}
+            >
               {data?.label}
             </span>
           </div>
@@ -65,7 +113,14 @@ export default function BaseNode(props: Props) {
 
       {/* Description - toggleable, but Handles always render */}
       {isExpanded && data?.label && (
-        <div className="text-xs text-muted-foreground mt-2">{data.label}</div>
+        <div
+          className="text-xs mt-2"
+          style={{
+            color: colorConfig?.descriptionColor,
+          }}
+        >
+          {data.label}
+        </div>
       )}
 
       {/* Children (Handles) - always render, but visually hidden when collapsed */}

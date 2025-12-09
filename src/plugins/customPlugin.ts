@@ -4,7 +4,7 @@
  */
 
 import type { Plugin } from "@/core/plugins/PluginManager";
-import type { BaseNodeConfig, BaseRuleConfig } from "@/core/types/base.types";
+import type { BaseNodeConfig } from "@/core/types/base.types";
 import { CategoryType } from "@/enum/workflow.enum";
 
 // Custom node types
@@ -76,7 +76,7 @@ const createCustomNodeConfig = (
       description: "Maximum 5 connections per node",
       maxInputConnections: 5,
       maxOutputConnections: 5,
-      validate: (source, target) => {
+      validate: (_source, _target) => {
         // Custom validation logic
         return { valid: true };
       },
@@ -192,7 +192,7 @@ export const customPlugin: Plugin = {
               description: "Must have at least one input",
               maxInputConnections: 10,
               maxOutputConnections: 5,
-              validate: (source, target) => {
+              validate: (source, _target) => {
                 // Data processor phải nhận input từ data sources
                 const validSources = [
                   CustomNodeType.API_INTEGRATOR,
@@ -355,8 +355,73 @@ export const customPlugin: Plugin = {
             // Kiểm tra có endpoint configuration
             return !!node.properties?.apiEndpoint;
           },
-          action: async (context: any) => {
+          action: async (_context: any) => {
             console.warn("API Integrator missing endpoint configuration");
+          },
+        },
+      },
+      {
+        id: "workflow-cycle-detection",
+        type: "validation",
+        name: "Cycle Detection",
+        config: {
+          id: "workflow-cycle-detection",
+          name: "Workflow Cycle Detection",
+          description: "Prevent circular loops in workflow",
+          type: "validation",
+          enabled: true,
+          priority: 100, // High priority - chạy đầu tiên
+          scope: "workflow",
+          condition: (context: any) => {
+            const { nodes, edges } = context;
+            if (!nodes || !edges) return true;
+
+            // Tạo adjacency list để dễ dàng traverse
+            const graph = new Map<string, string[]>();
+            nodes.forEach((node: any) => {
+              graph.set(node.id, []);
+            });
+
+            edges.forEach((edge: any) => {
+              const neighbors = graph.get(edge.source) || [];
+              neighbors.push(edge.target);
+              graph.set(edge.source, neighbors);
+            });
+
+            // DFS để phát hiện cycle
+            const visited = new Set<string>();
+            const recStack = new Set<string>();
+
+            const hasCycle = (nodeId: string): boolean => {
+              if (!visited.has(nodeId)) {
+                visited.add(nodeId);
+                recStack.add(nodeId);
+
+                const neighbors = graph.get(nodeId) || [];
+                for (const neighbor of neighbors) {
+                  if (!visited.has(neighbor) && hasCycle(neighbor)) {
+                    return true;
+                  } else if (recStack.has(neighbor)) {
+                    // Phát hiện cycle
+                    return true;
+                  }
+                }
+              }
+              recStack.delete(nodeId);
+              return false;
+            };
+
+            // Kiểm tra từ tất cả các nodes
+            for (const nodeId of graph.keys()) {
+              if (hasCycle(nodeId)) {
+                return false; // Có cycle - validation fail
+              }
+            }
+
+            return true; // Không có cycle - validation pass
+          },
+          action: async (_context: any) => {
+            console.error("❌ Workflow contains circular loop - not allowed!");
           },
         },
       },
