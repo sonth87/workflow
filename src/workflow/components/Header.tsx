@@ -13,9 +13,15 @@ import {
   Monitor,
   ArrowUpDown,
   ArrowRightLeft,
+  Download,
+  Upload,
 } from "lucide-react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { useTheme } from "@/hooks/useTheme";
+import {
+  useWorkflowEvents,
+  useWorkflowImportExport,
+} from "../hooks/useWorkflow";
 
 export type LayoutDirection = "vertical" | "horizontal";
 
@@ -35,6 +41,15 @@ export function Header({
   const { workflowName, setWorkflowName, undo, redo, history } =
     useWorkflowStore();
   const { theme, setLightMode, setDarkMode, setSystemMode } = useTheme();
+  const { exportWorkflow, importWorkflow } = useWorkflowImportExport();
+
+  useWorkflowEvents("node:added", event => {
+    console.log("Node được thêm:", event.payload);
+  });
+
+  useWorkflowEvents("edge:added", event => {
+    console.log("Edge connected:", event.payload);
+  });
 
   const canUndo = history.past.length > 0;
   const canRedo = history.future.length > 0;
@@ -154,6 +169,26 @@ export function Header({
             className="rounded p-2 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Redo2 size={18} />
+          </button>
+
+          <div className="mx-1 h-6 w-px bg-border" />
+
+          <button
+            title="Import Workflow"
+            onClick={importWorkflow}
+            className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
+          >
+            <Upload size={16} />
+            Import
+          </button>
+
+          <button
+            title="Export Workflow"
+            onClick={exportWorkflow}
+            className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
+          >
+            <Download size={16} />
+            Export
           </button>
 
           <div className="mx-1 h-6 w-px bg-border" />

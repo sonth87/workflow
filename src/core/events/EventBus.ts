@@ -134,6 +134,8 @@ export const WorkflowEventTypes = {
   WORKFLOW_VALIDATED: "workflow:validated",
   WORKFLOW_EXECUTED: "workflow:executed",
   WORKFLOW_CLEARED: "workflow:cleared",
+  WORKFLOW_EXPORTED: "workflow:exported",
+  WORKFLOW_IMPORTED: "workflow:imported",
 
   // Validation events
   VALIDATION_ERROR: "validation:error",

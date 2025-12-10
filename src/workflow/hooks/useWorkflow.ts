@@ -7,7 +7,7 @@ import { useWorkflowStore } from "@/core/store/workflowStore";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { edgeRegistry } from "@/core/registry/EdgeRegistry";
 import { validationEngine } from "@/core/validation/ValidationEngine";
-import { globalEventBus } from "@/core/events/EventBus";
+import { globalEventBus, type WorkflowEventType } from "@/core/events/EventBus";
 import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
 
 /**
@@ -127,7 +127,7 @@ export function useWorkflowValidation() {
  * Hook để listen workflow events
  */
 export function useWorkflowEvents(
-  eventType: string,
+  eventType: WorkflowEventType,
   handler: (event: any) => void,
   deps: any[] = []
 ) {
@@ -150,5 +150,101 @@ export function useAvailableNodes() {
   return {
     nodeTypes,
     getNodesByCategory,
+  };
+}
+
+/**
+ * Hook để handle workflow import/export
+ */
+export function useWorkflowImportExport() {
+  const { nodes, edges, workflowName, workflowDescription, loadWorkflow } =
+    useWorkflowStore();
+
+  /**
+   * Export workflow to JSON file
+   */
+  const exportWorkflow = useCallback(() => {
+    const workflowData = {
+      version: "1.0.0",
+      metadata: {
+        name: workflowName,
+        description: workflowDescription,
+        exportedAt: new Date().toISOString(),
+      },
+      nodes,
+      edges,
+    };
+
+    const jsonString = JSON.stringify(workflowData, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${workflowName.replace(/\s+/g, "_")}_${Date.now()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    globalEventBus.emit("workflow:exported", {
+      name: workflowName,
+      nodesCount: nodes.length,
+      edgesCount: edges.length,
+    });
+  }, [nodes, edges, workflowName, workflowDescription]);
+
+  /**
+   * Import workflow from JSON file
+   */
+  const importWorkflow = useCallback(() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+
+    input.onchange = async (e: Event) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const workflowData = JSON.parse(text);
+
+        // Validate workflow data structure
+        if (!workflowData.nodes || !workflowData.edges) {
+          throw new Error("Invalid workflow file: missing nodes or edges data");
+        }
+
+        // Load workflow
+        loadWorkflow({
+          workflowName: workflowData.metadata?.name || "Imported Workflow",
+          workflowDescription:
+            workflowData.metadata?.description || "Imported from file",
+          nodes: workflowData.nodes,
+          edges: workflowData.edges,
+        });
+
+        globalEventBus.emit("workflow:imported", {
+          name: workflowData.metadata?.name,
+          nodesCount: workflowData.nodes.length,
+          edgesCount: workflowData.edges.length,
+        });
+      } catch (error) {
+        console.error("Failed to import workflow:", error);
+        globalEventBus.emit("validation:error", {
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to import workflow",
+        });
+      }
+    };
+
+    input.click();
+  }, [loadWorkflow]);
+
+  return {
+    exportWorkflow,
+    importWorkflow,
   };
 }
