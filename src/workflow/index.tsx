@@ -27,8 +27,14 @@ import { getLayoutedElements } from "./utils/layout";
 function WorkflowBuilderInner() {
   const { createNode } = useNodeOperations();
   const { validate } = useWorkflowValidation();
-  const { nodes, edges, setNodes, selectedNodeIds, selectedEdgeIds } =
-    useWorkflowStore();
+  const {
+    nodes,
+    edges,
+    setNodes,
+    selectedNodeIds,
+    selectedEdgeIds,
+    saveToHistory,
+  } = useWorkflowStore();
   const { fitView } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();
 
@@ -85,6 +91,9 @@ function WorkflowBuilderInner() {
 
   const handleChangeLayoutDirection = useCallback(
     (direction: LayoutDirection) => {
+      // Save history before layout change
+      saveToHistory();
+
       setLayoutDirection(direction);
 
       const { nodes: layoutedNodes } = getLayoutedElements(
@@ -100,7 +109,7 @@ function WorkflowBuilderInner() {
         fitView({ padding: 0.2, duration: 300, maxZoom: 1 });
       }, 100);
     },
-    [nodes, edges, setNodes, updateNodeInternals, fitView]
+    [nodes, edges, setNodes, updateNodeInternals, fitView, saveToHistory]
   );
 
   const selectedNode =

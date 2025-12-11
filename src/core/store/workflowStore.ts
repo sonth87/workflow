@@ -170,7 +170,6 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
     },
 
     setNodes: nodes => {
-      get().saveToHistory();
       set({ nodes });
     },
 
@@ -212,7 +211,7 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
     },
 
     setEdges: edges => {
-      get().saveToHistory();
+      // Don't save to history here - let the caller decide when to save
       set({ edges });
     },
 

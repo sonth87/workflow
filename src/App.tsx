@@ -1,6 +1,8 @@
 import "@xyflow/react/dist/style.css";
 import WorkflowBuilder from "./workflow";
 import { customPlugin } from "./plugins/customPlugin";
+import { aiMLPlugin } from "./plugins/aiMLPlugin";
+// import { defaultBpmPlugin } from "./plugins/defaultBpmPlugin";
 
 function App() {
   // New version with custom plugin demo
@@ -15,7 +17,7 @@ function App() {
         autoActivate: true,
 
         // Danh sách custom plugins
-        plugins: [customPlugin],
+        plugins: [aiMLPlugin],
       }}
     />
   );

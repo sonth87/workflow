@@ -22,6 +22,7 @@ import { edgeRegistry } from "@/core/registry/EdgeRegistry";
 import { validateConnection } from "@/utils/validation";
 import { NodeType } from "@/enum/workflow.enum";
 import type { ContextMenuContext } from "@/core/types/base.types";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 // Import node/edge types from workflow
 import { nodeTypes } from "./nodes";
@@ -42,6 +43,9 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
     selectEdge,
     clearSelection,
     addEdge,
+    undo,
+    redo,
+    saveToHistory,
   } = useWorkflowStore();
   const { screenToFlowPosition } = useReactFlow();
   const [contextMenu, setContextMenu] = useState<{
@@ -49,6 +53,7 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
     y: number;
     context: ContextMenuContext;
   } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Handle node changes
   const onNodesChange = useCallback(
@@ -65,6 +70,19 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
     },
     [edges, setEdges]
   );
+
+  // Handle node drag start - save history before drag begins
+  const onNodeDragStart = useCallback(() => {
+    if (!isDragging) {
+      saveToHistory(); // Save state BEFORE drag
+      setIsDragging(true);
+    }
+  }, [isDragging, saveToHistory]);
+
+  // Handle node drag stop
+  const onNodeDragStop = useCallback(() => {
+    setIsDragging(false);
+  }, []);
 
   // Handle connection with validation
   const onConnect = useCallback(
@@ -264,53 +282,51 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  // Handle keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Delete or Backspace key
-      if (event.key === "Delete" || event.key === "Backspace") {
-        // Get selected nodes and edges
-        const selectedNodes = nodes.filter(node => node.selected);
-        const selectedEdges = edges.filter(edge => edge.selected);
+  // Keyboard shortcuts handlers
+  const handleDeleteSelection = useCallback(
+    (nodeIds: string[], edgeIds: string[]) => {
+      // Save history before deletion
+      saveToHistory();
 
-        // Delete selected nodes
-        if (selectedNodes.length > 0) {
-          const nodeIdsToDelete = selectedNodes
-            .filter(node => node.data?.deletable !== false)
-            .map(node => node.id);
-
-          if (nodeIdsToDelete.length > 0) {
-            setNodes(nodes.filter(node => !nodeIdsToDelete.includes(node.id)));
-            // Also delete connected edges
-            setEdges(
-              edges.filter(
-                edge =>
-                  !nodeIdsToDelete.includes(edge.source) &&
-                  !nodeIdsToDelete.includes(edge.target)
-              )
-            );
-          }
-        }
-
-        // Delete selected edges
-        if (selectedEdges.length > 0) {
-          const edgeIdsToDelete = selectedEdges
-            .filter(edge => edge.data?.deletable !== false)
-            .map(edge => edge.id);
-
-          if (edgeIdsToDelete.length > 0) {
-            setEdges(edges.filter(edge => !edgeIdsToDelete.includes(edge.id)));
-          }
-        }
-
-        // Prevent default behavior
-        event.preventDefault();
+      // Delete nodes
+      if (nodeIds.length > 0) {
+        setNodes(nodes.filter(node => !nodeIds.includes(node.id)));
+        // Also delete connected edges
+        setEdges(
+          edges.filter(
+            edge =>
+              !nodeIds.includes(edge.source) && !nodeIds.includes(edge.target)
+          )
+        );
       }
-    };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [nodes, edges, setNodes, setEdges]);
+      // Delete edges
+      if (edgeIds.length > 0) {
+        setEdges(edges.filter(edge => !edgeIds.includes(edge.id)));
+      }
+    },
+    [nodes, edges, setNodes, setEdges, saveToHistory]
+  );
+
+  const handleSelectAll = useCallback(() => {
+    setNodes(
+      nodes.map(node => ({
+        ...node,
+        selected: true,
+      }))
+    );
+  }, [nodes, setNodes]);
+
+  // Use keyboard shortcuts hook
+  useKeyboardShortcuts(nodes, edges, {
+    handlers: {
+      onDeleteSelection: handleDeleteSelection,
+      onSelectAll: handleSelectAll,
+      onClearSelection: clearSelection,
+      onUndo: undo,
+      onRedo: redo,
+    },
+  });
 
   return (
     <main
@@ -331,12 +347,14 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         onPaneClick={onPaneClick}
         onNodeContextMenu={onNodeContextMenu}
         onEdgeContextMenu={onEdgeContextMenu}
+        onNodeDragStart={onNodeDragStart}
+        onNodeDragStop={onNodeDragStop}
         defaultEdgeOptions={{
           type: "smooth",
           animated: true,
           markerEnd: { type: "arrowclosed" },
         }}
-        connectionLineType={ConnectionLineType.SmoothStep}
+        connectionLineType={ConnectionLineType.Bezier}
         snapGrid={[15, 15]}
         selectNodesOnDrag={false}
         panOnDrag={[1, 2]}
