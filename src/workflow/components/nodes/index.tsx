@@ -46,11 +46,18 @@ const wrapWithBaseNode = (
   Component: React.ComponentType<CustomNodeProps>,
   nodeType: NodeType
 ) => {
-  return (props: CustomNodeProps) => (
-    <BaseNode {...props} type={nodeType}>
-      <Component {...props} />
-    </BaseNode>
-  );
+  return (props: CustomNodeProps) => {
+    // Extract visualConfig from data
+    const visualConfig = props.data?.visualConfig as
+      | NodeVisualConfig
+      | undefined;
+
+    return (
+      <BaseNode {...props} type={nodeType} visualConfig={visualConfig}>
+        <Component {...props} />
+      </BaseNode>
+    );
+  };
 };
 
 export const nodeTypes = {

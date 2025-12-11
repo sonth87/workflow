@@ -3,6 +3,8 @@ import {
   BaseEdge,
   EdgeLabelRenderer,
   getSmoothStepPath,
+  getStraightPath,
+  getBezierPath,
   type EdgeProps,
 } from "@xyflow/react";
 import type { EdgeVisualConfig } from "@/core/types/base.types";
@@ -23,7 +25,58 @@ function getStrokeDashArray(
   }
 }
 
-export function SmoothEdge({
+/**
+ * Get edge path based on edge type
+ */
+function getEdgePath(
+  edgeType: string,
+  params: {
+    sourceX: number;
+    sourceY: number;
+    targetX: number;
+    targetY: number;
+    sourcePosition: any;
+    targetPosition: any;
+  }
+) {
+  const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } =
+    params;
+
+  switch (edgeType) {
+    case EdgeType.Straight:
+      return getStraightPath({
+        sourceX,
+        sourceY,
+        targetX,
+        targetY,
+      });
+    case EdgeType.Step:
+      return getSmoothStepPath({
+        sourceX,
+        sourceY,
+        sourcePosition,
+        targetX,
+        targetY,
+        targetPosition,
+      });
+    case EdgeType.Bezier:
+    default:
+      return getBezierPath({
+        sourceX,
+        sourceY,
+        sourcePosition,
+        targetX,
+        targetY,
+        targetPosition,
+      });
+  }
+}
+
+/**
+ * Dynamic Edge Component
+ * Renders different edge types based on data.edgeType
+ */
+export function DynamicEdge({
   id,
   sourceX,
   sourceY,
@@ -31,18 +84,21 @@ export function SmoothEdge({
   targetY,
   sourcePosition,
   targetPosition,
-  markerEnd,
   style,
   label,
   selected,
   data,
 }: EdgeProps) {
-  const [edgePath, labelX, labelY] = getSmoothStepPath({
+  // Get edge type from data, fallback to bezier
+  const edgeType = (data?.edgeType as string) || EdgeType.Bezier;
+  const pathStyle = (data?.pathStyle as string) || "solid";
+
+  const [edgePath, labelX, labelY] = getEdgePath(edgeType, {
     sourceX,
     sourceY,
-    sourcePosition,
     targetX,
     targetY,
+    sourcePosition,
     targetPosition,
   });
 
@@ -56,7 +112,7 @@ export function SmoothEdge({
   const strokeWidth = selected
     ? visualConfig?.selectedStrokeWidth || 3
     : visualConfig?.strokeWidth || 2;
-  const strokeDashArray = getStrokeDashArray(visualConfig?.strokeStyle);
+  const strokeDashArray = getStrokeDashArray(pathStyle as any);
   const markerColor = visualConfig?.markerColor || strokeColor || "#3b82f6";
 
   return (
@@ -135,9 +191,13 @@ export function SmoothEdge({
   );
 }
 
+/**
+ * Edge types mapping for React Flow
+ * All edge types use the DynamicEdge component
+ */
 export const edgeTypes = {
-  [EdgeType.SmoothStep]: SmoothEdge,
-  [EdgeType.Default]: SmoothEdge,
-  [EdgeType.Straight]: SmoothEdge,
-  [EdgeType.Bezier]: SmoothEdge,
+  "sequence-flow": DynamicEdge,
+  [EdgeType.Bezier]: DynamicEdge,
+  [EdgeType.Straight]: DynamicEdge,
+  [EdgeType.Step]: DynamicEdge,
 };

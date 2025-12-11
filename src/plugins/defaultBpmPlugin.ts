@@ -12,13 +12,17 @@ import type {
 } from "@/core/types/base.types";
 import type { ContextMenuConfig } from "@/core/registry/ContextMenuRegistry";
 import type { ContextMenuContext } from "@/core/types/base.types";
-import { NodeType, CategoryType, EdgeType } from "@/enum/workflow.enum";
+import {
+  NodeType,
+  CategoryType,
+  EdgeType,
+  EdgePathStyle,
+} from "@/enum/workflow.enum";
 import {
   createDefaultNodeContextMenuItems,
   createDefaultEdgeContextMenuItems,
-  paletteToNodeVisualConfig,
-  paletteToEdgeVisualConfig,
 } from "@/core/utils/contextMenuHelpers";
+import { contextMenuActionsRegistry } from "@/core/registry";
 
 // ============================================
 // Default Node Configurations
@@ -252,29 +256,32 @@ const defaultEdges: Array<{
   config: BaseEdgeConfig;
 }> = [
   {
-    id: EdgeType.Default,
-    type: EdgeType.Default,
-    name: "Default Edge",
+    id: "sequence-flow",
+    type: "sequence-flow",
+    name: "Sequence Flow",
     config: {
       id: "",
       source: "",
       target: "",
-      type: EdgeType.Default,
-      edgeType: EdgeType.Default,
+      type: "sequence-flow", // Registry type
+      edgeType: EdgeType.Bezier, // Default rendering type
       metadata: {
-        id: EdgeType.Default,
-        title: "Default Edge",
-        description: "Standard connection",
+        id: "sequence-flow",
+        title: "Sequence Flow",
+        description: "Standard BPMN sequence flow connection",
         version: "1.0.0",
       },
-      pathStyle: "solid",
+      pathStyle: EdgePathStyle.Solid,
       pathWidth: 2,
       animated: false,
       editable: true,
       deletable: true,
       selectable: true,
       labels: [],
-      properties: {},
+      properties: {
+        edgeType: EdgeType.Bezier,
+        pathStyle: EdgePathStyle.Solid,
+      },
       propertyDefinitions: [
         {
           id: "label",
@@ -290,34 +297,158 @@ const defaultEdges: Array<{
           description: "Conditional expression",
           defaultValue: "",
         },
+        {
+          id: "edgeType",
+          type: "select",
+          label: "Edge Type",
+          description: "Visual rendering type",
+          defaultValue: EdgeType.Bezier,
+          options: [
+            { label: "Bezier", value: EdgeType.Bezier },
+            { label: "Straight", value: EdgeType.Straight },
+            { label: "Step", value: EdgeType.Step },
+          ],
+        },
+        {
+          id: "pathStyle",
+          type: "select",
+          label: "Path Style",
+          description: "Line style",
+          defaultValue: "solid",
+          options: [
+            { label: "Solid", value: EdgePathStyle.Solid },
+            { label: "Dashed", value: EdgePathStyle.Dashed },
+            { label: "Dotted", value: EdgePathStyle.Dotted },
+          ],
+        },
       ],
     },
   },
   {
-    id: EdgeType.SmoothStep,
-    type: EdgeType.SmoothStep,
-    name: "Smooth Step Edge",
+    id: "message-flow",
+    type: "message-flow",
+    name: "Message Flow",
     config: {
       id: "",
       source: "",
       target: "",
-      type: EdgeType.SmoothStep,
-      edgeType: EdgeType.SmoothStep,
+      type: "message-flow",
+      edgeType: EdgeType.Straight,
       metadata: {
-        id: EdgeType.SmoothStep,
-        title: "Smooth Step Edge",
-        description: "Smooth step connection",
+        id: "message-flow",
+        title: "Message Flow",
+        description: "BPMN message flow between pools/participants",
         version: "1.0.0",
       },
-      pathStyle: "solid",
+      pathStyle: EdgePathStyle.Dashed,
       pathWidth: 2,
       animated: false,
       editable: true,
       deletable: true,
       selectable: true,
       labels: [],
-      properties: {},
-      propertyDefinitions: [],
+      properties: {
+        edgeType: EdgeType.Straight,
+        pathStyle: EdgePathStyle.Dashed,
+        messageType: "default",
+      },
+      propertyDefinitions: [
+        {
+          id: "label",
+          type: "text",
+          label: "Label",
+          description: "Message name",
+          defaultValue: "",
+        },
+        {
+          id: "messageType",
+          type: "select",
+          label: "Message Type",
+          description: "Type of message being sent",
+          defaultValue: "default",
+          options: [
+            { label: "Default", value: "default" },
+            { label: "Email", value: "email" },
+            { label: "API Call", value: "api" },
+            { label: "Event", value: "event" },
+          ],
+        },
+        {
+          id: "edgeType",
+          type: "select",
+          label: "Edge Type",
+          description: "Visual rendering type",
+          defaultValue: EdgeType.Straight,
+          options: [
+            { label: "Bezier", value: EdgeType.Bezier },
+            { label: "Straight", value: EdgeType.Straight },
+            { label: "Step", value: EdgeType.Step },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: "association",
+    type: "association",
+    name: "Association",
+    config: {
+      id: "",
+      source: "",
+      target: "",
+      type: "association",
+      edgeType: EdgeType.Straight,
+      metadata: {
+        id: "association",
+        title: "Association",
+        description: "BPMN association for artifacts and annotations",
+        version: "1.0.0",
+      },
+      pathStyle: EdgePathStyle.Dotted,
+      pathWidth: 1.5,
+      animated: false,
+      editable: true,
+      deletable: true,
+      selectable: true,
+      labels: [],
+      properties: {
+        edgeType: EdgeType.Straight,
+        pathStyle: EdgePathStyle.Dotted,
+        direction: "none",
+      },
+      propertyDefinitions: [
+        {
+          id: "label",
+          type: "text",
+          label: "Label",
+          description: "Association label",
+          defaultValue: "",
+        },
+        {
+          id: "direction",
+          type: "select",
+          label: "Direction",
+          description: "Association direction",
+          defaultValue: "none",
+          options: [
+            { label: "None", value: "none" },
+            { label: "One Way", value: "one" },
+            { label: "Both Ways", value: "both" },
+          ],
+        },
+        {
+          id: "edgeType",
+          type: "select",
+          label: "Edge Type",
+          description: "Visual rendering type",
+          defaultValue: EdgeType.Straight,
+          options: [
+            { label: "Bezier", value: EdgeType.Bezier },
+            { label: "Straight", value: EdgeType.Straight },
+            { label: "Step", value: EdgeType.Step },
+          ],
+        },
+      ],
     },
   },
 ];
@@ -427,18 +558,26 @@ const defaultContextMenus: Array<{
       items: createDefaultNodeContextMenuItems(
         // On color change
         async (paletteId: string, context: ContextMenuContext) => {
-          if (context.node) {
-            const visualConfig = paletteToNodeVisualConfig(paletteId);
-            // Update node visual config
-            // This will be handled by the workflow store/canvas
-            console.log("Change node color to:", paletteId, visualConfig);
+          const action =
+            contextMenuActionsRegistry.getAction("changeNodeColor");
+          if (action && context.nodeId) {
+            action(context.nodeId, paletteId);
+          }
+        },
+        // On border style change
+        async (borderStyle: string, context: ContextMenuContext) => {
+          const action = contextMenuActionsRegistry.getAction(
+            "changeNodeBorderStyle"
+          );
+          if (action && context.nodeId) {
+            action(context.nodeId, borderStyle);
           }
         },
         // On delete
         async (context: ContextMenuContext) => {
-          if (context.nodeId) {
-            console.log("Delete node:", context.nodeId);
-            // This will be handled by the workflow store/canvas
+          const action = contextMenuActionsRegistry.getAction("deleteNode");
+          if (action && context.nodeId) {
+            action(context.nodeId);
           }
         }
       ),
@@ -455,17 +594,33 @@ const defaultContextMenus: Array<{
       items: createDefaultEdgeContextMenuItems(
         // On color change
         async (paletteId: string, context: ContextMenuContext) => {
-          if (context.edge) {
-            const visualConfig = paletteToEdgeVisualConfig(paletteId);
-            console.log("Change edge color to:", paletteId, visualConfig);
-            // This will be handled by the workflow store/canvas
+          const action =
+            contextMenuActionsRegistry.getAction("changeEdgeColor");
+          if (action && context.edgeId) {
+            action(context.edgeId, paletteId);
+          }
+        },
+        // On edge type change
+        async (edgeType: string, context: ContextMenuContext) => {
+          const action = contextMenuActionsRegistry.getAction("changeEdgeType");
+          if (action && context.edgeId) {
+            action(context.edgeId, edgeType);
+          }
+        },
+        // On path style change
+        async (pathStyle: string, context: ContextMenuContext) => {
+          const action = contextMenuActionsRegistry.getAction(
+            "changeEdgePathStyle"
+          );
+          if (action && context.edgeId) {
+            action(context.edgeId, pathStyle);
           }
         },
         // On delete
         async (context: ContextMenuContext) => {
-          if (context.edgeId) {
-            console.log("Delete edge:", context.edgeId);
-            // This will be handled by the workflow store/canvas
+          const action = contextMenuActionsRegistry.getAction("deleteEdge");
+          if (action && context.edgeId) {
+            action(context.edgeId);
           }
         }
       ),

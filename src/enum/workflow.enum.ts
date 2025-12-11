@@ -57,12 +57,15 @@ export enum RoleType {
 }
 
 export enum EdgeType {
-  Default = "default",
+  Bezier = "bezier",
   Straight = "straight",
   Step = "step",
-  SmoothStep = "smoothstep",
-  Bezier = "bezier",
-  SimpleBezier = "simplebezier",
+}
+
+export enum EdgePathStyle {
+  Solid = "solid",
+  Dashed = "dashed",
+  Dotted = "dotted",
 }
 
 export enum CategoryType {

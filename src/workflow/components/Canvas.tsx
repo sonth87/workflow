@@ -21,10 +21,12 @@ import { useWorkflowStore } from "@/core/store/workflowStore";
 import { edgeRegistry } from "@/core/registry/EdgeRegistry";
 import { validateConnection } from "@/utils/validation";
 import { NodeType } from "@/enum/workflow.enum";
+import type { ContextMenuContext } from "@/core/types/base.types";
 
 // Import node/edge types from workflow
 import { nodeTypes } from "./nodes";
 import { edgeTypes } from "./edges";
+import { ContextMenu } from "./ContextMenu";
 
 interface CanvasProps {
   onNodeDrop?: (nodeType: string, position: { x: number; y: number }) => void;
@@ -45,6 +47,7 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
+    context: ContextMenuContext;
   } | null>(null);
 
   // Handle node changes
@@ -154,7 +157,7 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
       }
 
       const edge = edgeRegistry.createEdge(
-        "default",
+        "sequence-flow",
         connection.source,
         connection.target,
         {
@@ -190,6 +193,40 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
   const onPaneClick = useCallback(() => {
     clearSelection();
   }, [clearSelection]);
+
+  // Handle node context menu
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: any) => {
+      event.preventDefault();
+      setContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+        context: {
+          nodeId: node.id,
+          node: node,
+          position: { x: event.clientX, y: event.clientY },
+        },
+      });
+    },
+    []
+  );
+
+  // Handle edge context menu
+  const onEdgeContextMenu = useCallback(
+    (event: React.MouseEvent, edge: any) => {
+      event.preventDefault();
+      setContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+        context: {
+          edgeId: edge.id,
+          edge: edge,
+          position: { x: event.clientX, y: event.clientY },
+        },
+      });
+    },
+    []
+  );
 
   // Handle drop
   const onDrop = useCallback(
@@ -292,6 +329,8 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         onNodeClick={onNodeClick}
         onEdgeClick={onEdgeClick}
         onPaneClick={onPaneClick}
+        onNodeContextMenu={onNodeContextMenu}
+        onEdgeContextMenu={onEdgeContextMenu}
         defaultEdgeOptions={{
           type: "smooth",
           animated: true,
@@ -306,32 +345,16 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         reconnectRadius={20}
         minZoom={0.2}
         maxZoom={3}
-        onPaneContextMenu={e => {
-          e.preventDefault();
-          setContextMenu({
-            x: e.clientX,
-            y: e.clientY,
-          });
-        }}
       >
         <Background gap={15} />
       </ReactFlow>
       {contextMenu && (
-        <div
-          onClick={e => e.stopPropagation()}
-          style={{
-            position: "fixed",
-            top: contextMenu.y,
-            left: contextMenu.x,
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            padding: 8,
-            borderRadius: 6,
-            zIndex: 999,
-          }}
-        >
-          <div className="text-sm">Context Menu</div>
-        </div>
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          context={contextMenu.context}
+          onClose={() => setContextMenu(null)}
+        />
       )}
     </main>
   );

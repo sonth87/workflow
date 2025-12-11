@@ -8,6 +8,7 @@ import {
   WorkflowProvider,
   type PluginOptions,
 } from "./context/WorkflowProvider";
+import { WorkflowActionsProvider } from "./context/WorkflowActionsProvider";
 import { Canvas } from "./components/Canvas";
 import { Toolbox } from "./components/Toolbox";
 import { PropertiesPanel } from "./components/PropertiesPanel";
@@ -168,7 +169,9 @@ export default function WorkflowBuilder({
   return (
     <WorkflowProvider pluginOptions={pluginOptions}>
       <ReactFlowProvider>
-        <WorkflowBuilderInner />
+        <WorkflowActionsProvider>
+          <WorkflowBuilderInner />
+        </WorkflowActionsProvider>
       </ReactFlowProvider>
     </WorkflowProvider>
   );

@@ -36,7 +36,7 @@ export class EdgeRegistry extends BaseRegistry<BaseEdgeConfig> {
 
     const defaultConfig = item.config;
 
-    return {
+    const edge = {
       ...defaultConfig,
       ...overrides,
       id: overrides?.id || `${source}-${target}-${Date.now()}`,
@@ -50,7 +50,17 @@ export class EdgeRegistry extends BaseRegistry<BaseEdgeConfig> {
         ...defaultConfig.properties,
         ...overrides?.properties,
       },
+      data: {
+        ...defaultConfig.data,
+        ...overrides?.data,
+        // Ensure edgeType and pathStyle are in data for rendering
+        edgeType: overrides?.edgeType || defaultConfig.edgeType,
+        pathStyle: overrides?.pathStyle || defaultConfig.pathStyle,
+        visualConfig: overrides?.visualConfig || defaultConfig.visualConfig,
+      },
     } as BaseEdgeConfig;
+
+    return edge;
   }
 
   /**

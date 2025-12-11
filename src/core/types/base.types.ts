@@ -238,7 +238,8 @@ export interface ConnectionRule {
 export interface ContextMenuItem {
   id: string;
   label: string;
-  icon?: IconConfig;
+  icon?: IconConfig | string; // Có thể là IconConfig hoặc string (emoji/text)
+  color?: string; // Màu sắc để hiển thị (cho color picker)
   disabled?: boolean;
   separator?: boolean;
   children?: ContextMenuItem[];
@@ -368,6 +369,18 @@ export interface EdgeAnimation {
 }
 
 /**
+ * Edge type union - Có thể mở rộng bởi plugins
+ */
+export type EdgeTypeValue =
+  | "default"
+  | "straight"
+  | "step"
+  | "smoothstep"
+  | "bezier"
+  | "simplebezier"
+  | string; // Allow custom edge types from plugins
+
+/**
  * Base Edge Configuration - Core interface cho tất cả edge types
  */
 export interface BaseEdgeConfig extends Edge {
@@ -375,7 +388,7 @@ export interface BaseEdgeConfig extends Edge {
   metadata: BaseMetadata;
 
   // Edge type
-  edgeType: string; // 'default', 'smoothstep', 'step', 'straight', 'bezier', 'custom'
+  edgeType: EdgeTypeValue;
 
   // Visual & Styling
   visualConfig?: EdgeVisualConfig; // New: Centralized visual configuration

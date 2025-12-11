@@ -15,7 +15,11 @@ import {
   ArrowRightLeft,
   Download,
   Upload,
+  Eye,
+  X,
+  Copy,
 } from "lucide-react";
+import { useState } from "react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { useTheme } from "@/hooks/useTheme";
 import {
@@ -41,7 +45,11 @@ export function Header({
   const { workflowName, setWorkflowName, undo, redo, history } =
     useWorkflowStore();
   const { theme, setLightMode, setDarkMode, setSystemMode } = useTheme();
-  const { exportWorkflow, importWorkflow } = useWorkflowImportExport();
+  const { viewWorkflow, exportWorkflow, importWorkflow } =
+    useWorkflowImportExport();
+
+  const [showJsonDialog, setShowJsonDialog] = useState(false);
+  const [jsonData, setJsonData] = useState<string>("");
 
   useWorkflowEvents("node:added", event => {
     console.log("Node được thêm:", event.payload);
@@ -53,6 +61,16 @@ export function Header({
 
   const canUndo = history.past.length > 0;
   const canRedo = history.future.length > 0;
+
+  const handleViewWorkflow = () => {
+    const wfj = viewWorkflow();
+    setJsonData(JSON.stringify(wfj, null, 2));
+    setShowJsonDialog(true);
+  };
+
+  const handleCopyJson = () => {
+    navigator.clipboard.writeText(jsonData);
+  };
 
   return (
     <header className="w-full bg-card p-3">
@@ -174,6 +192,14 @@ export function Header({
           <div className="mx-1 h-6 w-px bg-border" />
 
           <button
+            title="View Workflow"
+            onClick={handleViewWorkflow}
+            className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
+          >
+            <Eye size={16} />
+          </button>
+
+          <button
             title="Import Workflow"
             onClick={importWorkflow}
             className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
@@ -212,6 +238,41 @@ export function Header({
           </button>
         </div>
       </div>
+
+      {/* JSON Dialog */}
+      {showJsonDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-[90vw] max-w-4xl h-[80vh] bg-card rounded-lg shadow-xl flex flex-col">
+            {/* Dialog Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-xl font-semibold">Workflow JSON</h2>
+              <div className="flex items-center gap-2">
+                <button
+                  title="Copy JSON"
+                  onClick={handleCopyJson}
+                  className="rounded p-2 hover:bg-muted"
+                >
+                  <Copy size={18} />
+                </button>
+                <button
+                  title="Close"
+                  onClick={() => setShowJsonDialog(false)}
+                  className="rounded p-2 hover:bg-muted"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Dialog Content */}
+            <div className="flex-1 overflow-auto p-4">
+              <pre className="bg-muted rounded p-4 text-sm font-mono overflow-auto">
+                {jsonData}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

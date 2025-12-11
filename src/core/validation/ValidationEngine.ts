@@ -169,8 +169,8 @@ export class ValidationEngine {
           const result = rule.validate(
             sourceNode,
             targetNode!,
-            edge.sourceHandle,
-            edge.targetHandle
+            edge.sourceHandle || undefined,
+            edge.targetHandle || undefined
           );
 
           if (typeof result === "boolean" && !result) {

@@ -184,9 +184,21 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
     updateEdge: (edgeId, updates) => {
       get().saveToHistory();
       set(state => ({
-        edges: state.edges.map(edge =>
-          edge.id === edgeId ? { ...edge, ...updates } : edge
-        ),
+        edges: state.edges.map(edge => {
+          if (edge.id !== edgeId) return edge;
+
+          // Deep merge data object to ensure nested properties are preserved
+          const updatedEdge = {
+            ...edge,
+            ...updates,
+            data: {
+              ...edge.data,
+              ...updates.data,
+            },
+          };
+
+          return updatedEdge;
+        }),
       }));
       globalEventBus.emit(WorkflowEventTypes.EDGE_UPDATED, { edgeId, updates });
     },

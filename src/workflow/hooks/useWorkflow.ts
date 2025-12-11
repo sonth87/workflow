@@ -65,7 +65,7 @@ export function useEdgeOperations() {
   const { addEdge, updateEdge, deleteEdge } = useWorkflowStore();
 
   const createEdge = useCallback(
-    (source: string, target: string, edgeType: string = "default") => {
+    (source: string, target: string, edgeType: string = "sequence-flow") => {
       const edge = edgeRegistry.createEdge(edgeType, source, target);
 
       if (edge) {
@@ -160,6 +160,15 @@ export function useWorkflowImportExport() {
   const { nodes, edges, workflowName, workflowDescription, loadWorkflow } =
     useWorkflowStore();
 
+  const viewWorkflow = useCallback(() => {
+    return {
+      nodes,
+      edges,
+      workflowName,
+      workflowDescription,
+    };
+  }, [nodes, edges, workflowName, workflowDescription]);
+
   /**
    * Export workflow to JSON file
    */
@@ -244,6 +253,7 @@ export function useWorkflowImportExport() {
   }, [loadWorkflow]);
 
   return {
+    viewWorkflow,
     exportWorkflow,
     importWorkflow,
   };
