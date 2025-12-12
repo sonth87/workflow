@@ -4,14 +4,24 @@
  */
 
 import { useReactFlow } from "@xyflow/react";
-import { Hand, Minus, Plus, Maximize2, Menu } from "lucide-react";
+import {
+  Hand,
+  Minus,
+  Plus,
+  Maximize,
+  Menu,
+  RefreshCcw,
+  MousePointer2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface ToolbarProps {
   onMenu?: () => void;
+  isPanMode?: boolean;
+  onPanModeChange?: (isPanMode: boolean) => void;
 }
 
-export function Toolbar({ onMenu }: ToolbarProps) {
+export function Toolbar({ onMenu, isPanMode = false, onPanModeChange }: ToolbarProps) {
   const { zoomIn, zoomOut, fitView, getZoom } = useReactFlow();
   const [displayZoom, setDisplayZoom] = useState(100);
 
@@ -36,13 +46,38 @@ export function Toolbar({ onMenu }: ToolbarProps) {
     fitView({ padding: 0.2, duration: 200, maxZoom: 1 });
   };
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  };
+
   return (
     <footer className="flex items-center justify-center gap-1 rounded-lg bg-card p-2 shadow-md border border-border">
       <button
-        title="Pan tool"
-        className="rounded p-2 hover:bg-muted transition-colors"
+        title="Select tool (V)"
+        onClick={() => onPanModeChange?.(false)}
+        className={`rounded p-2 transition-colors ${
+          !isPanMode
+            ? "bg-primary text-primary-foreground"
+            : "hover:bg-muted text-foreground"
+        }`}
       >
-        <Hand size={18} className="text-foreground" />
+        <MousePointer2 size={18} />
+      </button>
+
+      <button
+        title="Hand tool (H) - Pan canvas only"
+        onClick={() => onPanModeChange?.(true)}
+        className={`rounded p-2 transition-colors ${
+          isPanMode
+            ? "bg-primary text-primary-foreground"
+            : "hover:bg-muted text-foreground"
+        }`}
+      >
+        <Hand size={18} />
       </button>
 
       <div className="h-6 w-px bg-border" />
@@ -67,14 +102,22 @@ export function Toolbar({ onMenu }: ToolbarProps) {
         <Plus size={18} className="text-foreground" />
       </button>
 
+      <button
+        onClick={handleFitView}
+        title="Zoom in"
+        className="rounded p-2 hover:bg-muted transition-colors"
+      >
+        <RefreshCcw size={18} className="text-foreground" />
+      </button>
+
       <div className="h-6 w-px bg-border" />
 
       <button
-        onClick={handleFitView}
-        title="Fit view"
+        onClick={toggleFullscreen}
+        title="Fullscreen"
         className="rounded p-2 hover:bg-muted transition-colors"
       >
-        <Maximize2 size={18} className="text-foreground" />
+        <Maximize size={18} className="text-foreground" />
       </button>
 
       <button

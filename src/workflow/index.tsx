@@ -3,7 +3,7 @@
  * Layout giống với workflow cũ
  */
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   WorkflowProvider,
   type PluginOptions,
@@ -34,12 +34,19 @@ function WorkflowBuilderInner() {
     selectedNodeIds,
     selectedEdgeIds,
     saveToHistory,
+    clearSelection,
   } = useWorkflowStore();
   const { fitView } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();
 
   const [layoutDirection, setLayoutDirection] =
     useState<LayoutDirection>("horizontal");
+  const [isPanMode, setIsPanMode] = useState(false);
+
+  // Clear selection when entering pan mode
+  useEffect(() => {
+    if (isPanMode) clearSelection();
+  }, [isPanMode, clearSelection]);
 
   const handleNodeDrop = useCallback(
     (nodeType: string, position: { x: number; y: number }) => {
@@ -137,7 +144,11 @@ function WorkflowBuilderInner() {
           <Toolbox />
         </div>
 
-        <Canvas onNodeDrop={handleNodeDrop} />
+        <Canvas
+          onNodeDrop={handleNodeDrop}
+          isPanMode={isPanMode}
+          onPanModeChange={setIsPanMode}
+        />
 
         {selectedNode && (
           <div className="absolute top-4 right-4 bottom-20 z-10 h-[calc(100%-2rem)]">
@@ -154,7 +165,11 @@ function WorkflowBuilderInner() {
         <ValidationPanel onNodeSelect={handleNodeSelect} />
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
-          <Toolbar onMenu={handleMenu} />
+          <Toolbar
+            onMenu={handleMenu}
+            isPanMode={isPanMode}
+            onPanModeChange={setIsPanMode}
+          />
         </div>
       </div>
     </div>

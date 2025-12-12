@@ -28,12 +28,15 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { nodeTypes } from "./nodes";
 import { edgeTypes } from "./edges";
 import { ContextMenu } from "./ContextMenu";
+import clsx from "clsx";
 
 interface CanvasProps {
   onNodeDrop?: (nodeType: string, position: { x: number; y: number }) => void;
+  isPanMode?: boolean;
+  onPanModeChange?: (isPanMode: boolean) => void;
 }
 
-function CanvasInner({ onNodeDrop }: CanvasProps) {
+function CanvasInner({ onNodeDrop, isPanMode, onPanModeChange }: CanvasProps) {
   const {
     nodes,
     edges,
@@ -87,6 +90,9 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
   // Handle connection with validation
   const onConnect = useCallback(
     (connection: Connection) => {
+      // Disable connections in pan mode
+      if (isPanMode) return;
+
       if (!connection.source || !connection.target) return;
 
       const sourceNode = nodes.find(n => n.id === connection.source);
@@ -188,23 +194,27 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         addEdge(edge);
       }
     },
-    [nodes, edges, addEdge]
+    [nodes, edges, addEdge, isPanMode]
   );
 
   // Handle node click
   const onNodeClick = useCallback(
     (_event: React.MouseEvent, node: any) => {
+      // Disable node selection in pan mode
+      if (isPanMode) return;
       selectNode(node.id);
     },
-    [selectNode]
+    [selectNode, isPanMode]
   );
 
   // Handle edge click
   const onEdgeClick = useCallback(
     (_event: React.MouseEvent, edge: any) => {
+      // Disable edge selection in pan mode
+      if (isPanMode) return;
       selectEdge(edge.id);
     },
-    [selectEdge]
+    [selectEdge, isPanMode]
   );
 
   // Handle pane click
@@ -216,6 +226,8 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
   const onNodeContextMenu = useCallback(
     (event: React.MouseEvent, node: any) => {
       event.preventDefault();
+      // Disable context menu in pan mode
+      if (isPanMode) return;
       setContextMenu({
         x: event.clientX,
         y: event.clientY,
@@ -226,13 +238,15 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         },
       });
     },
-    []
+    [isPanMode]
   );
 
   // Handle edge context menu
   const onEdgeContextMenu = useCallback(
     (event: React.MouseEvent, edge: any) => {
       event.preventDefault();
+      // Disable context menu in pan mode
+      if (isPanMode) return;
       setContextMenu({
         x: event.clientX,
         y: event.clientY,
@@ -243,13 +257,15 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         },
       });
     },
-    []
+    [isPanMode]
   );
 
   // Handle pane context menu
   const onPaneContextMenu = useCallback(
     (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
       event.preventDefault();
+      // Disable context menu in pan mode
+      if (isPanMode) return;
       setContextMenu({
         x: event.clientX,
         y: event.clientY,
@@ -258,7 +274,7 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         },
       });
     },
-    []
+    [isPanMode]
   );
 
   // Handle drop
@@ -280,9 +296,14 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         y: position.y - 35,
       };
 
+      // Auto-exit pan mode when dropping a node
+      if (isPanMode && onPanModeChange) {
+        onPanModeChange(false);
+      }
+
       onNodeDrop?.(type, centeredPosition);
     },
-    [screenToFlowPosition, onNodeDrop]
+    [screenToFlowPosition, onNodeDrop, isPanMode, onPanModeChange]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -345,7 +366,10 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
 
   return (
     <main
-      className="absolute inset-0 w-full h-full overflow-hidden bg-background"
+      className={clsx(
+        "absolute inset-0 w-full h-full overflow-hidden bg-background",
+        isPanMode ? "pan-mode-active" : ""
+      )}
       onDragOver={onDragOver}
       onDrop={onDrop}
     >
@@ -373,9 +397,13 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         connectionLineType={ConnectionLineType.Bezier}
         snapGrid={[15, 15]}
         selectNodesOnDrag={false}
-        panOnDrag={[1, 2]}
-        selectionOnDrag
+        panOnDrag={isPanMode ? [0, 1, 2] : [1, 2]}
+        selectionOnDrag={!isPanMode}
         selectionMode={SelectionMode.Partial}
+        nodesDraggable={!isPanMode}
+        nodesConnectable={!isPanMode}
+        elementsSelectable={!isPanMode}
+        edgesReconnectable={!isPanMode}
         reconnectRadius={20}
         minZoom={0.2}
         maxZoom={3}
