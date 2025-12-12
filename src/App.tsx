@@ -1,16 +1,26 @@
-import { ReactFlowProvider } from '@xyflow/react'
-import '@xyflow/react/dist/style.css'
-import WorkflowBuilder from './pages/WorkflowBuilder'
-import dataBpm from './pages/WorkflowBuilder/data/bpm.json'
-import type { DynamicWorkflowDefinition } from './types/dynamic-bpm.type'
-function App() {
-  const fakeDataBpm = dataBpm as DynamicWorkflowDefinition
+import "@xyflow/react/dist/style.css";
+import WorkflowBuilder from "./workflow";
+import { customPlugin } from "./plugins/customPlugin";
+import { aiMLPlugin } from "./plugins/aiMLPlugin";
+// import { defaultBpmPlugin } from "./plugins/defaultBpmPlugin";
 
+function App() {
+  // New version with custom plugin demo
+  // Demo: Register custom plugin với custom components và custom category
   return (
-    <ReactFlowProvider>
-      <WorkflowBuilder dynamicBpm={fakeDataBpm} />
-    </ReactFlowProvider>
-  )
+    <WorkflowBuilder
+      pluginOptions={{
+        // Enable default BPM plugin (mặc định là true)
+        enableDefaultPlugin: true,
+
+        // Auto-activate plugins sau khi install (mặc định là true)
+        autoActivate: true,
+
+        // Danh sách custom plugins
+        plugins: [aiMLPlugin],
+      }}
+    />
+  );
 }
 
-export default App
+export default App;
