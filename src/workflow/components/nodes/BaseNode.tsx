@@ -25,25 +25,6 @@ export interface Props extends CustomNodeProps {
   visualConfig?: NodeVisualConfig; // New: Use this instead
 }
 
-/**
- * Convert border style to CSS border style string
- */
-function getBorderStyleValue(
-  style?: "solid" | "dashed" | "dotted" | "double"
-): string {
-  switch (style) {
-    case "dashed":
-      return "2px dashed";
-    case "dotted":
-      return "2px dotted";
-    case "double":
-      return "3px double";
-    case "solid":
-    default:
-      return "2px solid";
-  }
-}
-
 export default function BaseNode(props: Props) {
   const {
     children,
@@ -70,7 +51,6 @@ export default function BaseNode(props: Props) {
   };
 
   // Build dynamic styles with border support
-  const borderStyle = getBorderStyleValue(finalVisualConfig.borderStyle);
   const borderWidth = finalVisualConfig.borderWidth || 2;
 
   const containerStyle: React.CSSProperties = {

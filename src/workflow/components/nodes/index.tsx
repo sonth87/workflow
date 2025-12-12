@@ -1,31 +1,31 @@
+import type { NodeVisualConfig } from "@/core/types/base.types";
 import { NodeType } from "@/enum/workflow.enum";
-import { StartEventNode, EndEventNode } from "./EventNodes";
-import {
-  TaskNode,
-  ServiceTaskNode,
-  NotificationNode,
-  TimeDelayNode,
-  SubflowNode,
-} from "./TaskNodes";
-import {
-  ExclusiveGatewayNode,
-  ParallelGatewayNode,
-  ParallelGatewayJoinNode,
-} from "./GatewayNodes";
-import { PoolNode } from "./PoolNode";
-import { NoteNode } from "./NoteNode";
+import type { Position } from "@xyflow/react";
+import BaseNode from "./BaseNode";
 import {
   AIAssistantNode,
-  DataProcessorNode,
   APIIntegratorNode,
   CustomValidatorNode,
+  DataProcessorNode,
 } from "./CustomNodes";
-import BaseNode from "./BaseNode";
-import type { Position } from "@xyflow/react";
-import type { NodeVisualConfig } from "@/core/types/base.types";
+import { EndEventNode, StartEventNode } from "./EventNodes";
+import {
+  ExclusiveGatewayNode,
+  ParallelGatewayJoinNode,
+  ParallelGatewayNode,
+} from "./GatewayNodes";
+import { NoteNode } from "./NoteNode";
+import PoolNode from "./PoolNode";
+import {
+  NotificationNode,
+  ServiceTaskNode,
+  SubflowNode,
+  TaskNode,
+  TimeDelayNode,
+} from "./TaskNodes";
 
 // Export shared styles
-export { nodeStyle, handleStyle } from "./styles";
+export { handleStyle, nodeStyle } from "./styles";
 
 export interface CustomNodeProps {
   id: string;

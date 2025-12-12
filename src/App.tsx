@@ -1,7 +1,6 @@
 import "@xyflow/react/dist/style.css";
-import WorkflowBuilder from "./workflow";
-import { customPlugin } from "./plugins/customPlugin";
 import { aiMLPlugin } from "./plugins/aiMLPlugin";
+import WorkflowBuilder from "./workflow";
 // import { defaultBpmPlugin } from "./plugins/defaultBpmPlugin";
 
 function App() {

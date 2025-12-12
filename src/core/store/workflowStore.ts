@@ -3,11 +3,11 @@
  * Central state management cho toàn bộ workflow
  */
 
+import type { Viewport } from "@xyflow/react";
 import { create } from "zustand";
-import type { Node, Edge, Viewport } from "@xyflow/react";
-import type { BaseNodeConfig, BaseEdgeConfig } from "../types/base.types";
-import type { ValidationError } from "../validation/ValidationEngine";
 import { globalEventBus, WorkflowEventTypes } from "../events/EventBus";
+import type { BaseEdgeConfig, BaseNodeConfig } from "../types/base.types";
+import type { ValidationError } from "../validation/ValidationEngine";
 
 export interface WorkflowState {
   // Workflow metadata

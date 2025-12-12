@@ -9,13 +9,12 @@
  * 5. Use event system
  */
 
+import type { BaseNodeConfig, BaseRuleConfig, Plugin } from "@/core";
 import { pluginManager } from "@/core/plugins/PluginManager";
-import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
-import { useWorkflowStore } from "@/core/store/workflowStore";
-import { globalEventBus, WorkflowEventTypes } from "@/core/events/EventBus";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { ruleRegistry } from "@/core/registry/RuleRegistry";
-import type { Plugin, BaseNodeConfig, BaseRuleConfig } from "@/core";
+import { useWorkflowStore } from "@/core/store/workflowStore";
+import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
 
 // ============================================
 // 1. Initialize Core System
@@ -350,17 +349,7 @@ export const ecommercePlugin: Plugin = {
 // ============================================
 
 export function useWorkflowExample() {
-  const {
-    nodes,
-    edges,
-    addNode,
-    updateNode,
-    deleteNode,
-    addEdge,
-    selectNode,
-    undo,
-    redo,
-  } = useWorkflowStore();
+  const { nodes, edges, addNode, updateNode, undo, redo } = useWorkflowStore();
 
   // Add a new order node
   const addOrderNode = () => {
@@ -448,43 +437,43 @@ export function setupCustomValidation() {
 // ============================================
 
 export function setupEventListeners() {
-  // Listen to node additions
-  globalEventBus.on(WorkflowEventTypes.NODE_ADDED, event => {
-    console.log("📝 Node added:", event.payload.node.metadata.title);
+  // // Listen to node additions
+  // globalEventBus.on(WorkflowEventTypes.NODE_ADDED, event => {
+  //   console.log("📝 Node added:", event.payload.node.metadata.title);
 
-    // Example: Send analytics
-    // analytics.track('node_added', { type: event.payload.node.nodeType });
-  });
+  //   // Example: Send analytics
+  //   // analytics.track('node_added', { type: event.payload.node.nodeType });
+  // });
 
-  // Listen to node updates
-  globalEventBus.on(WorkflowEventTypes.NODE_UPDATED, event => {
-    console.log("✏️ Node updated:", event.payload.nodeId);
+  // // Listen to node updates
+  // globalEventBus.on(WorkflowEventTypes.NODE_UPDATED, event => {
+  //   console.log("✏️ Node updated:", event.payload.nodeId);
 
-    // Example: Auto-save
-    // autoSaveWorkflow();
-  });
+  //   // Example: Auto-save
+  //   // autoSaveWorkflow();
+  // });
 
-  // Listen to validation
-  globalEventBus.on(WorkflowEventTypes.WORKFLOW_VALIDATED, event => {
-    const { valid, errors } = event.payload;
+  // // Listen to validation
+  // globalEventBus.on(WorkflowEventTypes.WORKFLOW_VALIDATED, event => {
+  //   const { valid, errors } = event.payload;
 
-    if (valid) {
-      console.log("✅ Workflow validation passed");
-    } else {
-      console.log("❌ Workflow validation failed:", errors);
-    }
-  });
+  //   if (valid) {
+  //     console.log("✅ Workflow validation passed");
+  //   } else {
+  //     console.log("❌ Workflow validation failed:", errors);
+  //   }
+  // });
 
-  // Custom event example
-  globalEventBus.on("order:processed", event => {
-    console.log("📦 Order processed:", event.payload);
+  // // Custom event example
+  // globalEventBus.on("order:processed", event => {
+  //   console.log("📦 Order processed:", event.payload);
 
-    // Send notification
-    // notificationService.send({
-    //   title: 'Order Processed',
-    //   message: `Order ${event.payload.orderId} has been processed`,
-    // });
-  });
+  //   // Send notification
+  //   // notificationService.send({
+  //   //   title: 'Order Processed',
+  //   //   message: `Order ${event.payload.orderId} has been processed`,
+  //   // });
+  // });
 }
 
 // ============================================
