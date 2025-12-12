@@ -1,10 +1,10 @@
+import type { NodeVisualConfig } from "@/core/types/base.types";
+import { NodeType } from "@/enum/workflow.enum";
+import { cx } from "@/utils/cx";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import React, { useState } from "react";
 import { nodeStyle, type CustomNodeProps } from ".";
-import { cx } from "@/utils/cx";
-import { getIconConfig } from "@/workflow/utils/iconConfig";
-import { NodeType } from "@/enum/workflow.enum";
-import { ChevronUp, ChevronDown } from "lucide-react";
-import type { NodeVisualConfig } from "@/core/types/base.types";
+import IconConfig from "../../IconConfig";
 
 // Deprecated: Use NodeVisualConfig from core types instead
 export interface NodeColorConfig {
@@ -35,9 +35,6 @@ export default function BaseNode(props: Props) {
     visualConfig,
   } = props;
   const [isExpanded, setIsExpanded] = useState(true);
-
-  const iconConfig = type ? getIconConfig(type) : null;
-  const Icon = iconConfig?.icon;
 
   // Merge colorConfig (deprecated) with visualConfig (new)
   const finalVisualConfig: NodeVisualConfig = visualConfig || {
@@ -97,31 +94,14 @@ export default function BaseNode(props: Props) {
       }}
     >
       {/* Header - always visible */}
-      {showHeader && iconConfig && (
+      {showHeader && (
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            {typeof Icon === "string" ? (
-              <img
-                src={Icon}
-                alt={iconConfig.label}
-                className="w-8 h-8 shrink-0"
-              />
-            ) : Icon ? (
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                style={{
-                  backgroundColor:
-                    finalVisualConfig.iconBackgroundColor || iconConfig.bgColor,
-                }}
-              >
-                <Icon
-                  size={18}
-                  style={{
-                    color: finalVisualConfig.iconColor || iconConfig.color,
-                  }}
-                />
-              </div>
-            ) : null}
+            <IconConfig
+              type={type}
+              colorConfig={colorConfig}
+              visualConfig={visualConfig}
+            />
             <span
               className="text-sm font-semibold truncate"
               style={{

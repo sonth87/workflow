@@ -4,10 +4,10 @@
  */
 
 import { CategoryType, NodeType } from "@/enum/workflow.enum";
-import { getIconConfig } from "../utils/iconConfig";
+import { getIconConfig } from "../../utils/iconConfig";
 import { X } from "lucide-react";
 import React, { useMemo, useState } from "react";
-import { type NodeCategory, NODES_BY_CATEGORIES } from "../data/toolboxData";
+import { type NodeCategory, NODES_BY_CATEGORIES } from "../../data/toolboxData";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { categoryRegistry } from "@/core/registry/CategoryRegistry";
 

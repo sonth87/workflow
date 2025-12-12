@@ -27,8 +27,8 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 // Import node/edge types from workflow
 import { nodeTypes } from "./nodes";
 import { edgeTypes } from "./edges";
-import { ContextMenu } from "./ContextMenu";
 import clsx from "clsx";
+import { ContextMenu } from "../ContextMenu";
 
 interface CanvasProps {
   onNodeDrop?: (nodeType: string, position: { x: number; y: number }) => void;
@@ -367,7 +367,7 @@ function CanvasInner({ onNodeDrop, isPanMode, onPanModeChange }: CanvasProps) {
   return (
     <main
       className={clsx(
-        "absolute inset-0 w-full h-full overflow-hidden bg-background",
+        "w-full h-full overflow-hidden bg-whiteOpacity100",
         isPanMode ? "pan-mode-active" : ""
       )}
       onDragOver={onDragOver}

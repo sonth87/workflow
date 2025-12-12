@@ -639,7 +639,7 @@ const defaultContextMenus: Array<{
           id: "add-node",
           label: "Add Node",
           icon: "",
-          onClick: async (context: ContextMenuContext) => {
+          onClick: async () => {
             console.log("Add node action triggered");
           },
           children: [

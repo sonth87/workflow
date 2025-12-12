@@ -3,47 +3,41 @@
  * Giống với header của workflow cũ
  */
 
-import {
-  Undo2,
-  Redo2,
-  Play,
-  Save,
-  Sun,
-  Moon,
-  Monitor,
-  ArrowUpDown,
-  ArrowRightLeft,
-  Download,
-  Upload,
-  Eye,
-  X,
-  Copy,
-} from "lucide-react";
-import { useState } from "react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { useTheme } from "@/hooks/useTheme";
 import {
   useWorkflowEvents,
   useWorkflowImportExport,
-} from "../hooks/useWorkflow";
+} from "@/workflow/hooks/useWorkflow";
+import {
+  ArrowRightLeft,
+  ArrowUpDown,
+  Copy,
+  Download,
+  Eye,
+  Monitor,
+  Moon,
+  Save,
+  Sun,
+  Upload,
+  X,
+} from "lucide-react";
+import { useState } from "react";
 
 export type LayoutDirection = "vertical" | "horizontal";
 
 interface HeaderProps {
-  onRun?: () => void;
   onSave?: () => void;
   layoutDirection?: LayoutDirection;
   onLayoutDirectionChange?: (direction: LayoutDirection) => void;
 }
 
 export function Header({
-  onRun,
   onSave,
   layoutDirection = "vertical",
   onLayoutDirectionChange,
 }: HeaderProps) {
-  const { workflowName, setWorkflowName, undo, redo, history } =
-    useWorkflowStore();
+  const { workflowName, setWorkflowName } = useWorkflowStore();
   const { theme, setLightMode, setDarkMode, setSystemMode } = useTheme();
   const { viewWorkflow, exportWorkflow, importWorkflow } =
     useWorkflowImportExport();
@@ -59,9 +53,6 @@ export function Header({
     console.log("Edge connected:", event.payload);
   });
 
-  const canUndo = history.past.length > 0;
-  const canRedo = history.future.length > 0;
-
   const handleViewWorkflow = () => {
     const wfj = viewWorkflow();
     setJsonData(JSON.stringify(wfj, null, 2));
@@ -73,7 +64,7 @@ export function Header({
   };
 
   return (
-    <header className="w-full bg-card p-3">
+    <header className="w-full bg-primaryA-100 p-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="">
@@ -173,25 +164,6 @@ export function Header({
           )}
 
           <button
-            title="Undo"
-            onClick={undo}
-            disabled={!canUndo}
-            className="rounded p-2 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Undo2 size={18} />
-          </button>
-          <button
-            title="Redo"
-            onClick={redo}
-            disabled={!canRedo}
-            className="rounded p-2 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Redo2 size={18} />
-          </button>
-
-          <div className="mx-1 h-6 w-px bg-border" />
-
-          <button
             title="View Workflow"
             onClick={handleViewWorkflow}
             className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
@@ -218,15 +190,6 @@ export function Header({
           </button>
 
           <div className="mx-1 h-6 w-px bg-border" />
-
-          <button
-            title="Run"
-            onClick={onRun}
-            className="flex items-center gap-2 rounded bg-success px-3 py-2 text-success-foreground hover:opacity-90"
-          >
-            <Play size={16} />
-            Run
-          </button>
 
           <button
             title="Save"

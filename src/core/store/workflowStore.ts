@@ -20,8 +20,8 @@ export interface WorkflowState {
   edges: BaseEdgeConfig[];
 
   // Selection
-  selectedNodeIds: string[];
-  selectedEdgeIds: string[];
+  selectedNodeId: string | null;
+  selectedEdgeId: string | null;
 
   // Viewport
   viewport: Viewport;
@@ -68,13 +68,9 @@ export interface WorkflowActions {
   setEdges: (edges: BaseEdgeConfig[]) => void;
 
   // Selection actions
-  selectNode: (nodeId: string) => void;
-  selectNodes: (nodeIds: string[]) => void;
-  deselectNode: (nodeId: string) => void;
+  selectNode: (nodeId: string | null) => void;
   clearNodeSelection: () => void;
-  selectEdge: (edgeId: string) => void;
-  selectEdges: (edgeIds: string[]) => void;
-  deselectEdge: (edgeId: string) => void;
+  selectEdge: (edgeId: string | null) => void;
   clearEdgeSelection: () => void;
   clearSelection: () => void;
 
@@ -103,8 +99,8 @@ const initialState: WorkflowState = {
   workflowDescription: "",
   nodes: [],
   edges: [],
-  selectedNodeIds: [],
-  selectedEdgeIds: [],
+  selectedNodeId: null,
+  selectedEdgeId: null,
   viewport: { x: 0, y: 0, zoom: 1 },
   validationErrors: [],
   history: {
@@ -216,53 +212,35 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
 
     // Selection actions
     selectNode: nodeId => {
-      set(state => ({
-        selectedNodeIds: [...state.selectedNodeIds, nodeId],
-        selectedEdgeIds: [],
-      }));
-      globalEventBus.emit(WorkflowEventTypes.NODE_SELECTED, { nodeId });
-    },
-
-    selectNodes: nodeIds => {
-      set({ selectedNodeIds: nodeIds, selectedEdgeIds: [] });
-    },
-
-    deselectNode: nodeId => {
-      set(state => ({
-        selectedNodeIds: state.selectedNodeIds.filter(id => id !== nodeId),
-      }));
-      globalEventBus.emit(WorkflowEventTypes.NODE_DESELECTED, { nodeId });
+      set({
+        selectedNodeId: nodeId,
+        selectedEdgeId: null,
+      });
+      if (nodeId) {
+        globalEventBus.emit(WorkflowEventTypes.NODE_SELECTED, { nodeId });
+      }
     },
 
     clearNodeSelection: () => {
-      set({ selectedNodeIds: [] });
+      set({ selectedNodeId: null });
     },
 
     selectEdge: edgeId => {
-      set(state => ({
-        selectedEdgeIds: [...state.selectedEdgeIds, edgeId],
-        selectedNodeIds: [],
-      }));
-      globalEventBus.emit(WorkflowEventTypes.EDGE_SELECTED, { edgeId });
-    },
-
-    selectEdges: edgeIds => {
-      set({ selectedEdgeIds: edgeIds, selectedNodeIds: [] });
-    },
-
-    deselectEdge: edgeId => {
-      set(state => ({
-        selectedEdgeIds: state.selectedEdgeIds.filter(id => id !== edgeId),
-      }));
-      globalEventBus.emit(WorkflowEventTypes.EDGE_DESELECTED, { edgeId });
+      set({
+        selectedEdgeId: edgeId,
+        selectedNodeId: null,
+      });
+      if (edgeId) {
+        globalEventBus.emit(WorkflowEventTypes.EDGE_SELECTED, { edgeId });
+      }
     },
 
     clearEdgeSelection: () => {
-      set({ selectedEdgeIds: [] });
+      set({ selectedEdgeId: null });
     },
 
     clearSelection: () => {
-      set({ selectedNodeIds: [], selectedEdgeIds: [] });
+      set({ selectedNodeId: null, selectedEdgeId: null });
     },
 
     // Viewport actions

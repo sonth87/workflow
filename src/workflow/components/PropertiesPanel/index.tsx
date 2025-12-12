@@ -3,33 +3,33 @@
  * Giống với ConfigPanel của workflow cũ
  */
 
-import { X } from "lucide-react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import type {
   BaseNodeConfig,
   PropertyDefinition,
 } from "@/core/types/base.types";
+import { X } from "lucide-react";
 import { memo } from "react";
+import IconConfig from "../IconConfig";
+import type { NodeType } from "@/enum/workflow.enum";
 
 export const PropertiesPanel = memo(function PropertiesPanel() {
   const {
     nodes,
     edges,
-    selectedNodeIds,
-    selectedEdgeIds,
+    selectedNodeId,
+    selectedEdgeId,
     updateNode,
     clearSelection,
   } = useWorkflowStore();
 
-  const selectedNode =
-    selectedNodeIds.length > 0
-      ? nodes.find(n => n.id === selectedNodeIds[0])
-      : null;
+  const selectedNode = selectedNodeId
+    ? nodes.find(n => n.id === selectedNodeId)
+    : null;
 
-  const selectedEdge =
-    selectedEdgeIds.length > 0
-      ? edges.find(e => e.id === selectedEdgeIds[0])
-      : null;
+  const selectedEdge = selectedEdgeId
+    ? edges.find(e => e.id === selectedEdgeId)
+    : null;
 
   if (!selectedNode && !selectedEdge) {
     return null;
@@ -98,9 +98,15 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
   return (
     <aside className="w-80 h-full border border-border/50 bg-card/95 backdrop-blur-sm overflow-y-auto rounded-xl shadow-xl flex flex-col animate-in slide-in-from-right duration-200">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground/80">
-          Configuration
-        </h2>
+        <div className="flex items-center gap-3">
+          <IconConfig
+            type={selectedNode?.nodeType as NodeType}
+            visualConfig={selectedNode?.visualConfig}
+          />
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink800">
+            {selectedNode ? selectedNode?.metadata?.title : "Edge Properties"}
+          </h2>
+        </div>
         <button
           onClick={() => clearSelection()}
           className="p-2 rounded-lg hover:bg-foreground/10"

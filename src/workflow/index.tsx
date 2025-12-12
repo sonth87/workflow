@@ -23,6 +23,7 @@ import {
   useUpdateNodeInternals,
 } from "@xyflow/react";
 import { getLayoutedElements } from "./utils/layout";
+import { Behavior } from "./components/Behavior";
 
 function WorkflowBuilderInner() {
   const { createNode } = useNodeOperations();
@@ -31,8 +32,8 @@ function WorkflowBuilderInner() {
     nodes,
     edges,
     setNodes,
-    selectedNodeIds,
-    selectedEdgeIds,
+    selectedNodeId,
+    selectedEdgeId,
     saveToHistory,
     clearSelection,
   } = useWorkflowStore();
@@ -119,45 +120,39 @@ function WorkflowBuilderInner() {
     [nodes, edges, setNodes, updateNodeInternals, fitView, saveToHistory]
   );
 
-  const selectedNode =
-    selectedNodeIds.length > 0
-      ? nodes.find(n => n.id === selectedNodeIds[0])
-      : undefined;
+  const selectedNode = selectedNodeId
+    ? nodes.find(n => n.id === selectedNodeId)
+    : undefined;
 
-  const selectedEdge =
-    selectedEdgeIds.length > 0
-      ? edges.find(e => e.id === selectedEdgeIds[0])
-      : undefined;
+  const selectedEdge = selectedEdgeId
+    ? edges.find(e => e.id === selectedEdgeId)
+    : undefined;
 
   return (
     <div className="flex flex-col h-screen w-screen">
       <div className="">
         <Header
-          onRun={handleRun}
           onSave={handleSave}
           layoutDirection={layoutDirection}
           onLayoutDirectionChange={handleChangeLayoutDirection}
         />
       </div>
-      <div className="relative h-screen w-screen bg-background overflow-hidden">
-        <div className="absolute top-4 left-4 bottom-20 z-10 h-[calc(100%-2rem)]">
+      <div className="flex-1 bg-primaryA-100 overflow-hidden flex gap-2 px-2 pb-2">
+        <div>
           <Toolbox />
         </div>
 
-        <Canvas
-          onNodeDrop={handleNodeDrop}
-          isPanMode={isPanMode}
-          onPanModeChange={setIsPanMode}
-        />
+        <div className="flex-1 rounded-2xl overflow-hidden">
+          <Behavior onRun={handleRun} />
+          <Canvas
+            onNodeDrop={handleNodeDrop}
+            isPanMode={isPanMode}
+            onPanModeChange={setIsPanMode}
+          />
+        </div>
 
-        {selectedNode && (
-          <div className="absolute top-4 right-4 bottom-20 z-10 h-[calc(100%-2rem)]">
-            <PropertiesPanel />
-          </div>
-        )}
-
-        {selectedEdge && (
-          <div className="absolute top-4 right-4 bottom-20 z-10 h-[calc(100%-2rem)]">
+        {(selectedNode || selectedEdge) && (
+          <div>
             <PropertiesPanel />
           </div>
         )}

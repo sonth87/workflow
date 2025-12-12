@@ -3,6 +3,7 @@
  * Định nghĩa các interface cơ bản cho hệ thống workflow động
  */
 
+import type { CategoryType, NodeType } from "@/enum/workflow.enum";
 import type { Node, Edge } from "@xyflow/react";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -312,8 +313,8 @@ export interface BaseNodeConfig extends Node {
   metadata: BaseMetadata;
 
   // Node type và category
-  nodeType: string; // 'start', 'end', 'task', 'gateway', etc.
-  category: string; // 'event', 'task', 'gateway', 'annotation', etc.
+  nodeType: NodeType | string; // 'start', 'end', 'task', 'gateway', etc.
+  category: CategoryType | string; // 'event', 'task', 'gateway', 'annotation', etc.
 
   // Input/Output definitions
   inputs?: IODefinition[];
