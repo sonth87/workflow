@@ -1,6 +1,7 @@
 'use client'
 
 import { EdgeType, NodeType } from '@/enum/workflow.enum'
+import type { DynamicWorkflowDefinition } from '@/types/dynamic-bpm.type'
 import type { BaseNode, WorkflowEdge, WorkflowNode } from '@/types/workflow.type'
 import { validateWorkflow } from '@/utils/validation'
 import type { Connection, Edge, Node } from '@xyflow/react'
@@ -13,6 +14,7 @@ import {
   useUpdateNodeInternals,
 } from '@xyflow/react'
 import { useCallback, useState } from 'react'
+import { Behavior } from './components/Behavior'
 import { Canvas } from './components/Canvas'
 import ConfigPanel from './components/ConfigPanel'
 import { Header, type LayoutDirection } from './components/Header'
@@ -21,7 +23,6 @@ import { Toolbox } from './components/Toolbox'
 import { ValidationPanel } from './components/ValidationPanel'
 import { useFlowHistory } from './hooks/useFlowHistory'
 import { getLayoutedElements } from './utils/layout'
-import type { DynamicWorkflowDefinition } from '@/types/dynamic-bpm.type'
 
 interface Props {
   dynamicBpm?: DynamicWorkflowDefinition
@@ -148,34 +149,40 @@ export default function WorkflowBuilder(props: Props) {
         <Header
           workflowName={workflowName}
           onWorkflowNameChange={setWorkflowName}
-          onUndo={undo}
-          onRedo={redo}
-          onRun={handleRun}
           onSave={handleSave}
           layoutDirection={layoutDirection}
           onLayoutDirectionChange={handleChangeLayoutDirection}
         />
       </div>
-      <div className='relative h-screen w-screen bg-background overflow-hidden'>
-        <div className='absolute top-4 left-4 bottom-20 z-10 h-[calc(100%-2rem)]'>
+      <div className='flex-1 bg-primaryA-100 overflow-hidden flex gap-2 px-2 pb-2'>
+        <div>
           <Toolbox dynamicBpm={dynamicBpm} />
         </div>
 
-        <Canvas
-          nodes={nodes}
-          edges={edges}
-          onNodeDrop={handleNodeDrop}
-          onNodesChange={(changes) => setNodes((nds) => applyNodeChanges(changes, nds))}
-          onEdgesChange={(changes) => setEdges((eds) => applyEdgeChanges(changes, eds))}
-          onConnect={handleConnect}
-          onNodeClick={handleNodeClick}
-          onEdgeClick={handleEdgeClick}
-          onPaneClick={handlePaneClick}
-          layoutDirection={layoutDirection}
-        />
+        <div className='flex-1 rounded-2xl overflow-hidden'>
+          <Behavior
+            workflowName={workflowName}
+            onWorkflowNameChange={setWorkflowName}
+            onUndo={undo}
+            onRedo={redo}
+            onRun={handleRun}
+          />
+          <Canvas
+            nodes={nodes}
+            edges={edges}
+            onNodeDrop={handleNodeDrop}
+            onNodesChange={(changes) => setNodes((nds) => applyNodeChanges(changes, nds))}
+            onEdgesChange={(changes) => setEdges((eds) => applyEdgeChanges(changes, eds))}
+            onConnect={handleConnect}
+            onNodeClick={handleNodeClick}
+            onEdgeClick={handleEdgeClick}
+            onPaneClick={handlePaneClick}
+            layoutDirection={layoutDirection}
+          />
+        </div>
 
         {selectedNode && (
-          <div className='absolute top-4 right-4 bottom-20 z-10 h-[calc(100%-2rem)]'>
+          <div>
             <ConfigPanel
               selectedNode={selectedNode as WorkflowNode}
               onClose={() => setSelectedNode(undefined)}
@@ -184,7 +191,7 @@ export default function WorkflowBuilder(props: Props) {
         )}
 
         {selectedEdge && (
-          <div className='absolute top-4 right-4 bottom-20 z-10 h-[calc(100%-2rem)]'>
+          <div>
             <ConfigPanel
               selectedEdge={selectedEdge as WorkflowEdge}
               onClose={() => setSelectedEdge(undefined)}

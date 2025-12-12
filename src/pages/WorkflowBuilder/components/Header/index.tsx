@@ -1,36 +1,19 @@
 import { useTheme } from '@/hooks/useTheme'
-import {
-  ArrowRightLeft,
-  ArrowUpDown,
-  Monitor,
-  Moon,
-  Play,
-  Redo2,
-  Save,
-  Sun,
-  Undo2,
-} from 'lucide-react'
+import { ArrowRightLeft, ArrowUpDown, Monitor, Moon, Save, Sun } from 'lucide-react'
 
 export type LayoutDirection = 'vertical' | 'horizontal'
 
 interface HeaderProps {
   workflowName: string
   onWorkflowNameChange: (name: string) => void
-  onUndo: () => void
-  onRedo: () => void
-  onRun: () => void
   onSave: () => void
   layoutDirection: LayoutDirection
   onLayoutDirectionChange: (direction: LayoutDirection) => void
-  
 }
 
 export function Header({
   workflowName,
   onWorkflowNameChange,
-  onUndo,
-  onRedo,
-  onRun,
   onSave,
   layoutDirection,
   onLayoutDirectionChange,
@@ -38,7 +21,7 @@ export function Header({
   const { theme, setLightMode, setDarkMode, setSystemMode } = useTheme()
 
   return (
-    <header className='w-full bg-card p-3'>
+    <header className='w-full bg-primaryA-100 p-3'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <div className=''>
@@ -126,24 +109,6 @@ export function Header({
           </div>
 
           <div className='mx-1 h-6 w-px bg-border' />
-
-          <button title='Undo' onClick={onUndo} className='rounded p-2 hover:bg-muted'>
-            <Undo2 size={18} />
-          </button>
-          <button title='Redo' onClick={onRedo} className='rounded p-2 hover:bg-muted'>
-            <Redo2 size={18} />
-          </button>
-
-          <div className='mx-1 h-6 w-px bg-border' />
-
-          <button
-            title='Run'
-            onClick={onRun}
-            className='flex items-center gap-2 rounded bg-success px-3 py-2 text-success-foreground hover:opacity-90'
-          >
-            <Play size={16} />
-            Run
-          </button>
 
           <button
             title='Save'
