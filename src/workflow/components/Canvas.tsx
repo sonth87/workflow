@@ -246,6 +246,21 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
     []
   );
 
+  // Handle pane context menu
+  const onPaneContextMenu = useCallback(
+    (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
+      event.preventDefault();
+      setContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+        context: {
+          position: { x: event.clientX, y: event.clientY },
+        },
+      });
+    },
+    []
+  );
+
   // Handle drop
   const onDrop = useCallback(
     (event: React.DragEvent) => {
@@ -347,6 +362,7 @@ function CanvasInner({ onNodeDrop }: CanvasProps) {
         onPaneClick={onPaneClick}
         onNodeContextMenu={onNodeContextMenu}
         onEdgeContextMenu={onEdgeContextMenu}
+        onPaneContextMenu={onPaneContextMenu}
         onNodeDragStart={onNodeDragStart}
         onNodeDragStop={onNodeDragStop}
         defaultEdgeOptions={{

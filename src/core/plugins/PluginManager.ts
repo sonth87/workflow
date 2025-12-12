@@ -10,11 +10,13 @@ import type {
   ThemeConfig,
 } from "../types/base.types";
 import type { ContextMenuConfig } from "../registry/ContextMenuRegistry";
+import type { CategoryConfig } from "../registry/CategoryRegistry";
 import { nodeRegistry } from "../registry/NodeRegistry";
 import { edgeRegistry } from "../registry/EdgeRegistry";
 import { ruleRegistry } from "../registry/RuleRegistry";
 import { themeRegistry } from "../registry/ThemeRegistry";
 import { contextMenuRegistry } from "../registry/ContextMenuRegistry";
+import { categoryRegistry } from "../registry/CategoryRegistry";
 import { globalEventBus, WorkflowEventTypes } from "../events/EventBus";
 
 /**
@@ -63,6 +65,12 @@ export interface PluginConfig {
     type: string;
     name: string;
     config: ContextMenuConfig;
+  }>;
+  categories?: Array<{
+    id: string;
+    type: string;
+    name: string;
+    config: CategoryConfig;
   }>;
   [key: string]: unknown;
 }
@@ -217,6 +225,11 @@ export class PluginManager {
   private registerPluginResources(plugin: Plugin): void {
     const { config } = plugin;
 
+    // Register categories first (before nodes)
+    if (config.categories) {
+      categoryRegistry.registerMany(config.categories);
+    }
+
     // Register nodes
     if (config.nodes) {
       nodeRegistry.registerMany(config.nodes);
@@ -273,6 +286,13 @@ export class PluginManager {
     if (config.contextMenus) {
       config.contextMenus.forEach(menu =>
         contextMenuRegistry.unregister(menu.id)
+      );
+    }
+
+    // Unregister categories
+    if (config.categories) {
+      config.categories.forEach(category =>
+        categoryRegistry.unregister(category.id)
       );
     }
   }

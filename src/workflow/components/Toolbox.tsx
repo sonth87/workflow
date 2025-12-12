@@ -9,6 +9,7 @@ import { X } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../data/toolboxData";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
+import { categoryRegistry } from "@/core/registry/CategoryRegistry";
 
 // Default icon for custom category
 const CustomCategoryIcon = () => (
@@ -39,19 +40,41 @@ export function Toolbox() {
 
   // Build categories từ registry
   const builderCategories = useMemo(() => {
+    // Start with default categories
     const categories = NODES_BY_CATEGORIES.map(category => ({
       ...category,
       nodes: [...category.nodes],
     }));
 
-    const ensureCategory = (categoryType: CategoryType): NodeCategory => {
+    // Add categories from CategoryRegistry (from plugins)
+    const registeredCategories = categoryRegistry.getAllSorted();
+    registeredCategories.forEach(registryItem => {
+      const categoryType = registryItem.config.categoryType;
+      // Check if category already exists
+      const existing = categories.find(
+        cat => cat.categoryType === categoryType
+      );
+      if (!existing) {
+        categories.push({
+          name: registryItem.config.name,
+          isOpen: registryItem.config.isOpen ?? true,
+          categoryType: categoryType as CategoryType,
+          nodes: [],
+          icon: registryItem.config.icon || <CustomCategoryIcon />,
+        });
+      }
+    });
+
+    const ensureCategory = (
+      categoryType: CategoryType | string
+    ): NodeCategory => {
       let existing = categories.find(cat => cat.categoryType === categoryType);
       if (!existing) {
         // Create new category with default icon
         existing = {
           name: categoryType.charAt(0).toUpperCase() + categoryType.slice(1),
           isOpen: true,
-          categoryType,
+          categoryType: categoryType as CategoryType,
           nodes: [],
           icon:
             categoryType === CategoryType.CUSTOM ? (
@@ -82,7 +105,7 @@ export function Toolbox() {
       };
 
       const categoryType =
-        categoryTypeMap[category as string] || CategoryType.TASK;
+        categoryTypeMap[category as string] || (category as CategoryType);
       const targetCategory = ensureCategory(categoryType);
 
       if (!targetCategory.nodes.some(item => item?.type === nodeType)) {
@@ -114,7 +137,16 @@ export function Toolbox() {
             className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"
             onClick={() => setSelectedCategoryType(category.categoryType)}
           >
-            {category.icon}
+            {typeof category.icon === "string" &&
+            category.icon.startsWith("data:image/svg") ? (
+              <img
+                src={category.icon}
+                alt={category.name}
+                className="w-4.5 h-4.5"
+              />
+            ) : (
+              category.icon
+            )}
           </div>
         ))}
         <div className="h-px w-6 bg-border my-4" />

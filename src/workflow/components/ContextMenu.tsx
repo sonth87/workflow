@@ -50,6 +50,8 @@ function ContextMenuItems({
   context: ContextMenuContext;
   onClose: () => void;
 }) {
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+
   return (
     <div className="py-1">
       {items.map(item => {
@@ -65,8 +67,15 @@ function ContextMenuItems({
 
         // Item with children (submenu)
         if (item.children && item.children.length > 0) {
+          const isOpen = openSubmenu === item.id;
+
           return (
-            <div key={item.id} className="relative group">
+            <div
+              key={item.id}
+              className="relative"
+              onMouseEnter={() => setOpenSubmenu(item.id)}
+              onMouseLeave={() => setOpenSubmenu(null)}
+            >
               <button
                 className="w-full px-3 py-2 text-sm text-left hover:bg-accent transition-colors flex items-center justify-between"
                 disabled={item.disabled}
@@ -77,16 +86,18 @@ function ContextMenuItems({
                 </div>
                 <span className="ml-2">›</span>
               </button>
-              <div
-                data-context-menu
-                className="hidden group-hover:block absolute left-full top-0 ml-1 min-w-40 bg-popover border border-border rounded-md shadow-lg z-50"
-              >
-                <ContextMenuItems
-                  items={item.children}
-                  context={context}
-                  onClose={onClose}
-                />
-              </div>
+              {isOpen && (
+                <div
+                  data-context-menu
+                  className="absolute left-full top-0 ml-0 min-w-40 bg-popover border border-border rounded-md shadow-lg z-50"
+                >
+                  <ContextMenuItems
+                    items={item.children}
+                    context={context}
+                    onClose={onClose}
+                  />
+                </div>
+              )}
             </div>
           );
         }
@@ -130,6 +141,8 @@ export function ContextMenu({ x, y, context, onClose }: ContextMenuProps) {
         context.edge.edgeType,
         context
       );
+    } else {
+      menuItems = contextMenuRegistry.getCanvasContextMenu(context);
     }
 
     setItems(menuItems);
