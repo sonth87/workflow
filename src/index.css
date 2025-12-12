@@ -128,3 +128,14 @@
 body {
   color: var(--color-muted-foreground);
 }
+
+/* Disable pointer events on nodes/edges when in pan mode */
+.pan-mode-active .react-flow__node {
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+.pan-mode-active .react-flow__edges {
+  pointer-events: none !important;
+  user-select: none !important;
+}

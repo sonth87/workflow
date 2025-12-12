@@ -14,3 +14,8 @@ export {
   type ContextMenuConfig,
 } from "./ContextMenuRegistry";
 export { contextMenuActionsRegistry } from "./ContextMenuActionsRegistry";
+export {
+  CategoryRegistry,
+  categoryRegistry,
+  type CategoryConfig,
+} from "./CategoryRegistry";

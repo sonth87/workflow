@@ -211,7 +211,6 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
     },
 
     setEdges: edges => {
-      // Don't save to history here - let the caller decide when to save
       set({ edges });
     },
 

@@ -626,6 +626,54 @@ const defaultContextMenus: Array<{
       ),
     },
   },
+  {
+    id: "canvas-context-menu",
+    type: "context-menu",
+    name: "Canvas Context Menu",
+    config: {
+      id: "canvas-context-menu",
+      name: "Canvas Context Menu",
+      targetType: "canvas",
+      items: [
+        {
+          id: "add-node",
+          label: "Add Node",
+          icon: "",
+          onClick: async (context: ContextMenuContext) => {
+            console.log("Add node action triggered");
+          },
+          children: [
+            {
+              id: "add-start-node",
+              label: "Add Start Node",
+              icon: "○",
+              onClick: async (context: ContextMenuContext) => {
+                console.log("Add Start Node clicked", context);
+              },
+              children: [
+                {
+                  id: "add-api-start-event",
+                  label: "API Start Event",
+                  icon: "▷",
+                  onClick: async (context: ContextMenuContext) => {
+                    console.log("Add API Start Event clicked", context);
+                  },
+                },
+              ],
+            },
+            {
+              id: "add-task-node",
+              label: "Add Task Node",
+              icon: "□",
+              onClick: async (context: ContextMenuContext) => {
+                console.log("Add Task Node clicked", context);
+              },
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 // ============================================

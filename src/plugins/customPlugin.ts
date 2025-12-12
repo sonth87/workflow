@@ -7,12 +7,23 @@ import type { Plugin } from "@/core/plugins/PluginManager";
 import type { BaseNodeConfig, NodeVisualConfig } from "@/core/types/base.types";
 import { CategoryType } from "@/enum/workflow.enum";
 
+import AICategoryIcon from "./icon/ai.svg";
+import DataCategoryIcon from "./icon/data.svg";
+import IntegrationCategoryIcon from "./icon/intergration.svg";
+
 // Custom node types
 export enum CustomNodeType {
   AI_ASSISTANT = "aiAssistant",
   DATA_PROCESSOR = "dataProcessor",
   API_INTEGRATOR = "apiIntegrator",
   CUSTOM_VALIDATOR = "customValidator",
+}
+
+// Custom category types
+export enum CustomCategoryType {
+  AI_ML = "ai_ml",
+  DATA_PROCESSING = "data_processing",
+  INTEGRATIONS = "integrations",
 }
 
 /**
@@ -148,10 +159,56 @@ export const customPlugin: Plugin = {
     name: "Custom Plugin",
     version: "1.0.0",
     description: "Demo plugin with custom components and category",
-    author: "Demo Team",
+    author: "BPM Team",
   },
 
   config: {
+    // Define custom categories
+    categories: [
+      {
+        id: "category-ai-ml",
+        type: CustomCategoryType.AI_ML,
+        name: "AI & ML",
+        config: {
+          id: "category-ai-ml",
+          name: "AI & Machine Learning",
+          categoryType: CustomCategoryType.AI_ML,
+          isOpen: true,
+          icon: AICategoryIcon,
+          description: "AI and Machine Learning nodes",
+          order: 10,
+        },
+      },
+      {
+        id: "category-data-processing",
+        type: CustomCategoryType.DATA_PROCESSING,
+        name: "Data Processing",
+        config: {
+          id: "category-data-processing",
+          name: "Data Processing",
+          categoryType: CustomCategoryType.DATA_PROCESSING,
+          isOpen: true,
+          icon: DataCategoryIcon,
+          description: "Data processing and transformation nodes",
+          order: 20,
+        },
+      },
+      {
+        id: "category-integrations",
+        type: CustomCategoryType.INTEGRATIONS,
+        name: "Integrations",
+        config: {
+          id: "category-integrations",
+          name: "Integrations",
+          categoryType: CustomCategoryType.INTEGRATIONS,
+          isOpen: true,
+          icon: IntegrationCategoryIcon,
+          description: "External system integration nodes",
+          order: 30,
+        },
+      },
+    ],
+
     nodes: [
       {
         id: CustomNodeType.AI_ASSISTANT,
@@ -160,7 +217,7 @@ export const customPlugin: Plugin = {
         config: {
           ...createCustomNodeConfig(
             CustomNodeType.AI_ASSISTANT,
-            CategoryType.CUSTOM,
+            CustomCategoryType.AI_ML as any,
             aiAssistantVisualConfig,
             {
               title: "AI Assistant",
@@ -218,7 +275,7 @@ export const customPlugin: Plugin = {
         config: {
           ...createCustomNodeConfig(
             CustomNodeType.DATA_PROCESSOR,
-            CategoryType.CUSTOM,
+            CustomCategoryType.DATA_PROCESSING as any,
             dataProcessorVisualConfig,
             {
               title: "Data Processor",
@@ -274,7 +331,7 @@ export const customPlugin: Plugin = {
         config: {
           ...createCustomNodeConfig(
             CustomNodeType.API_INTEGRATOR,
-            CategoryType.CUSTOM,
+            CustomCategoryType.INTEGRATIONS as any,
             apiIntegratorVisualConfig,
             {
               title: "API Integrator",
@@ -329,7 +386,7 @@ export const customPlugin: Plugin = {
         name: "Custom Validator",
         config: createCustomNodeConfig(
           CustomNodeType.CUSTOM_VALIDATOR,
-          CategoryType.CUSTOM,
+          CustomCategoryType.DATA_PROCESSING as any,
           customValidatorVisualConfig,
           {
             title: "Custom Validator",
