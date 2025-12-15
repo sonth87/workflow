@@ -97,22 +97,29 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
 
   return (
     <aside className="w-80 h-full border border-border/50 bg-card/95 backdrop-blur-sm overflow-y-auto rounded-xl shadow-xl flex flex-col animate-in slide-in-from-right duration-200">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <div className="flex items-center gap-3">
-          <IconConfig
-            type={selectedNode?.nodeType as NodeType}
-            visualConfig={selectedNode?.visualConfig}
-          />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink800">
-            {selectedNode ? selectedNode?.metadata?.title : "Edge Properties"}
-          </h2>
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <IconConfig
+              type={selectedNode?.nodeType as NodeType}
+              visualConfig={selectedNode?.visualConfig}
+            />
+            <h2 className="text-sm font-semibold tracking-wide text-ink800">
+              {selectedNode ? selectedNode?.metadata?.title : "Edge Properties"}
+            </h2>
+          </div>
+          <button
+            onClick={() => clearSelection()}
+            className="p-2 rounded-lg hover:bg-foreground/10"
+          >
+            <X size={16} />
+          </button>
         </div>
-        <button
-          onClick={() => clearSelection()}
-          className="p-2 rounded-lg hover:bg-foreground/10"
-        >
-          <X size={16} />
-        </button>
+        {selectedNode?.metadata?.description && (
+          <p className="text-xs text-ink500 mt-1">
+            {selectedNode?.metadata?.description}
+          </p>
+        )}
       </div>
 
       <div className="p-4">

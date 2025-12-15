@@ -1,4 +1,4 @@
-import type { NodeVisualConfig } from "@/core/types/base.types";
+import type { BaseMetadata, NodeVisualConfig } from "@/core/types/base.types";
 import { NodeType } from "@/enum/workflow.enum";
 import { cx } from "@/utils/cx";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -35,6 +35,9 @@ export default function BaseNode(props: Props) {
     visualConfig,
   } = props;
   const [isExpanded, setIsExpanded] = useState(true);
+
+  // Access metadata
+  const metadata = data?.metadata as BaseMetadata;
 
   // Merge colorConfig (deprecated) with visualConfig (new)
   const finalVisualConfig: NodeVisualConfig = visualConfig || {
@@ -129,14 +132,14 @@ export default function BaseNode(props: Props) {
       )}
 
       {/* Description - toggleable, but Handles always render */}
-      {isExpanded && data?.label && (
+      {isExpanded && metadata?.description && (
         <div
           className="text-xs mt-2"
           style={{
             color: finalVisualConfig.descriptionColor,
           }}
         >
-          {data.label}
+          {metadata?.description}
         </div>
       )}
 

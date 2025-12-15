@@ -3,13 +3,13 @@
  * Giống với Toolbox của workflow cũ
  */
 
+import { categoryRegistry } from "@/core/registry/CategoryRegistry";
+import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { CategoryType, NodeType } from "@/enum/workflow.enum";
-import { getIconConfig } from "../../utils/iconConfig";
 import { X } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../../data/toolboxData";
-import { nodeRegistry } from "@/core/registry/NodeRegistry";
-import { categoryRegistry } from "@/core/registry/CategoryRegistry";
+import { getIconConfig } from "../../utils/iconConfig";
 
 // Default icon for custom category
 const CustomCategoryIcon = () => (
@@ -112,6 +112,7 @@ export function Toolbox() {
         targetCategory.nodes.push({
           type: nodeType,
           label: registryItem.name,
+          description: registryItem?.config?.metadata?.description,
         });
       }
     });
@@ -176,16 +177,23 @@ export function Toolbox() {
                     key={node.type}
                     draggable
                     onDragStart={e => handleDragStart(e, node.type)}
-                    className="flex items-center gap-2 rounded-lg bg-card/80 backdrop-blur-sm p-3 font-medium cursor-move hover:bg-foreground/10 hover:border-primary hover:scale-[1.02] active:scale-95 transition-all duration-150"
+                    className="flex items-start gap-2 rounded-lg bg-card/80 backdrop-blur-sm p-3 font-medium cursor-move hover:bg-foreground/10 hover:border-primary hover:scale-[1.02] active:scale-95 transition-all duration-150"
                   >
                     {typeof Icon === "string" ? (
                       <img src={Icon} alt={node.label} className="w-6 h-6" />
                     ) : (
                       <Icon size={24} style={{ color: iconConfig.color }} />
                     )}
-                    <span className="text-sm font-medium text-ink800">
-                      {node.label}
-                    </span>
+                    <div className="flex flex-col justify-start">
+                      <span className="text-sm font-medium text-ink800">
+                        {node.label}
+                      </span>
+                      {node.description && (
+                        <div className="text-xs mt-1 text-ink600 font-normal">
+                          {node.description}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}

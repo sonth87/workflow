@@ -7,6 +7,7 @@ import { CategoryType, NodeType } from "@/enum/workflow.enum";
 export interface NodeItem {
   type: NodeType;
   label: string;
+  description?: string;
 }
 
 export interface NodeCategory {

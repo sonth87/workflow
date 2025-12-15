@@ -26,6 +26,7 @@ export function useNodeOperations() {
         position,
         properties: properties || {},
       });
+      console.log("🚀 ~ node:", node);
 
       if (node) {
         addNode(node);

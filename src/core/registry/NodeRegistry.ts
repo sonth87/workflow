@@ -42,6 +42,11 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
         label: item.name || "New Node",
         ...defaultConfig.data,
         ...overrides?.data,
+        // Pass metadata into data so it's accessible in React components
+        metadata: {
+          ...defaultConfig.metadata,
+          ...overrides?.metadata,
+        },
       },
       metadata: {
         ...defaultConfig.metadata,
