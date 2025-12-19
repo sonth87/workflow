@@ -9,9 +9,19 @@ import type {
   PropertyDefinition,
 } from "@/core/types/base.types";
 import { X } from "lucide-react";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import IconConfig from "../IconConfig";
 import type { NodeType } from "@/enum/workflow.enum";
+import { mergeWithBaseProperties } from "@/core/constants/baseProperties";
+import {
+  TextInput,
+  NumberInput,
+  TextArea,
+  Select,
+  BooleanInput,
+  ColorInput,
+  JsonInput,
+} from "./ControlType";
 
 export const PropertiesPanel = memo(function PropertiesPanel() {
   const {
@@ -37,6 +47,12 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
 
   const node = selectedNode as BaseNodeConfig | null;
 
+  // Merge base properties với custom properties
+  const allPropertyDefinitions = useMemo(() => {
+    if (!node) return [];
+    return mergeWithBaseProperties(node.propertyDefinitions);
+  }, [node?.propertyDefinitions]);
+
   const handlePropertyChange = (propertyId: string, value: unknown) => {
     if (node) {
       updateNode(node.id, {
@@ -57,11 +73,11 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
       );
     }
 
-    // Dynamic Properties
-    if (node.propertyDefinitions && node.propertyDefinitions.length > 0) {
+    // Sử dụng merged properties (base + custom)
+    if (allPropertyDefinitions && allPropertyDefinitions.length > 0) {
       return (
         <div className="space-y-3">
-          {node.propertyDefinitions.map(propDef => (
+          {allPropertyDefinitions.map(propDef => (
             <PropertyField
               key={propDef.id}
               definition={propDef}
@@ -124,12 +140,12 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
 
       <div className="p-4">
         {selectedNode && (
-          <div className="space-y-4 flex-1 overflow-y-auto pr-1">
+          <div className="space-y-4 flex-1 overflow-y-auto p-0.5">
             {renderConfigNodeContent()}
           </div>
         )}
         {selectedEdge && (
-          <div className="space-y-4 flex-1 overflow-y-auto pr-1">
+          <div className="space-y-4 flex-1 overflow-y-auto p-0.5">
             {renderConfigEdgeContent()}
           </div>
         )}
@@ -148,100 +164,57 @@ function PropertyField({ definition, value, onChange }: PropertyFieldProps) {
   const renderField = () => {
     switch (definition.type) {
       case "text":
+        return (
+          <TextInput
+            definition={definition}
+            value={value}
+            onChange={onChange}
+          />
+        );
+
       case "number":
         return (
-          <input
-            type={definition.type}
-            value={(value as string | number) || ""}
-            onChange={e =>
-              onChange(
-                definition.type === "number"
-                  ? parseFloat(e.target.value)
-                  : e.target.value
-              )
-            }
-            placeholder={definition.placeholder}
-            className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+          <NumberInput
+            definition={definition}
+            value={value}
+            onChange={onChange}
           />
         );
 
       case "textarea":
         return (
-          <textarea
-            value={(value as string) || ""}
-            onChange={e => onChange(e.target.value)}
-            placeholder={definition.placeholder}
-            rows={3}
-            className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-          />
+          <TextArea definition={definition} value={value} onChange={onChange} />
         );
 
       case "boolean":
         return (
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={(value as boolean) || false}
-              onChange={e => onChange(e.target.checked)}
-              className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary"
-            />
-            <span className="text-sm">{definition.label}</span>
-          </label>
+          <BooleanInput
+            definition={definition}
+            value={value}
+            onChange={onChange}
+          />
         );
 
       case "select":
         return (
-          <select
-            value={(value as string) || ""}
-            onChange={e => onChange(e.target.value)}
-            className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">Select...</option>
-            {definition.options?.map(opt => (
-              <option key={String(opt.value)} value={String(opt.value)}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <Select definition={definition} value={value} onChange={onChange} />
         );
 
       case "color":
         return (
-          <div className="flex gap-2">
-            <input
-              type="color"
-              value={(value as string) || "#000000"}
-              onChange={e => onChange(e.target.value)}
-              className="w-12 h-9 rounded border border-border cursor-pointer"
-            />
-            <input
-              type="text"
-              value={(value as string) || ""}
-              onChange={e => onChange(e.target.value)}
-              placeholder="#000000"
-              className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+          <ColorInput
+            definition={definition}
+            value={value}
+            onChange={onChange}
+          />
         );
 
       case "json":
         return (
-          <textarea
-            value={
-              typeof value === "string"
-                ? value
-                : JSON.stringify(value, null, 2) || ""
-            }
-            onChange={e => {
-              try {
-                onChange(JSON.parse(e.target.value));
-              } catch {
-                onChange(e.target.value);
-              }
-            }}
-            placeholder={definition.placeholder || "{}"}
-            rows={5}
-            className="w-full px-3 py-1.5 text-sm font-mono rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+          <JsonInput
+            definition={definition}
+            value={value}
+            onChange={onChange}
           />
         );
 
