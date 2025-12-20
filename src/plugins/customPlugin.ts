@@ -10,6 +10,7 @@ import { CategoryType } from "@/enum/workflow.enum";
 import AICategoryIcon from "./icon/ai.svg";
 import DataCategoryIcon from "./icon/data.svg";
 import IntegrationCategoryIcon from "./icon/intergration.svg";
+import { CheckCircle2, Database, Globe, Sparkles } from "lucide-react";
 
 // Custom node types
 export enum CustomNodeType {
@@ -224,6 +225,12 @@ export const customPlugin: Plugin = {
               description: "AI-powered task automation",
             }
           ),
+          icon: {
+            type: "lucide",
+            value: Sparkles,
+            color: "#9333ea",
+            backgroundColor: "#f3e8ff",
+          },
           // Override với specific rules cho AI Assistant
           propertyDefinitions: [
             {
@@ -233,7 +240,7 @@ export const customPlugin: Plugin = {
               type: "select",
               required: true,
               defaultValue: "gpt-4",
-              order: 0,
+              order: 3,
               group: "config",
               options: [
                 { label: "GPT-4", value: "gpt-4" },
@@ -282,6 +289,12 @@ export const customPlugin: Plugin = {
               description: "Process and transform data",
             }
           ),
+          icon: {
+            type: "lucide",
+            value: Database,
+            color: "#2563eb",
+            backgroundColor: "#dbeafe",
+          },
           propertyDefinitions: [
             {
               id: "processingType",
@@ -290,7 +303,7 @@ export const customPlugin: Plugin = {
               type: "select",
               required: true,
               defaultValue: "transform",
-              order: 0,
+              order: 3,
               group: "config",
               options: [
                 { label: "Transform", value: "transform" },
@@ -311,8 +324,8 @@ export const customPlugin: Plugin = {
                 const validSources = [
                   CustomNodeType.API_INTEGRATOR,
                   CustomNodeType.DATA_PROCESSOR,
-                ];
-                if (validSources.includes(source.type as CustomNodeType)) {
+                ] as string[];
+                if (source.type && validSources.includes(source.type)) {
                   return { valid: true };
                 }
                 return {
@@ -338,6 +351,12 @@ export const customPlugin: Plugin = {
               description: "Integrate with external APIs",
             }
           ),
+          icon: {
+            type: "lucide",
+            value: Globe,
+            color: "#16a34a",
+            backgroundColor: "#dcfce7",
+          },
           propertyDefinitions: [
             {
               id: "apiEndpoint",
@@ -346,7 +365,7 @@ export const customPlugin: Plugin = {
               type: "text",
               required: true,
               defaultValue: "",
-              order: 0,
+              order: 3,
               group: "config",
             },
             {
@@ -384,15 +403,23 @@ export const customPlugin: Plugin = {
         id: CustomNodeType.CUSTOM_VALIDATOR,
         type: CustomNodeType.CUSTOM_VALIDATOR,
         name: "Custom Validator",
-        config: createCustomNodeConfig(
-          CustomNodeType.CUSTOM_VALIDATOR,
-          CustomCategoryType.DATA_PROCESSING as any,
-          customValidatorVisualConfig,
-          {
-            title: "Custom Validator",
-            description: "Custom validation logic",
-          }
-        ),
+        config: {
+          ...createCustomNodeConfig(
+            CustomNodeType.CUSTOM_VALIDATOR,
+            CustomCategoryType.DATA_PROCESSING as any,
+            customValidatorVisualConfig,
+            {
+              title: "Custom Validator",
+              description: "Custom validation logic",
+            }
+          ),
+          icon: {
+            type: "lucide",
+            value: CheckCircle2,
+            color: "#ea580c",
+            backgroundColor: "#ffedd5",
+          },
+        },
       },
     ],
 

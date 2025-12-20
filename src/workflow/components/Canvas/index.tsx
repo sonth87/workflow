@@ -3,7 +3,7 @@
  * Sử dụng workflowStore và event bus
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import {
   ReactFlow,
   Background,
@@ -19,13 +19,15 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { edgeRegistry } from "@/core/registry/EdgeRegistry";
+import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { validateConnection } from "@/utils/validation";
 import { NodeType } from "@/enum/workflow.enum";
 import type { ContextMenuContext } from "@/core/types/base.types";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 // Import node/edge types from workflow
-import { nodeTypes } from "./nodes";
+import { nodeTypes as builtInNodeTypes } from "./nodes";
+import { CustomNode } from "./nodes/CustomNodes";
 import { edgeTypes } from "./edges";
 import clsx from "clsx";
 import { ContextMenu } from "../ContextMenu";
@@ -56,6 +58,21 @@ function CanvasInner({ onNodeDrop, isPanMode, onPanModeChange }: CanvasProps) {
     y: number;
     context: ContextMenuContext;
   } | null>(null);
+
+  // Dynamically build nodeTypes from registry (includes plugin nodes)
+  const nodeTypes = useMemo(() => {
+    const customNodeTypes: Record<string, React.ComponentType<any>> = {};
+    const allNodes = nodeRegistry.getAll();
+
+    // Add custom nodes from plugins (any node not in built-in types)
+    allNodes.forEach(item => {
+      if (!(item.type in builtInNodeTypes)) {
+        customNodeTypes[item.type] = CustomNode;
+      }
+    });
+
+    return { ...builtInNodeTypes, ...customNodeTypes };
+  }, []);
   const [isDragging, setIsDragging] = useState(false);
 
   // Handle node changes

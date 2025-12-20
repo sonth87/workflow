@@ -440,34 +440,27 @@ export function setupEventListeners() {
   // // Listen to node additions
   // globalEventBus.on(WorkflowEventTypes.NODE_ADDED, event => {
   //   console.log("📝 Node added:", event.payload.node.metadata.title);
-
   //   // Example: Send analytics
   //   // analytics.track('node_added', { type: event.payload.node.nodeType });
   // });
-
   // // Listen to node updates
   // globalEventBus.on(WorkflowEventTypes.NODE_UPDATED, event => {
   //   console.log("✏️ Node updated:", event.payload.nodeId);
-
   //   // Example: Auto-save
   //   // autoSaveWorkflow();
   // });
-
   // // Listen to validation
   // globalEventBus.on(WorkflowEventTypes.WORKFLOW_VALIDATED, event => {
   //   const { valid, errors } = event.payload;
-
   //   if (valid) {
   //     console.log("✅ Workflow validation passed");
   //   } else {
   //     console.log("❌ Workflow validation failed:", errors);
   //   }
   // });
-
   // // Custom event example
   // globalEventBus.on("order:processed", event => {
   //   console.log("📦 Order processed:", event.payload);
-
   //   // Send notification
   //   // notificationService.send({
   //   //   title: 'Order Processed',

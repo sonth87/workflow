@@ -2,12 +2,15 @@
  * Toolbox data configuration
  */
 
+import type { IconConfig, NodeVisualConfig } from "@/core";
 import { CategoryType, NodeType } from "@/enum/workflow.enum";
 
 export interface NodeItem {
   type: NodeType;
   label: string;
   description?: string;
+  visualConfig?: NodeVisualConfig;
+  icon?: IconConfig;
 }
 
 export interface NodeCategory {

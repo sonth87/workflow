@@ -1,10 +1,14 @@
-import type { BaseMetadata, NodeVisualConfig } from "@/core/types/base.types";
+import type {
+  BaseMetadata,
+  NodeVisualConfig,
+  IconConfig,
+} from "@/core/types/base.types";
 import { NodeType } from "@/enum/workflow.enum";
 import { cx } from "@/utils/cx";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React, { useState } from "react";
 import { nodeStyle, type CustomNodeProps } from ".";
-import IconConfig from "../../IconConfig";
+import IconConfigComponent from "../../IconConfig";
 
 // Deprecated: Use NodeVisualConfig from core types instead
 export interface NodeColorConfig {
@@ -38,6 +42,7 @@ export default function BaseNode(props: Props) {
 
   // Access metadata
   const metadata = data?.metadata as BaseMetadata;
+  const iconConfig = data?.icon as IconConfig | undefined;
 
   // Merge colorConfig (deprecated) with visualConfig (new)
   const finalVisualConfig: NodeVisualConfig = visualConfig || {
@@ -100,10 +105,11 @@ export default function BaseNode(props: Props) {
       {showHeader && (
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <IconConfig
+            <IconConfigComponent
               type={type}
               colorConfig={colorConfig}
               visualConfig={visualConfig}
+              icon={iconConfig}
             />
             <span
               className="text-sm font-semibold truncate"

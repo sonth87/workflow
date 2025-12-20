@@ -184,7 +184,7 @@ export interface ThemeConfig {
  */
 export interface IconConfig {
   type: "lucide" | "custom" | "svg" | "image";
-  value: string | ReactNode; // Icon name (lucide) hoặc URL (image) hoặc ReactNode
+  value: string | ReactNode | React.ComponentType<any>; // Icon name (lucide) hoặc URL (image) hoặc ReactNode
   color?: string;
   backgroundColor?: string;
   size?: number;

@@ -35,10 +35,6 @@ import {
   LayoutGrid,
   StickyNote,
   Workflow,
-  Sparkles,
-  Database,
-  Globe,
-  CheckCircle2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -249,31 +245,6 @@ const NODE_ICON_CONFIG: Record<NodeType | string, IconConfig> = {
     color: "#FBBF24",
     bgColor: "#FEF9C3",
     label: "Note",
-  },
-  // Custom plugin nodes
-  aiAssistant: {
-    icon: Sparkles,
-    color: "#9333ea",
-    bgColor: "#f3e8ff",
-    label: "AI Assistant",
-  },
-  dataProcessor: {
-    icon: Database,
-    color: "#2563eb",
-    bgColor: "#dbeafe",
-    label: "Data Processor",
-  },
-  apiIntegrator: {
-    icon: Globe,
-    color: "#16a34a",
-    bgColor: "#dcfce7",
-    label: "API Integrator",
-  },
-  customValidator: {
-    icon: CheckCircle2,
-    color: "#ea580c",
-    bgColor: "#ffedd5",
-    label: "Custom Validator",
   },
 };
 

@@ -21,7 +21,11 @@ interface ToolbarProps {
   onPanModeChange?: (isPanMode: boolean) => void;
 }
 
-export function Toolbar({ onMenu, isPanMode = false, onPanModeChange }: ToolbarProps) {
+export function Toolbar({
+  onMenu,
+  isPanMode = false,
+  onPanModeChange,
+}: ToolbarProps) {
   const { zoomIn, zoomOut, fitView, getZoom } = useReactFlow();
   const [displayZoom, setDisplayZoom] = useState(100);
 
