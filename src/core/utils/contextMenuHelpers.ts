@@ -18,7 +18,7 @@ export function createColorMenuItems(
 ): ContextMenuItem[] {
   const palettes = themeRegistry.getAllColorPalettes();
 
-  return palettes.map(palette => ({
+  const paletteItems = palettes.map(palette => ({
     id: `color-${palette.id}`,
     label: palette.name,
     color: palette.primary, // Hiển thị màu primary của palette
@@ -26,6 +26,24 @@ export function createColorMenuItems(
       await onColorChange(palette.id, context);
     },
   }));
+
+  // Add reset option at the beginning
+  return [
+    {
+      id: "color-reset",
+      label: "Reset Color",
+      icon: "↺",
+      onClick: async (context: any) => {
+        await onColorChange("", context); // Pass empty string to reset
+      },
+    },
+    {
+      id: "separator-color",
+      label: "",
+      separator: true,
+    },
+    ...paletteItems,
+  ];
 }
 
 /**
@@ -60,6 +78,19 @@ export function createDeleteMenuItem(
  * Convert color palette to NodeVisualConfig
  */
 export function paletteToNodeVisualConfig(paletteId: string): NodeVisualConfig {
+  // If paletteId is empty, return config to reset colors
+  if (!paletteId) {
+    return {
+      backgroundColor: undefined,
+      borderColor: undefined,
+      ringColor: undefined,
+      textColor: undefined,
+      descriptionColor: undefined,
+      iconBackgroundColor: undefined,
+      iconColor: undefined,
+    };
+  }
+
   const palette = themeRegistry.getColorPalette(paletteId);
   if (!palette) {
     console.warn(`Color palette "${paletteId}" not found`);
@@ -83,6 +114,18 @@ export function paletteToNodeVisualConfig(paletteId: string): NodeVisualConfig {
  * Convert color palette to EdgeVisualConfig
  */
 export function paletteToEdgeVisualConfig(paletteId: string): EdgeVisualConfig {
+  // If paletteId is empty, return config to reset colors
+  if (!paletteId) {
+    return {
+      strokeColor: undefined,
+      selectedStrokeColor: undefined,
+      markerColor: undefined,
+      labelBackgroundColor: undefined,
+      labelTextColor: undefined,
+      labelBorderColor: undefined,
+    };
+  }
+
   const palette = themeRegistry.getColorPalette(paletteId);
   if (!palette) {
     console.warn(`Color palette "${paletteId}" not found`);

@@ -64,13 +64,17 @@ export default function BaseNode(props: Props) {
     }),
     ...(finalVisualConfig.borderColor && {
       borderColor: finalVisualConfig.borderColor,
-      borderStyle: finalVisualConfig.borderStyle || "solid",
-      borderWidth: `${borderWidth}px`,
     }),
-    ...(finalVisualConfig.borderRadius && {
+    ...(finalVisualConfig.borderStyle && {
+      borderStyle: finalVisualConfig.borderStyle,
+    }),
+    ...(finalVisualConfig.borderWidth !== undefined && {
+      borderWidth: `${finalVisualConfig.borderWidth}px`,
+    }),
+    ...(finalVisualConfig.borderRadius !== undefined && {
       borderRadius: `${finalVisualConfig.borderRadius}px`,
     }),
-    ...(finalVisualConfig.opacity && {
+    ...(finalVisualConfig.opacity !== undefined && {
       opacity: finalVisualConfig.opacity,
     }),
     ...(finalVisualConfig.boxShadow && {

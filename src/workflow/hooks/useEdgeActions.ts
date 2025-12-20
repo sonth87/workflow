@@ -20,13 +20,28 @@ export function useEdgeActions() {
       if (!edge) return;
 
       const visualConfig = paletteToEdgeVisualConfig(paletteId);
-      updateEdge(edgeId, {
-        visualConfig: { ...(edge.visualConfig || {}), ...visualConfig },
-        data: {
-          ...(edge.data || {}),
-          visualConfig: { ...(edge.data?.visualConfig || {}), ...visualConfig },
-        },
-      } as Partial<BaseEdgeConfig>);
+
+      // If resetting (empty paletteId), remove visualConfig to reset to defaults
+      if (!paletteId) {
+        updateEdge(edgeId, {
+          visualConfig: undefined,
+          data: {
+            ...(edge.data || {}),
+            visualConfig: undefined,
+          },
+        } as Partial<BaseEdgeConfig>);
+      } else {
+        updateEdge(edgeId, {
+          visualConfig: { ...(edge.visualConfig || {}), ...visualConfig },
+          data: {
+            ...(edge.data || {}),
+            visualConfig: {
+              ...(edge.data?.visualConfig || {}),
+              ...visualConfig,
+            },
+          },
+        } as Partial<BaseEdgeConfig>);
+      }
     },
     [edges, updateEdge]
   );

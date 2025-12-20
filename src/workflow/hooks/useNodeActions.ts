@@ -20,13 +20,28 @@ export function useNodeActions() {
       if (!node) return;
 
       const visualConfig = paletteToNodeVisualConfig(paletteId);
-      updateNode(nodeId, {
-        visualConfig: { ...(node.visualConfig || {}), ...visualConfig },
-        data: {
-          ...(node.data || {}),
-          visualConfig: { ...(node.data?.visualConfig || {}), ...visualConfig },
-        },
-      } as Partial<BaseNodeConfig>);
+
+      // If resetting (empty paletteId), remove undefined values to reset to defaults
+      if (!paletteId) {
+        updateNode(nodeId, {
+          visualConfig: undefined,
+          data: {
+            ...(node.data || {}),
+            visualConfig: undefined,
+          },
+        } as Partial<BaseNodeConfig>);
+      } else {
+        updateNode(nodeId, {
+          visualConfig: { ...(node.visualConfig || {}), ...visualConfig },
+          data: {
+            ...(node.data || {}),
+            visualConfig: {
+              ...(node.data?.visualConfig || {}),
+              ...visualConfig,
+            },
+          },
+        } as Partial<BaseNodeConfig>);
+      }
     },
     [nodes, updateNode]
   );
