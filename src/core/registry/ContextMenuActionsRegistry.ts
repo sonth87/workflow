@@ -10,12 +10,16 @@ interface ContextMenuActions {
   deleteNode?: (nodeId: string) => void;
   duplicateNode?: (nodeId: string) => void;
   toggleNodeCollapse?: (nodeId: string, collapsed: boolean) => void;
+  selectNode?: (nodeId: string) => void;
 
   // Edge actions
   changeEdgeColor?: (edgeId: string, paletteId: string) => void;
-  changeEdgeType?: (edgeId: string, edgeType: string) => void;
+  changePathType?: (edgeId: string, pathType: string) => void;
   changeEdgePathStyle?: (edgeId: string, pathStyle: string) => void;
+  changeEdgeAnimation?: (edgeId: string, animated: boolean) => void;
+  addEdgeLabel?: (edgeId: string, position: "start" | "center" | "end") => void;
   deleteEdge?: (edgeId: string) => void;
+  selectEdge?: (edgeId: string) => void;
 
   // Extensible for custom actions
   [key: string]: any;

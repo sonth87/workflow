@@ -7,12 +7,17 @@ import { useWorkflowStore } from "@/core/store/workflowStore";
 import type {
   BaseNodeConfig,
   PropertyDefinition,
+  EdgeLabel,
+  BaseEdgeConfig,
 } from "@/core/types/base.types";
 import { X } from "lucide-react";
 import { memo, useMemo } from "react";
 import IconConfig from "../IconConfig";
 import type { NodeType } from "@/enum/workflow.enum";
-import { mergeWithBaseProperties } from "@/core/constants/baseProperties";
+import {
+  mergeWithBaseNodeProperties,
+  mergeWithBaseEdgeProperties,
+} from "@/core/constants/baseProperties";
 import {
   TextInput,
   NumberInput,
@@ -30,6 +35,7 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
     selectedNodeId,
     selectedEdgeId,
     updateNode,
+    updateEdge,
     clearSelection,
   } = useWorkflowStore();
 
@@ -46,18 +52,51 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
   }
 
   const node = selectedNode as BaseNodeConfig | null;
+  const edge = selectedEdge as BaseEdgeConfig | null;
 
   // Merge base properties với custom properties
   const allPropertyDefinitions = useMemo(() => {
     if (!node) return [];
-    return mergeWithBaseProperties(node.propertyDefinitions);
+    return mergeWithBaseNodeProperties(node.propertyDefinitions);
   }, [node?.propertyDefinitions]);
+
+  // Merge base edge properties với custom properties
+  const allEdgePropertyDefinitions = useMemo(() => {
+    if (!edge) return [];
+    return mergeWithBaseEdgeProperties(edge.propertyDefinitions);
+  }, [edge?.propertyDefinitions]);
 
   const handlePropertyChange = (propertyId: string, value: unknown) => {
     if (node) {
       updateNode(node.id, {
         properties: {
           ...node.properties,
+          [propertyId]: value,
+        },
+      });
+    }
+  };
+
+  const handleEdgePropertyChange = (propertyId: string, value: unknown) => {
+    if (!edge) return;
+
+    // Handle special case for labels
+    if (propertyId === "labels") {
+      updateEdge(edge.id, {
+        labels: value as EdgeLabel[],
+        data: {
+          ...(edge.data || {}),
+          labels: value as EdgeLabel[],
+        },
+      });
+    } else {
+      updateEdge(edge.id, {
+        properties: {
+          ...edge.properties,
+          [propertyId]: value,
+        },
+        data: {
+          ...(edge.data || {}),
           [propertyId]: value,
         },
       });
@@ -97,17 +136,37 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
   };
 
   const renderConfigEdgeContent = () => {
-    if (!selectedEdge) {
+    if (!edge) {
       return (
         <p className="text-xs text-muted-foreground">
           Select an edge to configure
         </p>
       );
     }
+
+    if (allEdgePropertyDefinitions.length === 0) {
+      return (
+        <p className="text-xs text-muted-foreground">
+          No configuration available for this edge type
+        </p>
+      );
+    }
+
     return (
-      <p className="text-xs text-muted-foreground">
-        Edge configuration coming soon
-      </p>
+      <div className="space-y-3">
+        {allEdgePropertyDefinitions.map(propDef => (
+          <PropertyField
+            key={propDef.id}
+            definition={propDef}
+            value={
+              propDef.id === "labels"
+                ? edge.labels
+                : edge.properties?.[propDef.id]
+            }
+            onChange={value => handleEdgePropertyChange(propDef.id, value)}
+          />
+        ))}
+      </div>
     );
   };
 

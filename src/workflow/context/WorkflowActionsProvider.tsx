@@ -7,6 +7,7 @@ import { useEffect, type ReactNode } from "react";
 import { contextMenuActionsRegistry } from "@/core/registry";
 import { useNodeActions } from "../hooks/useNodeActions";
 import { useEdgeActions } from "../hooks/useEdgeActions";
+import { useWorkflowStore } from "@/core/store/workflowStore";
 
 interface WorkflowActionsProviderProps {
   children: ReactNode;
@@ -17,6 +18,7 @@ export function WorkflowActionsProvider({
 }: WorkflowActionsProviderProps) {
   const nodeActions = useNodeActions();
   const edgeActions = useEdgeActions();
+  const { selectNode, selectEdge } = useWorkflowStore();
 
   useEffect(() => {
     // Register all actions
@@ -27,19 +29,23 @@ export function WorkflowActionsProvider({
       deleteNode: nodeActions.removeNode,
       duplicateNode: nodeActions.duplicateNode,
       toggleNodeCollapse: nodeActions.toggleNodeCollapse,
+      selectNode,
 
       // Edge actions
       changeEdgeColor: edgeActions.changeEdgeColor,
-      changeEdgeType: edgeActions.changeEdgeType,
+      changePathType: edgeActions.changePathType,
       changeEdgePathStyle: edgeActions.changeEdgePathStyle,
+      changeEdgeAnimation: edgeActions.changeEdgeAnimation,
+      addEdgeLabel: edgeActions.addEdgeLabel,
       deleteEdge: edgeActions.removeEdge,
+      selectEdge,
     });
 
     return () => {
       // Clean up on unmount
       contextMenuActionsRegistry.clearActions();
     };
-  }, [nodeActions, edgeActions]);
+  }, [nodeActions, edgeActions, selectNode, selectEdge]);
 
   return <>{children}</>;
 }

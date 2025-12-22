@@ -9,6 +9,8 @@ import type {
   EdgeVisualConfig,
 } from "../types/base.types";
 import { themeRegistry } from "../registry/ThemeRegistry";
+import { contextMenuActionsRegistry } from "../registry/ContextMenuActionsRegistry";
+import { Copy, Settings2, Tags, Trash2 } from "lucide-react";
 
 /**
  * Create color submenu items from color palettes
@@ -69,7 +71,11 @@ export function createDeleteMenuItem(
   return {
     id: "delete",
     label: "Delete",
-    icon: "",
+    icon: {
+      type: "lucide",
+      value: Trash2,
+      color: "red",
+    },
     onClick: onDelete,
   };
 }
@@ -100,8 +106,6 @@ export function paletteToNodeVisualConfig(paletteId: string): NodeVisualConfig {
   return {
     backgroundColor: palette.background,
     borderColor: palette.border || palette.primary,
-    borderStyle: "solid",
-    borderWidth: 2,
     ringColor: `${palette.primary}40`,
     textColor: palette.foreground,
     descriptionColor: palette.accent || palette.primary,
@@ -191,23 +195,48 @@ export function createDefaultNodeContextMenuItems(
       children: createNodeBorderStyleMenuItems(onBorderStyleChange),
     },
     {
-      id: "separator-1",
+      id: "separator-0",
       label: "",
       separator: true,
     },
-    createDeleteMenuItem(onDelete),
     {
-      id: "separator-2",
+      id: "properties",
+      label: "Properties",
+      icon: {
+        type: "lucide",
+        value: Settings2,
+      },
+      onClick: async (context: any) => {
+        const action = contextMenuActionsRegistry.getAction("selectNode");
+        if (action && context.nodeId) {
+          action(context.nodeId);
+        }
+      },
+    },
+    {
+      id: "separator-1",
       label: "",
       separator: true,
     },
     {
       id: "duplicate",
       label: "Duplicate",
-      icon: "",
-      onClick: async (context: any) => {
-        console.log("Duplicate node:", context.nodeId);
+      icon: {
+        type: "lucide",
+        value: Copy,
       },
+      onClick: async (context: any) => {
+        const action = contextMenuActionsRegistry.getAction("duplicateNode");
+        if (action && context.nodeId) {
+          action(context.nodeId);
+        }
+      },
+    },
+    createDeleteMenuItem(onDelete),
+    {
+      id: "separator-2",
+      label: "",
+      separator: true,
     },
     {
       id: "collapse",
@@ -231,23 +260,23 @@ export function createDefaultNodeContextMenuItems(
 }
 
 /**
- * Create edge type submenu items
+ * Create edge path type submenu items
  */
-export function createEdgeTypeMenuItems(
-  onEdgeTypeChange: (edgeType: string, context: any) => void | Promise<void>
+export function createPathTypeMenuItems(
+  onPathTypeChange: (pathType: string, context: any) => void | Promise<void>
 ): ContextMenuItem[] {
-  const edgeTypes = [
+  const pathTypes = [
     { id: "bezier", label: "Bezier (Curved)", icon: "⤴" },
     { id: "straight", label: "Straight", icon: "→" },
     { id: "step", label: "Step", icon: "⌐" },
   ];
 
-  return edgeTypes.map(type => ({
-    id: `edge-type-${type.id}`,
+  return pathTypes.map(type => ({
+    id: `path-type-${type.id}`,
     label: type.label,
     icon: type.icon,
     onClick: async (context: any) => {
-      await onEdgeTypeChange(type.id, context);
+      await onPathTypeChange(type.id, context);
     },
   }));
 }
@@ -275,26 +304,89 @@ export function createEdgePathStyleMenuItems(
 }
 
 /**
+ * Create edge animation submenu items
+ */
+export function createEdgeAnimationMenuItems(
+  onAnimationChange: (animated: boolean, context: any) => void | Promise<void>
+): ContextMenuItem[] {
+  return [
+    {
+      id: "animation-enable",
+      label: "Enable",
+      onClick: async (context: any) => {
+        await onAnimationChange(true, context);
+      },
+    },
+    {
+      id: "animation-disable",
+      label: "Disable",
+      onClick: async (context: any) => {
+        await onAnimationChange(false, context);
+      },
+    },
+  ];
+}
+
+/**
+ * Create edge label submenu items
+ */
+export function createEdgeLabelMenuItems(
+  onAddLabel: (
+    position: "start" | "center" | "end",
+    context: any
+  ) => void | Promise<void>
+): ContextMenuItem[] {
+  return [
+    {
+      id: "add-label-start",
+      label: "Label at Start",
+      onClick: async (context: any) => {
+        await onAddLabel("start", context);
+      },
+    },
+    {
+      id: "add-label-center",
+      label: "Label at Center",
+      onClick: async (context: any) => {
+        await onAddLabel("center", context);
+      },
+    },
+    {
+      id: "add-label-end",
+      label: "Label at End",
+      onClick: async (context: any) => {
+        await onAddLabel("end", context);
+      },
+    },
+  ];
+}
+
+/**
  * Create default edge context menu items
  */
 export function createDefaultEdgeContextMenuItems(
   onColorChange: (paletteId: string, context: any) => void | Promise<void>,
-  onEdgeTypeChange: (edgeType: string, context: any) => void | Promise<void>,
+  onPathTypeChange: (pathType: string, context: any) => void | Promise<void>,
   onPathStyleChange: (pathStyle: string, context: any) => void | Promise<void>,
+  onAnimationChange: (animated: boolean, context: any) => void | Promise<void>,
+  onAddLabel: (
+    position: "start" | "center" | "end",
+    context: any
+  ) => void | Promise<void>,
   onDelete: (context: any) => void | Promise<void>
 ): ContextMenuItem[] {
   return [
     createColorPickerMenuItem(onColorChange),
     {
-      id: "separator-1",
+      id: "separator-0",
       label: "",
       separator: true,
     },
     {
-      id: "change-edge-type",
-      label: "Edge Type",
+      id: "change-path-type",
+      label: "Path Type",
       icon: "⤴",
-      children: createEdgeTypeMenuItems(onEdgeTypeChange),
+      children: createPathTypeMenuItems(onPathTypeChange),
     },
     {
       id: "change-path-style",
@@ -303,16 +395,41 @@ export function createDefaultEdgeContextMenuItems(
       children: createEdgePathStyleMenuItems(onPathStyleChange),
     },
     {
-      id: "separator-2",
+      id: "change-animation",
+      label: "Animation",
+      children: createEdgeAnimationMenuItems(onAnimationChange),
+    },
+    {
+      id: "separator-1",
       label: "",
       separator: true,
     },
     {
       id: "add-label",
       label: "Add Label",
-      icon: "",
+      icon: {
+        type: "lucide",
+        value: Tags,
+      },
+      children: createEdgeLabelMenuItems(onAddLabel),
+    },
+    {
+      id: "separator-2",
+      label: "",
+      separator: true,
+    },
+    {
+      id: "properties",
+      label: "Properties",
+      icon: {
+        type: "lucide",
+        value: Settings2,
+      },
       onClick: async (context: any) => {
-        console.log("Add label to edge:", context.edgeId);
+        const action = contextMenuActionsRegistry.getAction("selectEdge");
+        if (action && context.edgeId) {
+          action(context.edgeId);
+        }
       },
     },
     {

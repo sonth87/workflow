@@ -53,8 +53,8 @@ export class EdgeRegistry extends BaseRegistry<BaseEdgeConfig> {
       data: {
         ...defaultConfig.data,
         ...overrides?.data,
-        // Ensure edgeType and pathStyle are in data for rendering
-        edgeType: overrides?.edgeType || defaultConfig.edgeType,
+        // Ensure pathType and pathStyle are in data for rendering
+        pathType: overrides?.pathType || defaultConfig.pathType,
         pathStyle: overrides?.pathStyle || defaultConfig.pathStyle,
         visualConfig: overrides?.visualConfig || defaultConfig.visualConfig,
       },

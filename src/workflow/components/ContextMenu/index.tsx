@@ -34,8 +34,27 @@ function MenuItemIcon({ icon, color }: { icon?: any; color?: string }) {
     if (typeof icon === "string") {
       return <span className="mr-2 text-base shrink-0">{icon}</span>;
     }
-    // Nếu là IconConfig, có thể mở rộng sau
-    return <span className="mr-2 text-base shrink-0">{icon}</span>;
+
+    // Nếu icon là object (lucide icon config)
+    if (typeof icon === "object" && icon.type === "lucide" && icon.value) {
+      const LucideIcon = icon.value;
+      const size = icon.size || 16;
+      const iconColor = icon.color;
+
+      return (
+        <LucideIcon
+          className="mr-2 shrink-0"
+          size={size}
+          style={iconColor ? { color: iconColor } : undefined}
+        />
+      );
+    }
+
+    // Nếu là React component trực tiếp
+    if (typeof icon === "function") {
+      const IconComponent = icon;
+      return <IconComponent className="mr-2 shrink-0" size={16} />;
+    }
   }
 
   return null;

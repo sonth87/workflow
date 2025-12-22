@@ -219,9 +219,14 @@ function CanvasInner({ onNodeDrop, isPanMode, onPanModeChange }: CanvasProps) {
     (_event: React.MouseEvent, node: any) => {
       // Disable node selection in pan mode
       if (isPanMode) return;
-      selectNode(node.id);
+
+      const { panelStates, selectedNodeId, selectedEdgeId } =
+        useWorkflowStore.getState();
+      if (panelStates.properties && (selectedNodeId || selectedEdgeId)) {
+        selectNode(node.id);
+      }
     },
-    [selectNode, isPanMode]
+    [isPanMode, selectNode]
   );
 
   // Handle edge click
@@ -229,9 +234,14 @@ function CanvasInner({ onNodeDrop, isPanMode, onPanModeChange }: CanvasProps) {
     (_event: React.MouseEvent, edge: any) => {
       // Disable edge selection in pan mode
       if (isPanMode) return;
-      selectEdge(edge.id);
+
+      const { panelStates, selectedNodeId, selectedEdgeId } =
+        useWorkflowStore.getState();
+      if (panelStates.properties && (selectedNodeId || selectedEdgeId)) {
+        selectEdge(edge.id);
+      }
     },
-    [selectEdge, isPanMode]
+    [isPanMode, selectEdge]
   );
 
   // Handle pane click
