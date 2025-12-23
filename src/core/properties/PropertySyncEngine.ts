@@ -7,6 +7,7 @@ import type {
   BaseNodeConfig,
   BaseEdgeConfig,
   BaseMetadata,
+  EdgeLabel,
 } from "@/core/types/base.types";
 import type {
   PropertyEntity,
@@ -82,6 +83,17 @@ export class PropertySyncEngine {
           ...(entity.data?.metadata || {}),
           description: value as string,
         },
+      };
+      updates.properties = {
+        ...entity.properties,
+        [propertyId]: value,
+      };
+    } else if (this.isEdgeLabelProperty(propertyId) && this.isEdge(entity)) {
+      // Edge label properties - update data.labels array
+      updates.data = {
+        ...(entity.data || {}),
+        labels: this.updateEdgeLabels(entity, propertyId, value),
+        [propertyId]: value,
       };
       updates.properties = {
         ...entity.properties,
@@ -418,6 +430,46 @@ export class PropertySyncEngine {
     entity: PropertyEntity
   ): PropertyFieldDefinition[] {
     return fields.filter(field => this.isFieldVisible(field, entity));
+  }
+
+  /**
+   * Check if propertyId is an edge label property
+   */
+  private isEdgeLabelProperty(propertyId: string): boolean {
+    return ["start-label", "center-label", "end-label"].includes(propertyId);
+  }
+
+  /**
+   * Check if entity is an edge
+   */
+  private isEdge(entity: PropertyEntity): entity is BaseEdgeConfig {
+    return "source" in entity && "target" in entity;
+  }
+
+  /**
+   * Update edge labels array
+   */
+  private updateEdgeLabels(
+    edge: BaseEdgeConfig,
+    propertyId: string,
+    value: unknown
+  ): EdgeLabel[] {
+    const position = propertyId.replace("-label", "") as
+      | "start"
+      | "center"
+      | "end";
+    const existingLabels = (edge.data?.labels as EdgeLabel[]) || [];
+    const updatedLabels = existingLabels.filter(l => l.position !== position);
+
+    const trimmedValue = String(value || "").trim();
+    if (trimmedValue) {
+      updatedLabels.push({
+        text: trimmedValue,
+        position,
+      });
+    }
+
+    return updatedLabels;
   }
 }
 

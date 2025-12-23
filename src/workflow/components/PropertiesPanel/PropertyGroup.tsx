@@ -54,6 +54,12 @@ export function PropertyGroup({
           if (field.id === "id") {
             // ID field lấy từ entity.id
             value = entity.id;
+          } else if (field.id === "source") {
+            // Source field lấy từ entity.source (for edges)
+            value = (entity as any).source || field.defaultValue;
+          } else if (field.id === "target") {
+            // Target field lấy từ entity.target (for edges)
+            value = (entity as any).target || field.defaultValue;
           } else if (field.id === "description") {
             // Description field lấy từ metadata hoặc data
             value =
