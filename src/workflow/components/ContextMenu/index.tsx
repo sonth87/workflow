@@ -157,7 +157,7 @@ export function ContextMenu({ x, y, context, onClose }: ContextMenuProps) {
       );
     } else if (context.edgeId && context.edge) {
       menuItems = contextMenuRegistry.getEdgeContextMenu(
-        context.edge.edgeType,
+        context.edge.edgeType as string,
         context
       );
     } else {

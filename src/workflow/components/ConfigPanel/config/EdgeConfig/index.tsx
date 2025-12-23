@@ -1,5 +1,5 @@
-import { useUpdateConfigFlow } from "@/pages/WorkflowBuilder/hooks/useUpdateConfigFlow";
 import type { WorkflowEdge } from "@/types/workflow.type";
+import { useUpdateConfigFlow } from "@/workflow/hooks/useUpdateConfigFlow";
 import { useEffect } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 

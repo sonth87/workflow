@@ -1,7 +1,7 @@
 import type { Edge, Node } from "@xyflow/react";
 import type {
   CategoryType,
-  EdgeType,
+  EdgePathType,
   HttpMethod,
   NodeType,
 } from "../enum/workflow.enum";
@@ -85,7 +85,7 @@ export interface WorkflowEdge extends Edge {
   condition?: string; // Condition expression for conditional edges
 
   label?: string; // Display label for the edge
-  type?: EdgeType;
+  type?: EdgePathType;
 }
 
 // Validation result for connections

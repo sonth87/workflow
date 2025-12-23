@@ -2,7 +2,6 @@ import type { IconConfig as IconConfigType, NodeVisualConfig } from "@/core";
 import type { NodeType } from "@/enum/workflow.enum";
 import { getIconConfig } from "@/workflow/utils/iconConfig";
 import type { NodeColorConfig } from "../Canvas/nodes/BaseNode";
-import type { LucideIcon } from "lucide-react";
 
 interface Props {
   type?: NodeType;

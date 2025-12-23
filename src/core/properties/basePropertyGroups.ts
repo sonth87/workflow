@@ -5,7 +5,7 @@
 
 import type { PropertyGroupDefinition } from "./types/propertyDefinition";
 import { z } from "zod";
-import { Settings, Palette, Info, Settings2 } from "lucide-react";
+import { Info, Settings2 } from "lucide-react";
 
 /**
  * Base property groups cho tất cả Node types
