@@ -1,23 +1,43 @@
+import type {
+  PropertyFieldDefinition,
+  ValidationError,
+} from "@/core/properties";
 import type { PropertyDefinition } from "@/core/types/base.types";
-import { Input } from "@sth87/shadcn-design-system";
+import { Input, cn } from "@sth87/shadcn-design-system";
 
 interface TextControlProps {
-  definition: PropertyDefinition;
+  definition: PropertyDefinition | PropertyFieldDefinition;
   value: unknown;
   onChange: (value: unknown) => void;
+  disabled?: boolean;
+  errors?: ValidationError[];
 }
 
-export function TextControl({ definition, value, onChange }: TextControlProps) {
+export function TextControl({
+  definition,
+  value,
+  onChange,
+  disabled = false,
+  errors = [],
+}: TextControlProps) {
+  const hasError = errors.length > 0;
+
   return (
-    <Input
-      type="text"
-      value={(value as string) || ""}
-      onChange={e => onChange(e.target.value)}
-      placeholder={definition.placeholder}
-      infoTooltip={definition.description}
-      label={definition.label}
-      required={definition.required}
-      disabled={!!definition.readonly}
-    />
+    <div className="space-y-1.5">
+      <Input
+        type="text"
+        value={(value as string) || ""}
+        onChange={e => onChange(e.target.value)}
+        placeholder={definition.placeholder}
+        label={definition.label}
+        required={definition.required}
+        disabled={disabled || !!definition.readonly}
+        className={cn(hasError && "border-destructive")}
+        infoTooltip={definition?.helpText as string}
+      />
+      {hasError && (
+        <p className="text-xs text-destructive">{errors[0].message}</p>
+      )}
+    </div>
   );
 }

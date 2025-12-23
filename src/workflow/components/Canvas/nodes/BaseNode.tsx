@@ -4,11 +4,11 @@ import type {
   IconConfig,
 } from "@/core/types/base.types";
 import { NodeType } from "@/enum/workflow.enum";
-import { cx } from "@/utils/cx";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React, { useState } from "react";
 import { nodeStyle, type CustomNodeProps } from ".";
 import IconConfigComponent from "../../IconConfig";
+import { cn } from "@sth87/shadcn-design-system";
 
 // Deprecated: Use NodeVisualConfig from core types instead
 export interface NodeColorConfig {
@@ -90,7 +90,7 @@ export default function BaseNode(props: Props) {
 
   return (
     <div
-      className={cx(nodeStyle, "min-w-[280px]", {
+      className={cn(nodeStyle, "min-w-70", {
         "border-primary ring-4":
           props.selected &&
           !finalVisualConfig.borderColor &&
@@ -155,7 +155,7 @@ export default function BaseNode(props: Props) {
 
       {/* Children (Handles) - always render, but visually hidden when collapsed */}
       <div
-        className={cx({
+        className={cn({
           "opacity-0 h-0 overflow-hidden": !isExpanded && !showHeader,
         })}
       >

@@ -57,6 +57,7 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
         ...overrides?.metadata,
       },
       properties: {
+        label: item.name || "New Node",
         ...defaultConfig.properties,
         ...overrides?.properties,
       },
