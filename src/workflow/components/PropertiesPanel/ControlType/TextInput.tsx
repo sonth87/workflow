@@ -1,19 +1,23 @@
 import type { PropertyDefinition } from "@/core/types/base.types";
+import { Input } from "@sth87/shadcn-design-system";
 
-interface TextInputProps {
+interface TextControlProps {
   definition: PropertyDefinition;
   value: unknown;
   onChange: (value: unknown) => void;
 }
 
-export function TextInput({ definition, value, onChange }: TextInputProps) {
+export function TextControl({ definition, value, onChange }: TextControlProps) {
   return (
-    <input
+    <Input
       type="text"
       value={(value as string) || ""}
       onChange={e => onChange(e.target.value)}
       placeholder={definition.placeholder}
-      className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+      infoTooltip={definition.description}
+      label={definition.label}
+      required={definition.required}
+      disabled={!!definition.readonly}
     />
   );
 }

@@ -10,6 +10,7 @@ import {
 import type { EdgeVisualConfig, EdgeLabel } from "@/core/types/base.types";
 import { useState, useCallback } from "react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
+import { handleEdgePropertyChange as syncEdgeProperty } from "@/workflow/utils/edgePropertySync";
 
 /**
  * Get stroke dash array based on border style
@@ -142,24 +143,12 @@ function EdgeLabelComponent({
     const edge = edges.find(e => e.id === edgeId);
     if (!edge) return;
 
-    const existingLabels = (edge.labels as EdgeLabel[]) || [];
-    const newLabels = existingLabels.filter(l => l.position !== position);
+    const trimmedValue = editValue.trim();
+    const propertyId = `${position}-label`;
 
-    if (editValue.trim()) {
-      newLabels.push({
-        text: editValue.trim(),
-        position,
-      });
-    }
-
-    // Update both edge.labels and edge.data.labels to ensure sync
-    updateEdge(edgeId, {
-      labels: newLabels,
-      data: {
-        ...(edge.data || {}),
-        labels: newLabels,
-      },
-    });
+    // Use sync handler to manage all related updates
+    const updates = syncEdgeProperty(propertyId, trimmedValue, edge);
+    updateEdge(edgeId, updates);
     setIsEditing(false);
   }, [edgeId, edges, updateEdge, position, editValue]);
 

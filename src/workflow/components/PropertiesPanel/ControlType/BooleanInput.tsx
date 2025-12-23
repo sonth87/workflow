@@ -1,25 +1,24 @@
 import type { PropertyDefinition } from "@/core/types/base.types";
+import { Checkbox } from "@sth87/shadcn-design-system";
 
-interface BooleanInputProps {
+interface BooleanControlProps {
   definition: PropertyDefinition;
   value: unknown;
   onChange: (value: unknown) => void;
 }
 
-export function BooleanInput({
+export function BooleanControl({
   definition,
   value,
   onChange,
-}: BooleanInputProps) {
+}: BooleanControlProps) {
   return (
-    <label className="flex items-center gap-2 cursor-pointer">
-      <input
-        type="checkbox"
-        checked={(value as boolean) || false}
-        onChange={e => onChange(e.target.checked)}
-        className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary"
-      />
-      <span className="text-sm">{definition.label}</span>
-    </label>
+    <Checkbox
+      checked={(value as boolean) || false}
+      onCheckedChange={checked => onChange(checked)}
+      label={definition.label}
+      infoTooltip={definition.description}
+      disabled={!!definition.readonly}
+    />
   );
 }

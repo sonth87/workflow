@@ -1,14 +1,15 @@
 import type { PropertyDefinition } from "@/core/types/base.types";
+import { Textarea } from "@sth87/shadcn-design-system";
 
-interface JsonInputProps {
+interface JsonControlProps {
   definition: PropertyDefinition;
   value: unknown;
   onChange: (value: unknown) => void;
 }
 
-export function JsonInput({ definition, value, onChange }: JsonInputProps) {
+export function JsonControl({ definition, value, onChange }: JsonControlProps) {
   return (
-    <textarea
+    <Textarea
       value={
         typeof value === "string" ? value : JSON.stringify(value, null, 2) || ""
       }
@@ -20,6 +21,10 @@ export function JsonInput({ definition, value, onChange }: JsonInputProps) {
         }
       }}
       placeholder={definition.placeholder || "{}"}
+      infoTooltip={definition.description}
+      label={definition.label}
+      required={definition.required}
+      disabled={!!definition.readonly}
       rows={5}
       className="w-full px-3 py-1.5 text-sm font-mono rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
     />

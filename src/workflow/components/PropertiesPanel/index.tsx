@@ -11,7 +11,7 @@ import type {
   BaseEdgeConfig,
 } from "@/core/types/base.types";
 import { X } from "lucide-react";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useEffect } from "react";
 import IconConfig from "../IconConfig";
 import type { NodeType } from "@/enum/workflow.enum";
 import {
@@ -19,14 +19,16 @@ import {
   mergeWithBaseEdgeProperties,
 } from "@/core/constants/baseProperties";
 import {
-  TextInput,
-  NumberInput,
-  TextArea,
-  Select,
-  BooleanInput,
-  ColorInput,
-  JsonInput,
+  TextControl,
+  NumberControl,
+  TextAreaControl,
+  SelectControl,
+  BooleanControl,
+  ColorControl,
+  JsonControl,
 } from "./ControlType";
+import { handleNodePropertyChange as syncNodeProperty } from "@/workflow/utils/nodePropertySync";
+import { handleEdgePropertyChange as syncEdgeProperty } from "@/workflow/utils/edgePropertySync";
 
 export const PropertiesPanel = memo(function PropertiesPanel() {
   const {
@@ -54,6 +56,34 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
   const node = selectedNode as BaseNodeConfig | null;
   const edge = selectedEdge as BaseEdgeConfig | null;
 
+  // Sync edge properties from labels when edge is selected
+  useEffect(() => {
+    if (edge && edge.data?.labels) {
+      const labels = edge.data.labels as EdgeLabel[];
+      const propertiesToUpdate: Record<string, string> = {};
+
+      labels.forEach(label => {
+        const propertyId = `${label.position}-label`;
+        if (edge.properties?.[propertyId] !== label.text) {
+          propertiesToUpdate[propertyId] = label.text;
+        }
+      });
+
+      if (Object.keys(propertiesToUpdate).length > 0) {
+        updateEdge(edge.id, {
+          properties: {
+            ...edge.properties,
+            ...propertiesToUpdate,
+          },
+          data: {
+            ...edge.data,
+            ...propertiesToUpdate,
+          },
+        });
+      }
+    }
+  }, [edge?.id, edge?.data?.labels, updateEdge]);
+
   // Merge base properties với custom properties
   const allPropertyDefinitions = useMemo(() => {
     if (!node) return [];
@@ -67,14 +97,9 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
   }, [edge?.propertyDefinitions]);
 
   const handlePropertyChange = (propertyId: string, value: unknown) => {
-    if (node) {
-      updateNode(node.id, {
-        properties: {
-          ...node.properties,
-          [propertyId]: value,
-        },
-      });
-    }
+    if (!node) return;
+    const updates = syncNodeProperty(propertyId, value, node);
+    updateNode(node.id, updates);
   };
 
   const handleEdgePropertyChange = (propertyId: string, value: unknown) => {
@@ -90,16 +115,8 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
         },
       });
     } else {
-      updateEdge(edge.id, {
-        properties: {
-          ...edge.properties,
-          [propertyId]: value,
-        },
-        data: {
-          ...(edge.data || {}),
-          [propertyId]: value,
-        },
-      });
+      const updates = syncEdgeProperty(propertyId, value, edge);
+      updateEdge(edge.id, updates);
     }
   };
 
@@ -224,7 +241,7 @@ function PropertyField({ definition, value, onChange }: PropertyFieldProps) {
     switch (definition.type) {
       case "text":
         return (
-          <TextInput
+          <TextControl
             definition={definition}
             value={value}
             onChange={onChange}
@@ -233,7 +250,7 @@ function PropertyField({ definition, value, onChange }: PropertyFieldProps) {
 
       case "number":
         return (
-          <NumberInput
+          <NumberControl
             definition={definition}
             value={value}
             onChange={onChange}
@@ -242,12 +259,16 @@ function PropertyField({ definition, value, onChange }: PropertyFieldProps) {
 
       case "textarea":
         return (
-          <TextArea definition={definition} value={value} onChange={onChange} />
+          <TextAreaControl
+            definition={definition}
+            value={value}
+            onChange={onChange}
+          />
         );
 
       case "boolean":
         return (
-          <BooleanInput
+          <BooleanControl
             definition={definition}
             value={value}
             onChange={onChange}
@@ -256,12 +277,16 @@ function PropertyField({ definition, value, onChange }: PropertyFieldProps) {
 
       case "select":
         return (
-          <Select definition={definition} value={value} onChange={onChange} />
+          <SelectControl
+            definition={definition}
+            value={value}
+            onChange={onChange}
+          />
         );
 
       case "color":
         return (
-          <ColorInput
+          <ColorControl
             definition={definition}
             value={value}
             onChange={onChange}
@@ -270,7 +295,7 @@ function PropertyField({ definition, value, onChange }: PropertyFieldProps) {
 
       case "json":
         return (
-          <JsonInput
+          <JsonControl
             definition={definition}
             value={value}
             onChange={onChange}
@@ -286,22 +311,5 @@ function PropertyField({ definition, value, onChange }: PropertyFieldProps) {
     }
   };
 
-  return (
-    <div className="space-y-1.5">
-      {definition.type !== "boolean" && (
-        <label className="text-xs font-medium text-foreground/90">
-          {definition.label}
-          {definition.required && (
-            <span className="text-destructive ml-1">*</span>
-          )}
-        </label>
-      )}
-      {renderField()}
-      {definition.description && (
-        <p className="text-xs text-muted-foreground">
-          {definition.description}
-        </p>
-      )}
-    </div>
-  );
+  return <div className="space-y-1.5">{renderField()}</div>;
 }

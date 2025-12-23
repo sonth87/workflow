@@ -1,7 +1,7 @@
-export { TextInput } from "./TextInput";
-export { NumberInput } from "./NumberInput";
-export { TextArea } from "./TextArea";
-export { Select } from "./Select";
-export { BooleanInput } from "./BooleanInput";
-export { ColorInput } from "./ColorInput";
-export { JsonInput } from "./JsonInput";
+export { TextControl } from "./TextInput";
+export { NumberControl } from "./NumberInput";
+export { TextAreaControl } from "./TextArea";
+export { SelectControl } from "./Select";
+export { BooleanControl } from "./BooleanInput";
+export { ColorControl } from "./ColorInput";
+export { JsonControl } from "./JsonInput";

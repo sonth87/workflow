@@ -1,4 +1,5 @@
 import type { PropertyDefinition } from "@/core/types/base.types";
+import { Select } from "@sth87/shadcn-design-system";
 
 interface SelectProps {
   definition: PropertyDefinition;
@@ -6,19 +7,18 @@ interface SelectProps {
   onChange: (value: unknown) => void;
 }
 
-export function Select({ definition, value, onChange }: SelectProps) {
+export function SelectControl({ definition, value, onChange }: SelectProps) {
   return (
-    <select
+    <Select
       value={(value as string) || ""}
-      onChange={e => onChange(e.target.value)}
-      className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-    >
-      <option value="">Select...</option>
-      {definition.options?.map(opt => (
-        <option key={String(opt.value)} value={String(opt.value)}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
+      onChange={e => onChange(e)}
+      infoTooltip={definition.description}
+      label={definition.label}
+      disabled={!!definition.readonly}
+      options={definition?.options?.map(opt => ({
+        label: opt.label,
+        value: String(opt.value),
+      }))}
+    />
   );
 }

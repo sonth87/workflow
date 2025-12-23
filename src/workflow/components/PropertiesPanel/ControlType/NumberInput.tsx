@@ -1,19 +1,27 @@
 import type { PropertyDefinition } from "@/core/types/base.types";
+import { Input } from "@sth87/shadcn-design-system";
 
-interface NumberInputProps {
+interface NumberControlProps {
   definition: PropertyDefinition;
   value: unknown;
   onChange: (value: unknown) => void;
 }
 
-export function NumberInput({ definition, value, onChange }: NumberInputProps) {
+export function NumberControl({
+  definition,
+  value,
+  onChange,
+}: NumberControlProps) {
   return (
-    <input
+    <Input
       type="number"
       value={(value as number) || ""}
       onChange={e => onChange(parseFloat(e.target.value))}
       placeholder={definition.placeholder}
-      className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+      infoTooltip={definition.description}
+      label={definition.label}
+      required={definition.required}
+      disabled={!!definition.readonly}
     />
   );
 }

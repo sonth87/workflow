@@ -1,4 +1,5 @@
 import type { PropertyDefinition } from "@/core/types/base.types";
+import { Textarea as STextArea } from "@sth87/shadcn-design-system";
 
 interface TextAreaProps {
   definition: PropertyDefinition;
@@ -6,14 +7,21 @@ interface TextAreaProps {
   onChange: (value: unknown) => void;
 }
 
-export function TextArea({ definition, value, onChange }: TextAreaProps) {
+export function TextAreaControl({
+  definition,
+  value,
+  onChange,
+}: TextAreaProps) {
   return (
-    <textarea
+    <STextArea
       value={(value as string) || ""}
       onChange={e => onChange(e.target.value)}
       placeholder={definition.placeholder}
+      infoTooltip={definition.description}
+      label={definition.label}
       rows={3}
-      className="w-full px-3 py-1.5 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+      required={definition.required}
+      disabled={!!definition.readonly}
     />
   );
 }
