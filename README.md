@@ -63,3 +63,312 @@
 │  └──────────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────────┘
 ```
+
+## 📚 Registry System
+
+Hệ thống BPM Core sử dụng Registry Pattern để quản lý các thành phần có thể mở rộng. Dưới đây là các loại registry chính:
+
+### 🔹 NodeRegistry
+
+**Mục đích:** Quản lý tất cả các loại nodes trong workflow (Start Events, Tasks, Gateways, End Events, v.v.)
+
+**Chức năng:**
+
+- Đăng ký node types từ plugins
+- Tạo node instances với cấu hình mặc định
+- Validate cấu hình node
+- Lọc nodes theo category
+
+**Sử dụng:**
+
+```typescript
+import { nodeRegistry } from "@/core/registry";
+
+// Lấy node config
+const nodeConfig = nodeRegistry.get("taskDefault");
+
+// Tạo node mới
+const newNode = nodeRegistry.createNode("taskUser", { x: 100, y: 200 });
+
+// Lấy tất cả nodes theo category
+const startEvents = nodeRegistry.getByCategory("start");
+```
+
+### 🔹 EdgeRegistry
+
+**Mục đích:** Quản lý các loại edges (connections) trong workflow
+
+**Các loại edge:**
+
+- **`sequence-flow`** - Kết nối tuần tự trong cùng một process (nét liền)
+- **`message-flow`** - Kết nối message giữa các pools khác nhau (nét đứt)
+- **`association`** - Liên kết artifacts/annotations (nét chấm)
+
+**Path Rendering Types:**
+
+- **`bezier`** - Đường cong mượt
+- **`straight`** - Đường thẳng
+- **`step`** - Đường bậc thang
+
+**Sử dụng:**
+
+```typescript
+import { edgeRegistry } from "@/core/registry";
+
+// Tạo sequence flow
+const edge = edgeRegistry.createEdge("sequence-flow", "node1", "node2", {
+  pathType: "bezier",
+  pathStyle: "solid",
+});
+```
+
+### 🔹 RuleRegistry
+
+**Mục đích:** Quản lý các validation rules và business rules
+
+**Các loại rules:**
+
+- **Validation Rules** - Kiểm tra tính hợp lệ của workflow
+- **Business Rules** - Logic nghiệp vụ tùy chỉnh
+- **Connection Rules** - Quy tắc kết nối giữa các nodes
+
+**Sử dụng:**
+
+```typescript
+import { ruleRegistry } from "@/core/registry";
+
+// Đăng ký rule mới
+ruleRegistry.register({
+  id: "custom-rule",
+  type: "validation",
+  name: "Custom Validation",
+  config: {
+    enabled: true,
+    scope: "workflow",
+    condition: context => {
+      /* validation logic */
+    },
+  },
+});
+
+// Thực thi rules
+const results = ruleRegistry.executeRules("validation", workflowContext);
+```
+
+### 🔹 ThemeRegistry
+
+**Mục đích:** Quản lý themes và color palettes
+
+**Chức năng:**
+
+- Đăng ký themes tùy chỉnh
+- Chuyển đổi themes động
+- Quản lý color palettes cho nodes và edges
+
+**Sử dụng:**
+
+```typescript
+import { themeRegistry } from "@/core/registry";
+
+// Đăng ký theme mới
+themeRegistry.register({
+  id: "dark-theme",
+  name: "Dark Theme",
+  config: {
+    colors: {
+      primary: "#1e40af",
+      secondary: "#64748b",
+      // ...
+    },
+  },
+});
+```
+
+### 🔹 ContextMenuRegistry
+
+**Mục đích:** Quản lý context menus cho nodes, edges, và canvas
+
+**Chức năng:**
+
+- Đăng ký menu items động
+- Submenu và nested menus
+- Context-aware actions
+
+**Sử dụng:**
+
+```typescript
+import { contextMenuRegistry } from "@/core/registry";
+
+// Lấy menu items cho node
+const nodeMenuItems = contextMenuRegistry.getMenuItemsForNode("taskUser", {
+  nodeId: "node-123",
+});
+
+// Đăng ký menu mới
+contextMenuRegistry.register({
+  id: "custom-menu",
+  name: "Custom Menu",
+  config: {
+    targetType: "node",
+    items: [
+      /* menu items */
+    ],
+  },
+});
+```
+
+### 🔹 CategoryRegistry
+
+**Mục đích:** Quản lý categories để phân loại nodes
+
+**Categories mặc định:**
+
+- `start` - Start Events
+- `end` - End Events
+- `task` - Tasks
+- `gateway` - Gateways
+- `subflow` - Subprocesses
+- `custom` - Custom nodes
+
+**Sử dụng:**
+
+```typescript
+import { categoryRegistry } from "@/core/registry";
+
+// Thêm category mới
+categoryRegistry.register({
+  id: "integration",
+  name: "Integration",
+  config: {
+    metadata: {
+      title: "Integration Nodes",
+      description: "Third-party integrations",
+      icon: "🔌",
+    },
+  },
+});
+```
+
+### 🔹 ContextMenuActionsRegistry
+
+**Mục đích:** Quản lý các actions được trigger từ context menu
+
+**Actions có sẵn:**
+
+- `changeNodeColor` - Đổi màu node
+- `changeNodeBorderStyle` - Đổi kiểu viền node
+- `deleteNode` - Xóa node
+- `changeEdgeColor` - Đổi màu edge
+- `changePathType` - Đổi kiểu path rendering (bezier/straight/step)
+- `changeEdgePathStyle` - Đổi style path (solid/dashed/dotted)
+- `addEdgeLabel` - Thêm label cho edge
+
+**Sử dụng:**
+
+```typescript
+import { contextMenuActionsRegistry } from "@/core/registry";
+
+// Đăng ký action mới
+contextMenuActionsRegistry.registerActions({
+  customAction: (nodeId: string, params: any) => {
+    // Custom action logic
+  },
+});
+
+// Thực thi action
+const action = contextMenuActionsRegistry.getAction("changeNodeColor");
+if (action) {
+  action("node-123", "blue-palette");
+}
+```
+
+### 🔄 Registry Lifecycle
+
+Tất cả registries đều kế thừa từ `BaseRegistry` và cung cấp các operations cơ bản:
+
+```typescript
+// CRUD Operations
+registry.register(item); // Thêm item mới
+registry.get(id); // Lấy item theo id
+registry.getAll(); // Lấy tất cả items
+registry.update(id, updates); // Cập nhật item
+registry.unregister(id); // Xóa item
+registry.clear(); // Xóa tất cả items
+
+// Query Operations
+registry.find(predicate); // Tìm items theo điều kiện
+registry.filter(predicate); // Lọc items
+registry.has(id); // Kiểm tra tồn tại
+```
+
+### 🔌 Plugin Integration
+
+Plugins có thể đăng ký items vào bất kỳ registry nào:
+
+```typescript
+export const customPlugin: Plugin = {
+  metadata: {
+    id: "custom-plugin",
+    name: "Custom Plugin",
+    version: "1.0.0",
+  },
+  config: {
+    nodes: [
+      /* custom nodes */
+    ],
+    edges: [
+      /* custom edges */
+    ],
+    rules: [
+      /* custom rules */
+    ],
+    themes: [
+      /* custom themes */
+    ],
+    contextMenus: [
+      /* custom menus */
+    ],
+  },
+  async initialize() {
+    console.log("Custom plugin initialized");
+  },
+};
+```
+
+## Properties Panel
+
+┌─────────────────────────────────────────────────────────────┐
+│ PropertiesPanel (UI Layer) │
+├─────────────────────────────────────────────────────────────┤
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │ Tab 1 │ │ Tab 2 │ │ Tab 3 │ │
+│ │ (Basic) │ │ (Advanced) │ │ (Styling) │ │
+│ └─────────────┘ └─────────────┘ └─────────────┘ │
+│ │
+│ ┌───────────────────────────────────────────────┐ │
+│ │ Property Group Renderer │ │
+│ │ ┌─────────────────────────────────────────┐ │ │
+│ │ │ Dynamic Field Renderer │ │ │
+│ │ │ - TextInput, NumberInput, etc. │ │ │
+│ │ │ - Conditional rendering │ │ │
+│ │ │ - Validation feedback │ │ │
+│ │ └─────────────────────────────────────────┘ │ │
+│ └───────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+↕ Two-way binding
+┌─────────────────────────────────────────────────────────────┐
+│ Property Schema Layer (Configuration) │
+├─────────────────────────────────────────────────────────────┤
+│ - PropertyGroupDefinition[] │
+│ - PropertyFieldDefinition[] │
+│ - Validation Schema (Zod) │
+│ - Conditional Logic │
+└─────────────────────────────────────────────────────────────┘
+↕ Data sync
+┌─────────────────────────────────────────────────────────────┐
+│ Data Layer (Store & Sync) │
+├─────────────────────────────────────────────────────────────┤
+│ - useWorkflowStore (Zustand) │
+│ - Property Sync Handlers │
+│ - Validation Engine │
+└─────────────────────────────────────────────────────────────┘

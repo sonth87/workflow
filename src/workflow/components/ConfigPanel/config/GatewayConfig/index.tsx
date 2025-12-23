@@ -1,6 +1,3 @@
-
 export default function GatewayConfig() {
-  return (
-    <div>GatewayConfig</div>
-  )
+  return <div>GatewayConfig</div>;
 }

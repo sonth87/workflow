@@ -9,7 +9,7 @@ import { CategoryType, NodeType } from "@/enum/workflow.enum";
 import { X } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../../data/toolboxData";
-import { getIconConfig } from "../../utils/iconConfig";
+import IconConfig from "../IconConfig";
 
 // Default icon for custom category
 const CustomCategoryIcon = () => (
@@ -113,6 +113,8 @@ export function Toolbox() {
           type: nodeType,
           label: registryItem.name,
           description: registryItem?.config?.metadata?.description,
+          icon: registryItem?.config?.icon,
+          visualConfig: registryItem?.config?.visualConfig,
         });
       }
     });
@@ -169,9 +171,6 @@ export function Toolbox() {
             {selectedCategory.nodes
               .filter(node => node && node.type)
               .map(node => {
-                const iconConfig = getIconConfig(node.type);
-                const Icon = iconConfig.icon;
-
                 return (
                   <div
                     key={node.type}
@@ -179,11 +178,11 @@ export function Toolbox() {
                     onDragStart={e => handleDragStart(e, node.type)}
                     className="flex items-start gap-2 rounded-lg bg-card/80 backdrop-blur-sm p-3 font-medium cursor-move hover:bg-foreground/10 hover:border-primary hover:scale-[1.02] active:scale-95 transition-all duration-150"
                   >
-                    {typeof Icon === "string" ? (
-                      <img src={Icon} alt={node.label} className="w-6 h-6" />
-                    ) : (
-                      <Icon size={24} style={{ color: iconConfig.color }} />
-                    )}
+                    <IconConfig
+                      type={node.type}
+                      visualConfig={node?.visualConfig}
+                      icon={node?.icon}
+                    />
                     <div className="flex flex-col justify-start">
                       <span className="text-sm font-medium text-ink800">
                         {node.label}

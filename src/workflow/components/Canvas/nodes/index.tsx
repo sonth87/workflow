@@ -2,12 +2,6 @@ import type { NodeVisualConfig } from "@/core/types/base.types";
 import { NodeType } from "@/enum/workflow.enum";
 import type { Position } from "@xyflow/react";
 import BaseNode from "./BaseNode";
-import {
-  AIAssistantNode,
-  APIIntegratorNode,
-  CustomValidatorNode,
-  DataProcessorNode,
-} from "./CustomNodes";
 import { EndEventNode, StartEventNode } from "./EventNodes";
 import {
   ExclusiveGatewayNode,
@@ -26,6 +20,7 @@ import {
 
 // Export shared styles
 export { handleStyle, nodeStyle } from "./styles";
+export { CustomNode } from "./CustomNodes";
 
 export interface CustomNodeProps {
   id: string;
@@ -135,10 +130,4 @@ export const nodeTypes = {
   [NodeType.SUBFLOW]: wrapWithBaseNode(SubflowNode, NodeType.SUBFLOW),
   [NodeType.POOL]: PoolNode,
   [NodeType.NOTE]: NoteNode,
-
-  // Custom plugin nodes
-  aiAssistant: AIAssistantNode,
-  dataProcessor: DataProcessorNode,
-  apiIntegrator: APIIntegratorNode,
-  customValidator: CustomValidatorNode,
 };

@@ -56,7 +56,8 @@ export enum RoleType {
   SYSTEM = "System",
 }
 
-export enum EdgeType {
+// Edge Path Type - Kiểu đường vẽ (rendering type)
+export enum EdgePathType {
   SmoothStep = "smoothstep",
   Bezier = "bezier",
   Straight = "straight",

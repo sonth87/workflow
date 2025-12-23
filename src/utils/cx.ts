@@ -4,3 +4,6 @@ import { twMerge } from "tailwind-merge";
 export function cx(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+// Alias for cn (common naming convention)
+export { cx as cn };

@@ -1,4 +1,4 @@
-import { EdgeType } from "@/enum/workflow.enum";
+import { EdgePathType } from "@/enum/workflow.enum";
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -7,7 +7,10 @@ import {
   getBezierPath,
   type EdgeProps,
 } from "@xyflow/react";
-import type { EdgeVisualConfig } from "@/core/types/base.types";
+import type { EdgeVisualConfig, EdgeLabel } from "@/core/types/base.types";
+import { useState, useCallback } from "react";
+import { useWorkflowStore } from "@/core/store/workflowStore";
+import { handleEdgePropertyChange as syncEdgeProperty } from "@/workflow/utils/edgePropertySync";
 
 /**
  * Get stroke dash array based on border style
@@ -43,14 +46,14 @@ function getEdgePath(
     params;
 
   switch (edgeType) {
-    case EdgeType.Straight:
+    case EdgePathType.Straight:
       return getStraightPath({
         sourceX,
         sourceY,
         targetX,
         targetY,
       });
-    case EdgeType.Step:
+    case EdgePathType.Step:
       return getSmoothStepPath({
         sourceX,
         sourceY,
@@ -59,7 +62,7 @@ function getEdgePath(
         targetY,
         targetPosition,
       });
-    case EdgeType.Bezier:
+    case EdgePathType.Bezier:
     default:
       return getBezierPath({
         sourceX,
@@ -70,6 +73,153 @@ function getEdgePath(
         targetPosition,
       });
   }
+}
+
+/**
+ * Calculate position for edge labels
+ */
+function calculateLabelPosition(
+  edgePath: string,
+  position: "start" | "center" | "end"
+): { x: number; y: number } {
+  const pathElement = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path"
+  );
+  pathElement.setAttribute("d", edgePath);
+  const pathLength = pathElement.getTotalLength();
+
+  let point;
+  switch (position) {
+    case "start":
+      point = pathElement.getPointAtLength(pathLength * 0.15);
+      break;
+    case "end":
+      point = pathElement.getPointAtLength(pathLength * 0.85);
+      break;
+    case "center":
+    default:
+      point = pathElement.getPointAtLength(pathLength * 0.5);
+      break;
+  }
+
+  return { x: point.x, y: point.y };
+}
+
+/**
+ * Edge Label Component with hover and edit functionality
+ */
+function EdgeLabelComponent({
+  edgeId,
+  label,
+  position,
+  edgePath,
+  visualConfig,
+}: {
+  edgeId: string;
+  label: EdgeLabel | undefined;
+  position: "start" | "center" | "end";
+  edgePath: string;
+  visualConfig?: EdgeVisualConfig;
+}) {
+  const { updateEdge, edges } = useWorkflowStore();
+  const [isHovered, setIsHovered] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(label?.text || "");
+
+  const labelPos = calculateLabelPosition(edgePath, position);
+
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      setIsEditing(true);
+      setEditValue(label?.text || "");
+    },
+    [label]
+  );
+
+  const handleSave = useCallback(() => {
+    const edge = edges.find(e => e.id === edgeId);
+    if (!edge) return;
+
+    const trimmedValue = editValue.trim();
+    const propertyId = `${position}-label`;
+
+    // Use sync handler to manage all related updates
+    const updates = syncEdgeProperty(propertyId, trimmedValue, edge);
+    updateEdge(edgeId, updates);
+    setIsEditing(false);
+  }, [edgeId, edges, updateEdge, position, editValue]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+        handleSave();
+      } else if (e.key === "Escape") {
+        setIsEditing(false);
+        setEditValue(label?.text || "");
+      }
+    },
+    [handleSave, label]
+  );
+
+  const showPlaceholder = isHovered && !label?.text && !isEditing;
+  const showLabel = label?.text || isEditing;
+
+  if (!showPlaceholder && !showLabel) return null;
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        transform: `translate(-50%, -50%) translate(${labelPos.x}px,${labelPos.y}px)`,
+        pointerEvents: "all",
+      }}
+      className="nodrag nopan"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onDoubleClick={handleDoubleClick}
+    >
+      {isEditing ? (
+        <input
+          type="text"
+          value={editValue}
+          onChange={e => setEditValue(e.target.value)}
+          onBlur={handleSave}
+          onKeyDown={handleKeyDown}
+          autoFocus
+          className="px-2 py-1 text-xs border rounded bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{
+            minWidth: "80px",
+            maxWidth: "200px",
+          }}
+        />
+      ) : showPlaceholder ? (
+        <div
+          className="px-2 py-1 text-xs border-none bg-whiteOpacity100 rounded cursor-text opacity-60 hover:opacity-100 transition-opacity"
+          style={{
+            // backgroundColor: visualConfig?.labelBackgroundColor || "#f0f0f0",
+            color: visualConfig?.labelTextColor || "#999",
+            // borderColor: visualConfig?.labelBorderColor || "#ccc",
+          }}
+        >
+          Double click to add {position} label
+        </div>
+      ) : (
+        <div
+          className="px-2 py-1 text-xs border-none bg-whiteOpacity100 rounded cursor-text hover:bg-accent transition-colors"
+          style={{
+            // backgroundColor: visualConfig?.labelBackgroundColor || "#e0f2fe",
+            color: visualConfig?.labelTextColor || "#0369a1",
+            // borderColor: visualConfig?.labelBorderColor || "#7dd3fc",
+          }}
+        >
+          {label?.text}
+        </div>
+      )}
+    </div>
+  );
 }
 
 /**
@@ -89,11 +239,11 @@ export function DynamicEdge({
   selected,
   data,
 }: EdgeProps) {
-  // Get edge type from data, fallback to bezier
-  const edgeType = (data?.edgeType as string) || EdgeType.Bezier;
+  // Get path type (rendering type) from data, fallback to bezier
+  const pathType = (data?.pathType as string) || EdgePathType.Bezier;
   const pathStyle = (data?.pathStyle as string) || "solid";
 
-  const [edgePath, labelX, labelY] = getEdgePath(edgeType, {
+  const [edgePath, labelX, labelY] = getEdgePath(pathType, {
     sourceX,
     sourceY,
     targetX,
@@ -104,6 +254,12 @@ export function DynamicEdge({
 
   // Get visual config from edge data
   const visualConfig = data?.visualConfig as EdgeVisualConfig | undefined;
+  const labels = (data?.labels as EdgeLabel[]) || [];
+
+  // Find labels by position
+  const startLabel = labels.find(l => l.position === "start");
+  const centerLabel = labels.find(l => l.position === "center");
+  const endLabel = labels.find(l => l.position === "end");
 
   // Determine colors and styles
   const strokeColor = selected
@@ -164,7 +320,38 @@ export function DynamicEdge({
       />
 
       <EdgeLabelRenderer>
-        {label && (
+        {/* Start Label */}
+        <EdgeLabelComponent
+          key={`${id}-start-${startLabel?.text || "empty"}`}
+          edgeId={id}
+          label={startLabel}
+          position="start"
+          edgePath={edgePath}
+          visualConfig={visualConfig}
+        />
+
+        {/* Center Label */}
+        <EdgeLabelComponent
+          key={`${id}-center-${centerLabel?.text || "empty"}`}
+          edgeId={id}
+          label={centerLabel}
+          position="center"
+          edgePath={edgePath}
+          visualConfig={visualConfig}
+        />
+
+        {/* End Label */}
+        <EdgeLabelComponent
+          key={`${id}-end-${endLabel?.text || "empty"}`}
+          edgeId={id}
+          label={endLabel}
+          position="end"
+          edgePath={edgePath}
+          visualConfig={visualConfig}
+        />
+
+        {/* Legacy label support - show at center if no labels array exists */}
+        {label && !labels.length && (
           <div
             style={{
               position: "absolute",
@@ -193,11 +380,11 @@ export function DynamicEdge({
 
 /**
  * Edge types mapping for React Flow
- * All edge types use the DynamicEdge component
+ * Maps BPMN edge registry types to the DynamicEdge component
+ * The actual rendering type (Bezier/Straight/Step) is determined by data.edgeType
  */
 export const edgeTypes = {
-  "sequence-flow": DynamicEdge,
-  [EdgeType.Bezier]: DynamicEdge,
-  [EdgeType.Straight]: DynamicEdge,
-  [EdgeType.Step]: DynamicEdge,
+  "sequence-flow": DynamicEdge, // kết nối tuần tự (giữa các hoạt động trong cùng một pool)
+  "message-flow": DynamicEdge, // kết nối message (giữa các pool/participants)
+  association: DynamicEdge, // liên kết artifact (không ảnh hưởng tới logic luồng, mang ý nghĩa tham khảo, chú thích)
 };

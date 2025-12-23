@@ -15,7 +15,7 @@ import type { ContextMenuContext } from "@/core/types/base.types";
 import {
   NodeType,
   CategoryType,
-  EdgeType,
+  EdgePathType,
   EdgePathStyle,
 } from "@/enum/workflow.enum";
 import {
@@ -264,7 +264,7 @@ const defaultEdges: Array<{
       source: "",
       target: "",
       type: "sequence-flow", // Registry type
-      edgeType: EdgeType.Bezier, // Default rendering type
+      pathType: EdgePathType.Bezier, // Path rendering type
       metadata: {
         id: "sequence-flow",
         title: "Sequence Flow",
@@ -279,48 +279,11 @@ const defaultEdges: Array<{
       selectable: true,
       labels: [],
       properties: {
-        edgeType: EdgeType.Bezier,
+        pathType: EdgePathType.Bezier,
         pathStyle: EdgePathStyle.Solid,
       },
       propertyDefinitions: [
-        {
-          id: "label",
-          type: "text",
-          label: "Label",
-          description: "Edge label",
-          defaultValue: "",
-        },
-        {
-          id: "condition",
-          type: "text",
-          label: "Condition",
-          description: "Conditional expression",
-          defaultValue: "",
-        },
-        {
-          id: "edgeType",
-          type: "select",
-          label: "Edge Type",
-          description: "Visual rendering type",
-          defaultValue: EdgeType.Bezier,
-          options: [
-            { label: "Bezier", value: EdgeType.Bezier },
-            { label: "Straight", value: EdgeType.Straight },
-            { label: "Step", value: EdgeType.Step },
-          ],
-        },
-        {
-          id: "pathStyle",
-          type: "select",
-          label: "Path Style",
-          description: "Line style",
-          defaultValue: "solid",
-          options: [
-            { label: "Solid", value: EdgePathStyle.Solid },
-            { label: "Dashed", value: EdgePathStyle.Dashed },
-            { label: "Dotted", value: EdgePathStyle.Dotted },
-          ],
-        },
+        // Property
       ],
     },
   },
@@ -333,7 +296,7 @@ const defaultEdges: Array<{
       source: "",
       target: "",
       type: "message-flow",
-      edgeType: EdgeType.Straight,
+      pathType: EdgePathType.Straight,
       metadata: {
         id: "message-flow",
         title: "Message Flow",
@@ -348,24 +311,20 @@ const defaultEdges: Array<{
       selectable: true,
       labels: [],
       properties: {
-        edgeType: EdgeType.Straight,
+        pathType: EdgePathType.Straight,
         pathStyle: EdgePathStyle.Dashed,
         messageType: "default",
       },
       propertyDefinitions: [
         {
-          id: "label",
-          type: "text",
-          label: "Label",
-          description: "Message name",
-          defaultValue: "",
-        },
-        {
           id: "messageType",
+          name: "messageType",
           type: "select",
           label: "Message Type",
           description: "Type of message being sent",
           defaultValue: "default",
+          required: false,
+          order: 0,
           options: [
             { label: "Default", value: "default" },
             { label: "Email", value: "email" },
@@ -374,15 +333,16 @@ const defaultEdges: Array<{
           ],
         },
         {
-          id: "edgeType",
+          id: "pathType",
+          name: "pathType",
           type: "select",
-          label: "Edge Type",
+          label: "Path Type",
           description: "Visual rendering type",
-          defaultValue: EdgeType.Straight,
+          defaultValue: EdgePathType.Straight,
           options: [
-            { label: "Bezier", value: EdgeType.Bezier },
-            { label: "Straight", value: EdgeType.Straight },
-            { label: "Step", value: EdgeType.Step },
+            { label: "Bezier", value: EdgePathType.Bezier },
+            { label: "Straight", value: EdgePathType.Straight },
+            { label: "Step", value: EdgePathType.Step },
           ],
         },
       ],
@@ -397,7 +357,7 @@ const defaultEdges: Array<{
       source: "",
       target: "",
       type: "association",
-      edgeType: EdgeType.Straight,
+      pathType: EdgePathType.Straight,
       metadata: {
         id: "association",
         title: "Association",
@@ -412,20 +372,14 @@ const defaultEdges: Array<{
       selectable: true,
       labels: [],
       properties: {
-        edgeType: EdgeType.Straight,
+        pathType: EdgePathType.Straight,
         pathStyle: EdgePathStyle.Dotted,
         direction: "none",
       },
       propertyDefinitions: [
         {
-          id: "label",
-          type: "text",
-          label: "Label",
-          description: "Association label",
-          defaultValue: "",
-        },
-        {
           id: "direction",
+          name: "direction",
           type: "select",
           label: "Direction",
           description: "Association direction",
@@ -437,15 +391,15 @@ const defaultEdges: Array<{
           ],
         },
         {
-          id: "edgeType",
+          id: "pathType",
           type: "select",
-          label: "Edge Type",
+          label: "Path Type",
           description: "Visual rendering type",
-          defaultValue: EdgeType.Straight,
+          defaultValue: EdgePathType.Straight,
           options: [
-            { label: "Bezier", value: EdgeType.Bezier },
-            { label: "Straight", value: EdgeType.Straight },
-            { label: "Step", value: EdgeType.Step },
+            { label: "Bezier", value: EdgePathType.Bezier },
+            { label: "Straight", value: EdgePathType.Straight },
+            { label: "Step", value: EdgePathType.Step },
           ],
         },
       ],
@@ -600,11 +554,11 @@ const defaultContextMenus: Array<{
             action(context.edgeId, paletteId);
           }
         },
-        // On edge type change
-        async (edgeType: string, context: ContextMenuContext) => {
-          const action = contextMenuActionsRegistry.getAction("changeEdgeType");
+        // On path type change
+        async (pathType: string, context: ContextMenuContext) => {
+          const action = contextMenuActionsRegistry.getAction("changePathType");
           if (action && context.edgeId) {
-            action(context.edgeId, edgeType);
+            action(context.edgeId, pathType);
           }
         },
         // On path style change
@@ -614,6 +568,25 @@ const defaultContextMenus: Array<{
           );
           if (action && context.edgeId) {
             action(context.edgeId, pathStyle);
+          }
+        },
+        // On animation change
+        async (animated: boolean, context: ContextMenuContext) => {
+          const action = contextMenuActionsRegistry.getAction(
+            "changeEdgeAnimation"
+          );
+          if (action && context.edgeId) {
+            action(context.edgeId, animated);
+          }
+        },
+        // On add label
+        async (
+          position: "start" | "center" | "end",
+          context: ContextMenuContext
+        ) => {
+          const action = contextMenuActionsRegistry.getAction("addEdgeLabel");
+          if (action && context.edgeId) {
+            action(context.edgeId, position);
           }
         },
         // On delete

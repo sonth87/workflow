@@ -24,6 +24,7 @@ import {
 } from "@xyflow/react";
 import { getLayoutedElements } from "./utils/layout";
 import { Behavior } from "./components/Behavior";
+import { initializePropertySystem } from "@/core/properties";
 
 function WorkflowBuilderInner() {
   const { createNode } = useNodeOperations();
@@ -43,11 +44,6 @@ function WorkflowBuilderInner() {
   const [layoutDirection, setLayoutDirection] =
     useState<LayoutDirection>("horizontal");
   const [isPanMode, setIsPanMode] = useState(false);
-
-  // Clear selection when entering pan mode
-  useEffect(() => {
-    if (isPanMode) clearSelection();
-  }, [isPanMode, clearSelection]);
 
   const handleNodeDrop = useCallback(
     (nodeType: string, position: { x: number; y: number }) => {
@@ -185,6 +181,9 @@ export interface WorkflowBuilderProps {
 export default function WorkflowBuilder({
   pluginOptions,
 }: WorkflowBuilderProps = {}) {
+  // Initialize property system
+  initializePropertySystem();
+
   return (
     <WorkflowProvider pluginOptions={pluginOptions}>
       <ReactFlowProvider>

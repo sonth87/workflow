@@ -184,7 +184,7 @@ export interface ThemeConfig {
  */
 export interface IconConfig {
   type: "lucide" | "custom" | "svg" | "image";
-  value: string | ReactNode; // Icon name (lucide) hoặc URL (image) hoặc ReactNode
+  value: string | ReactNode | React.ComponentType<any>; // Icon name (lucide) hoặc URL (image) hoặc ReactNode
   color?: string;
   backgroundColor?: string;
   size?: number;
@@ -370,16 +370,16 @@ export interface EdgeAnimation {
 }
 
 /**
- * Edge type union - Có thể mở rộng bởi plugins
+ * Edge path type union - Kiểu đường vẽ (rendering type), có thể mở rộng bởi plugins
  */
-export type EdgeTypeValue =
+export type EdgePathTypeValue =
   | "default"
   | "straight"
   | "step"
   | "smoothstep"
   | "bezier"
   | "simplebezier"
-  | string; // Allow custom edge types from plugins
+  | string; // Allow custom path types from plugins
 
 /**
  * Base Edge Configuration - Core interface cho tất cả edge types
@@ -388,8 +388,8 @@ export interface BaseEdgeConfig extends Edge {
   // Thông tin cơ bản
   metadata: BaseMetadata;
 
-  // Edge type
-  edgeType: EdgeTypeValue;
+  // Path rendering type (Bezier, Straight, Step)
+  pathType: EdgePathTypeValue;
 
   // Visual & Styling
   visualConfig?: EdgeVisualConfig; // New: Centralized visual configuration

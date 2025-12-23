@@ -47,12 +47,17 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
           ...defaultConfig.metadata,
           ...overrides?.metadata,
         },
+        // Pass icon into data for rendering
+        icon: defaultConfig.icon,
+        // Pass visualConfig into data
+        visualConfig: defaultConfig.visualConfig,
       },
       metadata: {
         ...defaultConfig.metadata,
         ...overrides?.metadata,
       },
       properties: {
+        label: item.name || "New Node",
         ...defaultConfig.properties,
         ...overrides?.properties,
       },

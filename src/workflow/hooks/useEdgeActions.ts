@@ -5,7 +5,7 @@
 
 import { useCallback } from "react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
-import type { BaseEdgeConfig } from "@/core/types/base.types";
+import type { BaseEdgeConfig, EdgeLabel } from "@/core/types/base.types";
 import { paletteToEdgeVisualConfig } from "@/core/utils/contextMenuHelpers";
 
 export function useEdgeActions() {
@@ -20,29 +20,44 @@ export function useEdgeActions() {
       if (!edge) return;
 
       const visualConfig = paletteToEdgeVisualConfig(paletteId);
-      updateEdge(edgeId, {
-        visualConfig: { ...(edge.visualConfig || {}), ...visualConfig },
-        data: {
-          ...(edge.data || {}),
-          visualConfig: { ...(edge.data?.visualConfig || {}), ...visualConfig },
-        },
-      } as Partial<BaseEdgeConfig>);
+
+      // If resetting (empty paletteId), remove visualConfig to reset to defaults
+      if (!paletteId) {
+        updateEdge(edgeId, {
+          visualConfig: undefined,
+          data: {
+            ...(edge.data || {}),
+            visualConfig: undefined,
+          },
+        } as Partial<BaseEdgeConfig>);
+      } else {
+        updateEdge(edgeId, {
+          visualConfig: { ...(edge.visualConfig || {}), ...visualConfig },
+          data: {
+            ...(edge.data || {}),
+            visualConfig: {
+              ...(edge.data?.visualConfig || {}),
+              ...visualConfig,
+            },
+          },
+        } as Partial<BaseEdgeConfig>);
+      }
     },
     [edges, updateEdge]
   );
 
   /**
-   * Change edge rendering type (smooth, straight, bezier, etc.)
+   * Change edge path rendering type (bezier, straight, step)
    */
-  const changeEdgeType = useCallback(
-    (edgeId: string, edgeType: string) => {
+  const changePathType = useCallback(
+    (edgeId: string, pathType: string) => {
       const edge = edges.find(e => e.id === edgeId);
       if (!edge) return;
 
       updateEdge(edgeId, {
-        edgeType: edgeType as any,
-        properties: { ...(edge.properties || {}), edgeType },
-        data: { ...(edge.data || {}), edgeType },
+        pathType: pathType as any,
+        properties: { ...(edge.properties || {}), pathType },
+        data: { ...(edge.data || {}), pathType },
       } as Partial<BaseEdgeConfig>);
     },
     [edges, updateEdge]
@@ -66,6 +81,33 @@ export function useEdgeActions() {
   );
 
   /**
+   * Change edge animation
+   */
+  const changeEdgeAnimation = useCallback(
+    (edgeId: string, animated: boolean) => {
+      const edge = edges.find(e => e.id === edgeId);
+      if (!edge) return;
+
+      updateEdge(edgeId, {
+        animated,
+        visualConfig: {
+          ...(edge.visualConfig || {}),
+          animated,
+        },
+        data: {
+          ...(edge.data || {}),
+          animated,
+          visualConfig: {
+            ...(edge.data?.visualConfig || {}),
+            animated,
+          },
+        },
+      } as Partial<BaseEdgeConfig>);
+    },
+    [edges, updateEdge]
+  );
+
+  /**
    * Delete an edge
    */
   const removeEdge = useCallback(
@@ -75,10 +117,48 @@ export function useEdgeActions() {
     [deleteEdge]
   );
 
+  /**
+   * Add label to edge at specific position
+   */
+  const addEdgeLabel = useCallback(
+    (edgeId: string, position: "start" | "center" | "end") => {
+      const edge = edges.find(e => e.id === edgeId);
+      if (!edge) return;
+
+      const existingLabels = (edge.labels as EdgeLabel[]) || [];
+      const hasLabelAtPosition = existingLabels.some(
+        l => l.position === position
+      );
+
+      // If label already exists at this position, select the edge to show properties panel
+      if (hasLabelAtPosition) {
+        // The user can edit it in properties panel
+        return;
+      }
+
+      // Add new label with placeholder text
+      const newLabel: EdgeLabel = {
+        text: `${position.charAt(0).toUpperCase() + position.slice(1)} Label`,
+        position,
+      };
+
+      updateEdge(edgeId, {
+        labels: [...existingLabels, newLabel],
+        data: {
+          ...(edge.data || {}),
+          labels: [...existingLabels, newLabel],
+        },
+      } as Partial<BaseEdgeConfig>);
+    },
+    [edges, updateEdge]
+  );
+
   return {
     changeEdgeColor,
-    changeEdgeType,
+    changePathType,
     changeEdgePathStyle,
+    changeEdgeAnimation,
+    addEdgeLabel,
     removeEdge,
   };
 }
