@@ -3,7 +3,7 @@
  * Layout giống với workflow cũ
  */
 
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import {
   WorkflowProvider,
   type PluginOptions,
@@ -36,7 +36,6 @@ function WorkflowBuilderInner() {
     selectedNodeId,
     selectedEdgeId,
     saveToHistory,
-    clearSelection,
   } = useWorkflowStore();
   const { fitView } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();

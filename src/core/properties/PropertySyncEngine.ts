@@ -21,7 +21,7 @@ import type {
   FieldValidationResult,
   ValidationOptions,
 } from "./types/validationTypes";
-import { ZodError, type ZodSchema } from "zod";
+import { ZodError, type ZodType } from "zod";
 
 /**
  * Kết quả sau khi sync property
@@ -257,7 +257,7 @@ export class PropertySyncEngine {
   private validateField(
     fieldId: string,
     value: unknown,
-    schema: ZodSchema
+    schema: ZodType
   ): FieldValidationResult {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];

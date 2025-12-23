@@ -540,6 +540,7 @@ export async function runFullExample() {
       source: startNode.id,
       target: orderNode.id,
       edgeType: "default",
+      pathType: "default",
       metadata: { id: "e1", title: "" },
     });
   }

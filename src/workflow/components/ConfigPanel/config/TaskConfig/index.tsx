@@ -1,6 +1,6 @@
-import useBuildDefaultValue from "@/pages/WorkflowBuilder/hooks/useBuildDefaultValue";
-import { useUpdateConfigFlow } from "@/pages/WorkflowBuilder/hooks/useUpdateConfigFlow";
 import type { TaskNode } from "@/types/workflow.type";
+import useBuildDefaultValue from "@/workflow/hooks/useBuildDefaultValue";
+import { useUpdateConfigFlow } from "@/workflow/hooks/useUpdateConfigFlow";
 import { useEffect } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 

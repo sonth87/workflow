@@ -4,7 +4,7 @@
  */
 
 import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
-import type { ZodSchema } from "zod";
+import type { ZodType } from "zod";
 import type React from "react";
 
 /**
@@ -129,7 +129,7 @@ export interface PropertyFieldDefinition {
   visible?: PropertyCondition;
 
   // Validation
-  validation?: ZodSchema; // Zod schema cho validation
+  validation?: ZodType; // Zod schema cho validation
 
   // Field-specific options
   options?: FieldOptions;

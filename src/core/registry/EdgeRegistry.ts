@@ -85,7 +85,7 @@ export class EdgeRegistry extends BaseRegistry<BaseEdgeConfig> {
       errors.push("Edge type is required");
     }
 
-    if (!this.has(edge.edgeType)) {
+    if (!this.has(edge.edgeType as string)) {
       errors.push(`Edge type "${edge.edgeType}" is not registered`);
     }
 
