@@ -78,6 +78,10 @@ export class PropertySyncEngine {
       updates.data = {
         ...(entity.data || {}),
         description: value,
+        metadata: {
+          ...(entity.data?.metadata || {}),
+          description: value as string,
+        },
       };
       updates.properties = {
         ...entity.properties,
