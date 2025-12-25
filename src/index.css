@@ -139,3 +139,7 @@ body {
   pointer-events: none !important;
   user-select: none !important;
 }
+
+.indicator-glow {
+  box-shadow: 0 0 8px var(--color-primary);
+}

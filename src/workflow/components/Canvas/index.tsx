@@ -15,6 +15,7 @@ import {
   type Connection,
   type NodeChange,
   type EdgeChange,
+  MiniMap,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useWorkflowStore } from "@/core/store/workflowStore";
@@ -36,9 +37,15 @@ interface CanvasProps {
   onNodeDrop?: (nodeType: string, position: { x: number; y: number }) => void;
   isPanMode?: boolean;
   onPanModeChange?: (isPanMode: boolean) => void;
+  showMinimap?: boolean;
 }
 
-function CanvasInner({ onNodeDrop, isPanMode, onPanModeChange }: CanvasProps) {
+function CanvasInner({
+  onNodeDrop,
+  isPanMode,
+  onPanModeChange,
+  showMinimap = false,
+}: CanvasProps) {
   const {
     nodes,
     edges,
@@ -423,6 +430,7 @@ function CanvasInner({ onNodeDrop, isPanMode, onPanModeChange }: CanvasProps) {
         }}
         connectionLineType={ConnectionLineType.Bezier}
         snapGrid={[15, 15]}
+        snapToGrid={true}
         selectNodesOnDrag={false}
         panOnDrag={isPanMode ? [0, 1, 2] : [1, 2]}
         selectionOnDrag={!isPanMode}
@@ -433,10 +441,33 @@ function CanvasInner({ onNodeDrop, isPanMode, onPanModeChange }: CanvasProps) {
         edgesReconnectable={!isPanMode}
         reconnectRadius={20}
         minZoom={0.2}
-        maxZoom={3}
+        maxZoom={5}
       >
         <Background gap={15} />
       </ReactFlow>
+      {showMinimap && (
+        <MiniMap
+          nodeStrokeColor={n => {
+            if (n.type === "input") return "#0041d0";
+            if (n.type === "selectorNode") return "#3b82f6";
+            if (n.type === "output") return "#ff0072";
+            return "#000"; // Default stroke color for other node types
+          }}
+          nodeColor={n => {
+            try {
+              const { category } = (n as any) || {};
+              if (category === "task") return "#24b0fb";
+              if (category === "start") return "#39cc7e";
+              if (category === "end") return "#ff6262";
+              if (category === "gateway") return "#ff9d57";
+              return "#fff";
+            } catch (_) {
+              return "#fff";
+            }
+          }}
+          className="fill-transparent border border-border rounded-lg"
+        />
+      )}
       {contextMenu && (
         <ContextMenu
           x={contextMenu.x}

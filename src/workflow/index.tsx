@@ -36,13 +36,14 @@ function WorkflowBuilderInner() {
     selectedNodeId,
     selectedEdgeId,
     saveToHistory,
+    setLayoutDirection: storeSetLayoutDirection,
+    layoutDirection,
   } = useWorkflowStore();
   const { fitView } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();
 
-  const [layoutDirection, setLayoutDirection] =
-    useState<LayoutDirection>("horizontal");
   const [isPanMode, setIsPanMode] = useState(false);
+  const [showMinimap, setShowMinimap] = useState(false);
 
   const handleNodeDrop = useCallback(
     (nodeType: string, position: { x: number; y: number }) => {
@@ -97,7 +98,7 @@ function WorkflowBuilderInner() {
       // Save history before layout change
       saveToHistory();
 
-      setLayoutDirection(direction);
+      storeSetLayoutDirection(direction);
 
       const { nodes: layoutedNodes } = getLayoutedElements(
         nodes,
@@ -112,7 +113,15 @@ function WorkflowBuilderInner() {
         fitView({ padding: 0.2, duration: 300, maxZoom: 1 });
       }, 100);
     },
-    [nodes, edges, setNodes, updateNodeInternals, fitView, saveToHistory]
+    [
+      nodes,
+      edges,
+      setNodes,
+      updateNodeInternals,
+      fitView,
+      saveToHistory,
+      storeSetLayoutDirection,
+    ]
   );
 
   const selectedNode = selectedNodeId
@@ -143,6 +152,7 @@ function WorkflowBuilderInner() {
             onNodeDrop={handleNodeDrop}
             isPanMode={isPanMode}
             onPanModeChange={setIsPanMode}
+            showMinimap={showMinimap}
           />
         </div>
 
@@ -159,6 +169,8 @@ function WorkflowBuilderInner() {
             onMenu={handleMenu}
             isPanMode={isPanMode}
             onPanModeChange={setIsPanMode}
+            showMinimap={showMinimap}
+            onMinimapToggle={setShowMinimap}
           />
         </div>
       </div>

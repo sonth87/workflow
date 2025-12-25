@@ -37,6 +37,7 @@ export interface WorkflowState {
 
   // UI state
   layoutDirection: "horizontal" | "vertical";
+  compactView: boolean;
   panelStates: {
     toolbox: boolean;
     properties: boolean;
@@ -88,6 +89,7 @@ export interface WorkflowActions {
 
   // UI actions
   setLayoutDirection: (direction: "horizontal" | "vertical") => void;
+  toggleCompactView: () => void;
   togglePanel: (panel: keyof WorkflowState["panelStates"]) => void;
   setLoading: (isLoading: boolean) => void;
   setSaving: (isSaving: boolean) => void;
@@ -108,6 +110,7 @@ const initialState: WorkflowState = {
     future: [],
   },
   layoutDirection: "vertical",
+  compactView: false,
   panelStates: {
     toolbox: true,
     properties: true,
@@ -314,6 +317,10 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
     setLayoutDirection: direction => {
       set({ layoutDirection: direction });
       globalEventBus.emit(WorkflowEventTypes.LAYOUT_CHANGED, { direction });
+    },
+
+    toggleCompactView: () => {
+      set(state => ({ compactView: !state.compactView }));
     },
 
     togglePanel: panel => {
