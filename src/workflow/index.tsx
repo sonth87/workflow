@@ -79,10 +79,6 @@ function WorkflowBuilderInner() {
     alert("Workflow saved! Check console for details.");
   }, [validate, nodes, edges]);
 
-  const handleMenu = useCallback(() => {
-    console.log("Menu clicked");
-  }, []);
-
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
       const node = nodes.find(n => n.id === nodeId);
@@ -166,7 +162,6 @@ function WorkflowBuilderInner() {
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
           <Toolbar
-            onMenu={handleMenu}
             isPanMode={isPanMode}
             onPanModeChange={setIsPanMode}
             showMinimap={showMinimap}

@@ -12,9 +12,7 @@ import {
   Menu,
   RefreshCcw,
   MousePointer2,
-  CheckCheck,
   Check,
-  Map,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Popover, Command } from "@sth87/shadcn-design-system";
