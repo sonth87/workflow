@@ -2,16 +2,31 @@ import type { IconConfig as IconConfigType, NodeVisualConfig } from "@/core";
 import type { NodeType } from "@/enum/workflow.enum";
 import { getIconConfig } from "@/workflow/utils/iconConfig";
 import type { NodeColorConfig } from "../Canvas/nodes/BaseNode";
+import { useTheme } from "@/hooks/useTheme";
 
 interface Props {
   type?: NodeType;
   colorConfig?: NodeColorConfig; // Deprecated
   visualConfig?: NodeVisualConfig; // New: Use this instead
   icon?: IconConfigType; // Icon from node config
+  compactView?: boolean;
 }
 
 export default function IconConfig(props: Props) {
-  const { type, colorConfig, visualConfig, icon: nodeIcon } = props;
+  const {
+    type,
+    colorConfig,
+    visualConfig,
+    icon: nodeIcon,
+    compactView,
+  } = props;
+  const { theme } = useTheme();
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const defaultColor = isDark ? "#FFF" : "#000";
+
   const finalVisualConfig: NodeVisualConfig = visualConfig || {
     backgroundColor: colorConfig?.backgroundColor,
     borderColor: colorConfig?.borderColor,
@@ -51,13 +66,13 @@ export default function IconConfig(props: Props) {
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
           style={{
-            backgroundColor: iconBgColor,
+            backgroundColor: !compactView ? iconBgColor : undefined,
           }}
         >
           <Icon
-            size={18}
+            size={compactView ? 32 : 18}
             style={{
-              color: iconColor,
+              color: !compactView ? iconColor : iconBgColor || defaultColor,
             }}
           />
         </div>

@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { nodeStyle, type CustomNodeProps } from ".";
 import IconConfigComponent from "../../IconConfig";
 import { cn } from "@sth87/shadcn-design-system";
+import { useWorkflowStore } from "@/core/store/workflowStore";
 
 // Deprecated: Use NodeVisualConfig from core types instead
 export interface NodeColorConfig {
@@ -39,6 +40,7 @@ export default function BaseNode(props: Props) {
     visualConfig,
   } = props;
   const [isExpanded, setIsExpanded] = useState(true);
+  const { compactView, layoutDirection } = useWorkflowStore();
 
   // Access metadata
   const metadata = data?.metadata as BaseMetadata;
@@ -90,77 +92,118 @@ export default function BaseNode(props: Props) {
 
   return (
     <div
-      className={cn(nodeStyle, "min-w-70", {
-        "border-primary ring-4":
-          props.selected &&
-          !finalVisualConfig.borderColor &&
-          !finalVisualConfig.ringColor,
-        "ring-4": props.selected && finalVisualConfig.ringColor,
-        [ringClasses]: props.selected && !finalVisualConfig.ringColor,
-      })}
+      className={cn(
+        compactView ? "group" : nodeStyle,
+        compactView ? "" : "min-w-70",
+        {
+          "border-primary ring-4":
+            props.selected &&
+            !finalVisualConfig.borderColor &&
+            !finalVisualConfig.ringColor,
+          "ring-4": props.selected && finalVisualConfig.ringColor,
+          "rounded p-0.5": compactView,
+          [ringClasses]: props.selected && !finalVisualConfig.ringColor,
+        }
+      )}
       style={{
-        ...containerStyle,
+        ...(!compactView && containerStyle),
         ...(props.selected && ringStyle),
         ...(finalVisualConfig.borderColor &&
+          !compactView &&
           props.selected && { borderColor: finalVisualConfig.borderColor }),
       }}
     >
-      {/* Header - always visible */}
-      {showHeader && (
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
+      {compactView ? (
+        // Compact view: icon only, text below or right, no border/background
+        <div className="flex flex-row items-center relative">
+          <div className="text-3xl">
             <IconConfigComponent
               type={type}
               colorConfig={colorConfig}
               visualConfig={visualConfig}
               icon={iconConfig}
+              compactView={compactView}
             />
-            <span
-              className="text-sm font-semibold truncate"
+          </div>
+          <div
+            className={cn("text-xs font-semibold absolute", {
+              "pt-2 top-full left-1/2 -translate-x-1/2 max-w-40 text-center":
+                layoutDirection === "horizontal",
+              "pl-4 top-1/2 left-full -translate-y-1/2 max-w-40":
+                layoutDirection === "vertical",
+            })}
+          >
+            <div className="truncate w-full">{data?.label}</div>
+            {metadata?.description && (
+              <div className="text-muted-foreground line-clamp-3 mt-1 text-xs font-normal w-40">
+                {metadata.description}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Header - always visible */}
+          {showHeader && (
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <IconConfigComponent
+                  type={type}
+                  colorConfig={colorConfig}
+                  visualConfig={visualConfig}
+                  icon={iconConfig}
+                />
+                <span
+                  className="text-sm font-semibold truncate"
+                  style={{
+                    color: finalVisualConfig.textColor,
+                  }}
+                >
+                  {data?.label}
+                </span>
+              </div>
+
+              <button
+                onClick={e => {
+                  e.stopPropagation();
+                  setIsExpanded(!isExpanded);
+                }}
+                className="p-1 hover:bg-muted rounded transition-colors shrink-0"
+              >
+                {isExpanded ? (
+                  <ChevronUp size={16} className="text-muted-foreground" />
+                ) : (
+                  <ChevronDown size={16} className="text-muted-foreground" />
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Description - toggleable, but Handles always render */}
+          {isExpanded && metadata?.description && (
+            <div
+              className="text-xs mt-2"
               style={{
-                color: finalVisualConfig.textColor,
+                color: finalVisualConfig.descriptionColor,
               }}
             >
-              {data?.label}
-            </span>
-          </div>
+              {metadata?.description}
+            </div>
+          )}
 
-          <button
-            onClick={e => {
-              e.stopPropagation();
-              setIsExpanded(!isExpanded);
-            }}
-            className="p-1 hover:bg-muted rounded transition-colors shrink-0"
+          {/* Children (Handles) - always render, but visually hidden when collapsed */}
+          <div
+            className={cn({
+              "opacity-0 h-0 overflow-hidden": !isExpanded && !showHeader,
+            })}
           >
-            {isExpanded ? (
-              <ChevronUp size={16} className="text-muted-foreground" />
-            ) : (
-              <ChevronDown size={16} className="text-muted-foreground" />
-            )}
-          </button>
-        </div>
+            {children}
+          </div>
+        </>
       )}
 
-      {/* Description - toggleable, but Handles always render */}
-      {isExpanded && metadata?.description && (
-        <div
-          className="text-xs mt-2"
-          style={{
-            color: finalVisualConfig.descriptionColor,
-          }}
-        >
-          {metadata?.description}
-        </div>
-      )}
-
-      {/* Children (Handles) - always render, but visually hidden when collapsed */}
-      <div
-        className={cn({
-          "opacity-0 h-0 overflow-hidden": !isExpanded && !showHeader,
-        })}
-      >
-        {children}
-      </div>
+      {/* Children (Handles) always render for edges */}
+      {compactView && children}
     </div>
   );
 }

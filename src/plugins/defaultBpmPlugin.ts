@@ -3,7 +3,7 @@
  * Plugin mặc định cung cấp các BPM nodes, edges, rules cơ bản
  */
 
-import type { Plugin } from "@/core/plugins/PluginManager";
+import type { Plugin, PluginConfig } from "@/core/plugins/PluginManager";
 import type {
   BaseNodeConfig,
   BaseEdgeConfig,
@@ -23,6 +23,7 @@ import {
   createDefaultEdgeContextMenuItems,
 } from "@/core/utils/contextMenuHelpers";
 import { contextMenuActionsRegistry } from "@/core/registry";
+import { Circle, ClipboardList, DiamondPlus } from "lucide-react";
 
 // ============================================
 // Default Node Configurations
@@ -55,25 +56,28 @@ const createDefaultNodeConfig = (
   properties: {},
 });
 
-const defaultNodes: Array<{
-  id: string;
-  type: string;
-  name: string;
-  config: BaseNodeConfig;
-}> = [
+const defaultNodes: PluginConfig["nodes"] = [
   // Start Events
   {
     id: NodeType.START_EVENT_DEFAULT,
     type: NodeType.START_EVENT_DEFAULT,
     name: "Start Event",
-    config: createDefaultNodeConfig(
-      NodeType.START_EVENT_DEFAULT,
-      CategoryType.START,
-      {
-        title: "Start Event",
-        description: "Workflow start point",
-      }
-    ),
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.START_EVENT_DEFAULT,
+        CategoryType.START,
+        {
+          title: "Start Event",
+          description: "Workflow start point",
+        }
+      ),
+      icon: {
+        type: "lucide",
+        value: Circle,
+        backgroundColor: "#39cc7e",
+        color: "#ffffff",
+      },
+    },
   },
   {
     id: NodeType.START_EVENT_API,
@@ -133,10 +137,18 @@ const defaultNodes: Array<{
     id: NodeType.TASK_DEFAULT,
     type: NodeType.TASK_DEFAULT,
     name: "Task",
-    config: createDefaultNodeConfig(NodeType.TASK_DEFAULT, CategoryType.TASK, {
-      title: "Task",
-      description: "Generic task",
-    }),
+    config: {
+      ...createDefaultNodeConfig(NodeType.TASK_DEFAULT, CategoryType.TASK, {
+        title: "Task",
+        description: "Generic task",
+      }),
+      icon: {
+        type: "lucide",
+        value: ClipboardList,
+        backgroundColor: "#24b0fb",
+        color: "#ffffff",
+      },
+    },
   },
   {
     id: NodeType.TASK_USER,
@@ -180,14 +192,22 @@ const defaultNodes: Array<{
     id: NodeType.EXCLUSIVE_GATEWAY,
     type: NodeType.EXCLUSIVE_GATEWAY,
     name: "Exclusive Gateway",
-    config: createDefaultNodeConfig(
-      NodeType.EXCLUSIVE_GATEWAY,
-      CategoryType.GATEWAY,
-      {
-        title: "Exclusive Gateway",
-        description: "Choose one path (XOR)",
-      }
-    ),
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.EXCLUSIVE_GATEWAY,
+        CategoryType.GATEWAY,
+        {
+          title: "Exclusive Gateway",
+          description: "Choose one path (XOR)",
+        }
+      ),
+      icon: {
+        type: "lucide",
+        value: DiamondPlus,
+        backgroundColor: "#ff9d57",
+        color: "#ffffff",
+      },
+    },
   },
   {
     id: NodeType.PARALLEL_GATEWAY,
@@ -221,27 +241,47 @@ const defaultNodes: Array<{
     id: NodeType.END_EVENT_DEFAULT,
     type: NodeType.END_EVENT_DEFAULT,
     name: "End Event",
-    config: createDefaultNodeConfig(
-      NodeType.END_EVENT_DEFAULT,
-      CategoryType.END,
-      {
+    config: {
+      ...createDefaultNodeConfig(NodeType.END_EVENT_DEFAULT, CategoryType.END, {
         title: "End Event",
         description: "Workflow end point",
-      }
-    ),
+      }),
+      connectionRules: [
+        {
+          id: "end-event-default-connection-rule",
+          name: "End Event Default Connection Rule",
+          description: "Allow multiple inputs, no outputs",
+          maxInputConnections: undefined, // Allow multiple inputs
+          maxOutputConnections: 0,
+          requiresConnection: true,
+        },
+      ],
+    },
   },
   {
     id: NodeType.END_EVENT_SEND_SIGNAL,
     type: NodeType.END_EVENT_SEND_SIGNAL,
     name: "Send Signal End Event",
-    config: createDefaultNodeConfig(
-      NodeType.END_EVENT_SEND_SIGNAL,
-      CategoryType.END,
-      {
-        title: "Send Signal End Event",
-        description: "End workflow and send signal",
-      }
-    ),
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.END_EVENT_SEND_SIGNAL,
+        CategoryType.END,
+        {
+          title: "Send Signal End Event",
+          description: "End workflow and send signal",
+        }
+      ),
+      connectionRules: [
+        {
+          id: "end-event-send-signal-connection-rule",
+          name: "End Event Send Signal Connection Rule",
+          description: "Allow multiple inputs, no outputs",
+          maxInputConnections: undefined, // Allow multiple inputs
+          maxOutputConnections: 0,
+          requiresConnection: true,
+        },
+      ],
+    },
   },
 ];
 

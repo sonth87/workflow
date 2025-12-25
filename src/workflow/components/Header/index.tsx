@@ -18,6 +18,7 @@ import {
   Monitor,
   Moon,
   Save,
+  Shrink,
   Sun,
   Upload,
   X,
@@ -37,7 +38,8 @@ export function Header({
   layoutDirection = "vertical",
   onLayoutDirectionChange,
 }: HeaderProps) {
-  const { workflowName, setWorkflowName } = useWorkflowStore();
+  const { workflowName, setWorkflowName, compactView, toggleCompactView } =
+    useWorkflowStore();
   const { theme, setLightMode, setDarkMode, setSystemMode } = useTheme();
   const { viewWorkflow, exportWorkflow, importWorkflow } =
     useWorkflowImportExport();
@@ -162,6 +164,20 @@ export function Header({
               <div className="mx-1 h-6 w-px bg-border" />
             </>
           )}
+
+          {/* Compact View Toggle */}
+          <button
+            title={compactView ? "Expand View" : "Compact View"}
+            onClick={toggleCompactView}
+            className={`flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted ${
+              compactView ? "bg-primary text-primary-foreground" : ""
+            }`}
+          >
+            <Shrink size={16} />
+            {compactView ? "Expand" : "Compact"}
+          </button>
+
+          <div className="mx-1 h-6 w-px bg-border" />
 
           <button
             title="View Workflow"
