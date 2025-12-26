@@ -2,6 +2,9 @@ import { useState, useCallback, useEffect } from "react";
 import { NodeResizer, type NodeProps, useReactFlow } from "@xyflow/react";
 import { Palette, Type } from "lucide-react";
 import { cn, Popover } from "@sth87/shadcn-design-system";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import "./note.css";
 
 const colorClasses = {
   yellow: "bg-[#fde68a]",
@@ -157,7 +160,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
       >
         {/* Toolbar */}
         {selected && (
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex gap-1 bg-background border rounded shadow-sm p-1 nodrag">
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex gap-1 bg-background rounded-md shadow-sm p-1 nodrag">
             {/* Color Picker */}
             <Popover
               open={showColorPicker}
@@ -267,14 +270,16 @@ export function NoteNode({ id, data, selected }: NodeProps) {
                 e.preventDefault();
               }}
               className={cn(
-                "w-full h-full min-h-25 whitespace-pre-wrap wrap-break-word cursor-text overflow-auto custom-scrollbar",
+                "markdown prose w-full h-full min-h-25 cursor-text overflow-auto custom-scrollbar",
                 {
                   [fontSizeClasses[fontSize || "base"]]: true,
                   [colorClasses[color || "yellow"]]: true,
                 }
               )}
             >
-              {content}
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {content}
+              </ReactMarkdown>
             </div>
           )}
         </div>

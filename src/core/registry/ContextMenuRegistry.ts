@@ -6,11 +6,22 @@
 import type { ContextMenuItem, ContextMenuContext } from "../types/base.types";
 import { BaseRegistry } from "./BaseRegistry";
 
+/**
+ * @properties ContextMenuConfig
+ * Định nghĩa cấu hình cho một context menu
+ * - id: Định danh duy nhất cho context menu
+ * - name: Tên hiển thị của context menu
+ * - description: Mô tả ngắn về context menu
+ * - targetType: Xác định đối tượng chính mà menu áp dụng khi right-click (node, edge, canvas, all)
+ * - targetNodeTypes: (chỉ khi targetType là "node"): Lọc thêm loại node cụ thể mà menu áp dụng (note, task, pool, ...)
+ * - targetEdgeTypes: (chỉ khi targetType là "edge"): Lọc thêm loại edge cụ thể mà menu áp dụng (sequenceFlow, messageFlow, ...)
+ * - items: Mảng các mục menu (ContextMenuItem)
+ */
 export interface ContextMenuConfig {
   id: string;
   name: string;
   description?: string;
-  targetType: "node" | "edge" | "note" | "canvas" | "all";
+  targetType: "node" | "edge" | "canvas" | "all";
   targetNodeTypes?: string[]; // Specific node types
   targetEdgeTypes?: string[]; // Specific edge types
   items: ContextMenuItem[];
