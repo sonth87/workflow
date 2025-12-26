@@ -1,6 +1,6 @@
-import { Handle, Position } from "@xyflow/react";
+import { Position } from "@xyflow/react";
 import type { CustomNodeProps } from "..";
-import { handleStyle } from "../styles";
+import { CustomHandle } from "../../handle";
 
 export function ExclusiveGatewayNode({
   isConnecting,
@@ -13,26 +13,23 @@ export function ExclusiveGatewayNode({
 
   return (
     <>
-      <Handle
+      <CustomHandle
         type="target"
         position={targetPosition}
         id="in"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={out1Position}
         id="out-1"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={out2Position}
         id="out-2"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
     </>
   );
@@ -45,19 +42,17 @@ export function ParallelGatewayNode({
 }: CustomNodeProps) {
   return (
     <>
-      <Handle
+      <CustomHandle
         type="target"
         position={targetPosition}
         id="in"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={sourcePosition}
         id="out"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
     </>
   );
@@ -73,26 +68,23 @@ export function ParallelGatewayJoinNode({
 
   return (
     <>
-      <Handle
+      <CustomHandle
         type="target"
         position={targetPosition}
         id="in-1"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="target"
         position={in2Position}
         id="in-2"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={sourcePosition}
         id="out"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
     </>
   );

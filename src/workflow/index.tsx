@@ -153,7 +153,7 @@ function WorkflowBuilderInner() {
         </div>
 
         {(selectedNode || selectedEdge) && (
-          <div>
+          <div className="relative h-full">
             <PropertiesPanel />
           </div>
         )}

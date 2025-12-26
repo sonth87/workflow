@@ -143,16 +143,27 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
     // Node actions
     addNode: node => {
       get().saveToHistory();
-      set(state => ({ nodes: [...state.nodes, node] }));
-      globalEventBus.emit(WorkflowEventTypes.NODE_ADDED, { node });
+      const nodeWithZIndex =
+        node.type === "note" ? { ...node, zIndex: -1 } : node;
+      set(state => ({ nodes: [...state.nodes, nodeWithZIndex] }));
+      globalEventBus.emit(WorkflowEventTypes.NODE_ADDED, {
+        node: nodeWithZIndex,
+      });
     },
 
     updateNode: (nodeId, updates) => {
       get().saveToHistory();
       set(state => ({
-        nodes: state.nodes.map(node =>
-          node.id === nodeId ? { ...node, ...updates } : node
-        ),
+        nodes: state.nodes.map(node => {
+          if (node.id === nodeId) {
+            const updatedNode = { ...node, ...updates };
+            if (updatedNode.type === "note") {
+              updatedNode.zIndex = -1;
+            }
+            return updatedNode;
+          }
+          return node;
+        }),
       }));
       globalEventBus.emit(WorkflowEventTypes.NODE_UPDATED, { nodeId, updates });
     },
@@ -169,7 +180,10 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
     },
 
     setNodes: nodes => {
-      set({ nodes });
+      const nodesWithZIndex = nodes.map(node =>
+        node.type === "note" ? { ...node, zIndex: -1 } : node
+      );
+      set({ nodes: nodesWithZIndex });
     },
 
     // Edge actions

@@ -9,12 +9,14 @@ import { edgeRegistry } from "@/core/registry/EdgeRegistry";
 import { validationEngine } from "@/core/validation/ValidationEngine";
 import { globalEventBus, type WorkflowEventType } from "@/core/events/EventBus";
 import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
+import { Position } from "@xyflow/react";
 
 /**
  * Hook để handle node operations
  */
 export function useNodeOperations() {
-  const { addNode, updateNode, deleteNode, nodes } = useWorkflowStore();
+  const { addNode, updateNode, deleteNode, nodes, layoutDirection } =
+    useWorkflowStore();
 
   const createNode = useCallback(
     (
@@ -22,11 +24,13 @@ export function useNodeOperations() {
       position: { x: number; y: number },
       properties?: Record<string, unknown>
     ) => {
+      const layoutHorizontal = layoutDirection === "vertical";
       const node = nodeRegistry.createNode(nodeType, {
         position,
+        targetPosition: layoutHorizontal ? Position.Top : Position.Left,
+        sourcePosition: layoutHorizontal ? Position.Bottom : Position.Right,
         properties: properties || {},
       });
-      console.log("🚀 ~ node:", node);
 
       if (node) {
         addNode(node);
@@ -34,7 +38,7 @@ export function useNodeOperations() {
       }
       return null;
     },
-    [addNode]
+    [addNode, layoutDirection]
   );
 
   const updateNodeProperties = useCallback(

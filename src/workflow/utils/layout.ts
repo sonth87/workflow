@@ -19,9 +19,9 @@ export const getLayoutedElements = (
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-  const isHorizontal = direction === "horizontal";
-  const dagreDirection = isHorizontal ? "LR" : "TB";
-  dagreGraph.setGraph({ rankdir: dagreDirection, nodesep: 50, ranksep: 50 });
+  const layoutHorizontal = direction === "vertical";
+  const dagreDirection = layoutHorizontal ? "TB" : "LR";
+  dagreGraph.setGraph({ rankdir: dagreDirection, nodesep: 100, ranksep: 100 });
 
   nodes.forEach(node => {
     const width = node.measured?.width || nodeWidth;
@@ -42,8 +42,8 @@ export const getLayoutedElements = (
 
     return {
       ...node,
-      targetPosition: isHorizontal ? Position.Left : Position.Top,
-      sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
+      targetPosition: layoutHorizontal ? Position.Top : Position.Left,
+      sourcePosition: layoutHorizontal ? Position.Bottom : Position.Right,
       position: {
         x: nodeWithPosition.x - width / 2,
         y: nodeWithPosition.y - height / 2,

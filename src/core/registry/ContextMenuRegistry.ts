@@ -6,6 +6,17 @@
 import type { ContextMenuItem, ContextMenuContext } from "../types/base.types";
 import { BaseRegistry } from "./BaseRegistry";
 
+/**
+ * @properties ContextMenuConfig
+ * Định nghĩa cấu hình cho một context menu
+ * - id: Định danh duy nhất cho context menu
+ * - name: Tên hiển thị của context menu
+ * - description: Mô tả ngắn về context menu
+ * - targetType: Xác định đối tượng chính mà menu áp dụng khi right-click (node, edge, canvas, all)
+ * - targetNodeTypes: (chỉ khi targetType là "node"): Lọc thêm loại node cụ thể mà menu áp dụng (note, task, pool, ...)
+ * - targetEdgeTypes: (chỉ khi targetType là "edge"): Lọc thêm loại edge cụ thể mà menu áp dụng (sequenceFlow, messageFlow, ...)
+ * - items: Mảng các mục menu (ContextMenuItem)
+ */
 export interface ContextMenuConfig {
   id: string;
   name: string;
@@ -57,7 +68,8 @@ export class ContextMenuRegistry extends BaseRegistry<ContextMenuConfig> {
     specificType?: string,
     context?: ContextMenuContext
   ): ContextMenuItem[] {
-    const allItems: ContextMenuItem[] = [];
+    const specificItems: ContextMenuItem[] = [];
+    const generalItems: ContextMenuItem[] = [];
 
     this.getAll().forEach(item => {
       const config = item.config;
@@ -73,26 +85,26 @@ export class ContextMenuRegistry extends BaseRegistry<ContextMenuConfig> {
           if (!config.targetNodeTypes.includes(specificType)) {
             return;
           }
+          // This is a specific menu for this node type
+          specificItems.push(...config.items);
+          return;
         }
         if (targetType === "edge" && config.targetEdgeTypes) {
           if (!config.targetEdgeTypes.includes(specificType)) {
             return;
           }
+          // This is a specific menu for this edge type
+          specificItems.push(...config.items);
+          return;
         }
       }
 
-      // Filter items based on visibility
-      const visibleItems = config.items.filter(menuItem => {
-        if (menuItem.visible && context) {
-          return menuItem.visible(context);
-        }
-        return true;
-      });
-
-      allItems.push(...visibleItems);
+      // General menu (no specific types or no specific type provided)
+      generalItems.push(...config.items);
     });
 
-    return allItems;
+    // Return specific items if available, otherwise general items
+    return specificItems.length > 0 ? specificItems : generalItems;
   }
 
   /**

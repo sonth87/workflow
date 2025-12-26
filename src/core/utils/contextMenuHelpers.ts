@@ -440,3 +440,59 @@ export function createDefaultEdgeContextMenuItems(
     createDeleteMenuItem(onDelete),
   ];
 }
+
+/**
+ * Create note node context menu items (simplified)
+ */
+export function createNoteNodeContextMenuItems(
+  onColorChange: (color: string, context: any) => void | Promise<void>
+): ContextMenuItem[] {
+  const noteColors = [
+    { id: "yellow", label: "Yellow", color: "#fde68a" },
+    { id: "blue", label: "Blue", color: "#bfdbfe" },
+    { id: "green", label: "Green", color: "#d9f99d" },
+    { id: "pink", label: "Pink", color: "#fecdd3" },
+    { id: "purple", label: "Purple", color: "#ddd6fe" },
+    { id: "orange", label: "Orange", color: "#fed7aa" },
+    { id: "gray", label: "Gray", color: "#e4e4e7" },
+    { id: "transparent", label: "Transparent", color: "transparent" },
+  ];
+
+  const noteFontSizes = [
+    { id: "xs", label: "Extra Small" },
+    { id: "sm", label: "Small" },
+    { id: "base", label: "Base" },
+    { id: "lg", label: "Large" },
+  ];
+
+  return [
+    {
+      id: "change-color",
+      label: "Color",
+      icon: "",
+      children: noteColors.map(noteColor => ({
+        id: `color-${noteColor.id}`,
+        label: noteColor.label,
+        color: noteColor.color,
+        onClick: async (context: any) => {
+          await onColorChange(noteColor.id, context);
+        },
+      })),
+    },
+    {
+      id: "change-font-size",
+      label: "Font Size",
+      icon: "",
+      children: noteFontSizes.map(size => ({
+        id: `font-size-${size.id}`,
+        label: size.label,
+        onClick: async (context: any) => {
+          const action = contextMenuActionsRegistry.getAction("updateNodeData");
+          if (action && context.nodeId) {
+            action(context.nodeId, { fontSize: size.id });
+          }
+        },
+      })),
+    },
+  ];
+}

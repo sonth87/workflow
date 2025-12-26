@@ -38,7 +38,7 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
   }
 
   return (
-    <aside className="w-80 h-full border border-border/50 bg-card/95 backdrop-blur-sm overflow-y-auto rounded-xl shadow-xl flex flex-col animate-in slide-in-from-right duration-200">
+    <aside className="w-80 h-full border border-border/50 bg-card/95 backdrop-blur-sm overflow-y-auto rounded-xl shadow-xl flex flex-col animate-in slide-in-from-right duration-200 absolute right-0 z-10">
       {/* Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">

@@ -146,11 +146,30 @@ export function useNodeActions() {
     [nodes]
   );
 
+  /**
+   * Update node data
+   */
+  const updateNodeData = useCallback(
+    (nodeId: string, dataUpdates: Record<string, any>) => {
+      const node = nodes.find(n => n.id === nodeId);
+      if (!node) return;
+
+      updateNode(nodeId, {
+        data: {
+          ...(node.data || {}),
+          ...dataUpdates,
+        },
+      } as Partial<BaseNodeConfig>);
+    },
+    [nodes, updateNode]
+  );
+
   return {
     changeNodeColor,
     changeNodeBorderStyle,
     removeNode,
     toggleNodeCollapse,
     duplicateNode,
+    updateNodeData,
   };
 }

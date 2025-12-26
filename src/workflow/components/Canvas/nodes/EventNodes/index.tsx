@@ -1,29 +1,15 @@
-import { Handle, Position } from "@xyflow/react";
+import { Position } from "@xyflow/react";
 import type { CustomNodeProps } from "..";
-import { handleStyle } from "../styles";
+import { CustomHandle } from "../../handle";
 
 export function StartEventNode({
   sourcePosition = Position.Bottom,
 }: CustomNodeProps) {
-  return (
-    <Handle
-      type="source"
-      position={sourcePosition}
-      id="out"
-      className={handleStyle}
-    />
-  );
+  return <CustomHandle type="source" position={sourcePosition} id="out" />;
 }
 
 export function EndEventNode({
   targetPosition = Position.Top,
 }: CustomNodeProps) {
-  return (
-    <Handle
-      type="target"
-      position={targetPosition}
-      id="in"
-      className={handleStyle}
-    />
-  );
+  return <CustomHandle type="target" position={targetPosition} id="in" />;
 }

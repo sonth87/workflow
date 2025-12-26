@@ -4,10 +4,10 @@
  * Visual configurations are provided by plugins through node data
  */
 
-import { Handle, Position } from "@xyflow/react";
+import { Position } from "@xyflow/react";
 import BaseNode from "./BaseNode";
 import type { CustomNodeProps } from ".";
-import { handleStyle } from "./styles";
+import { CustomHandle } from "../handle";
 import type { NodeVisualConfig } from "@/core/types/base.types";
 
 /**
@@ -21,19 +21,17 @@ function CustomNodeContent({
 }: CustomNodeProps) {
   return (
     <>
-      <Handle
+      <CustomHandle
         type="target"
         position={targetPosition}
         id="in"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={sourcePosition}
         id="out"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
     </>
   );
