@@ -148,7 +148,8 @@ body {
   fill-opacity: 0.3;
 }
 
-.react-flow__handle:not(.connectionindicator):not(.connectingfrom)>.indicator-glow {
+.react-flow__handle:not(.connectionindicator):not(.connectingfrom)
+  > .indicator-glow {
   box-shadow: none;
   background-color: var(--color-border);
 }
@@ -207,4 +208,27 @@ body {
       hsl(from var(--color-primary) h s l) 0px 0px 20px 0px,
       hsl(from var(--color-primary) h s l) 0px 0px 25px 0px;
   }
+}
+
+/* Custom Scrollbar Styles */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
 }

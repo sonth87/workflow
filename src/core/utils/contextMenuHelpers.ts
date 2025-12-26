@@ -440,3 +440,37 @@ export function createDefaultEdgeContextMenuItems(
     createDeleteMenuItem(onDelete),
   ];
 }
+
+/**
+ * Create note node context menu items (simplified)
+ */
+export function createNoteNodeContextMenuItems(
+  onColorChange: (color: string, context: any) => void | Promise<void>
+): ContextMenuItem[] {
+  const noteColors = [
+    { id: "yellow", label: "Yellow", color: "#fde68a" },
+    { id: "blue", label: "Blue", color: "#bfdbfe" },
+    { id: "green", label: "Green", color: "#d9f99d" },
+    { id: "pink", label: "Pink", color: "#fecdd3" },
+    { id: "purple", label: "Purple", color: "#ddd6fe" },
+    { id: "orange", label: "Orange", color: "#fed7aa" },
+    { id: "gray", label: "Gray", color: "#e4e4e7" },
+    { id: "transparent", label: "Transparent", color: "transparent" },
+  ];
+
+  return [
+    {
+      id: "change-color",
+      label: "Change Color",
+      icon: "",
+      children: noteColors.map(noteColor => ({
+        id: `color-${noteColor.id}`,
+        label: noteColor.label,
+        color: noteColor.color,
+        onClick: async (context: any) => {
+          await onColorChange(noteColor.id, context);
+        },
+      })),
+    },
+  ];
+}

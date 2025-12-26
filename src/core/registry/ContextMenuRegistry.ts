@@ -10,7 +10,7 @@ export interface ContextMenuConfig {
   id: string;
   name: string;
   description?: string;
-  targetType: "node" | "edge" | "canvas" | "all";
+  targetType: "node" | "edge" | "note" | "canvas" | "all";
   targetNodeTypes?: string[]; // Specific node types
   targetEdgeTypes?: string[]; // Specific edge types
   items: ContextMenuItem[];
@@ -57,7 +57,8 @@ export class ContextMenuRegistry extends BaseRegistry<ContextMenuConfig> {
     specificType?: string,
     context?: ContextMenuContext
   ): ContextMenuItem[] {
-    const allItems: ContextMenuItem[] = [];
+    const specificItems: ContextMenuItem[] = [];
+    const generalItems: ContextMenuItem[] = [];
 
     this.getAll().forEach(item => {
       const config = item.config;
@@ -73,26 +74,26 @@ export class ContextMenuRegistry extends BaseRegistry<ContextMenuConfig> {
           if (!config.targetNodeTypes.includes(specificType)) {
             return;
           }
+          // This is a specific menu for this node type
+          specificItems.push(...config.items);
+          return;
         }
         if (targetType === "edge" && config.targetEdgeTypes) {
           if (!config.targetEdgeTypes.includes(specificType)) {
             return;
           }
+          // This is a specific menu for this edge type
+          specificItems.push(...config.items);
+          return;
         }
       }
 
-      // Filter items based on visibility
-      const visibleItems = config.items.filter(menuItem => {
-        if (menuItem.visible && context) {
-          return menuItem.visible(context);
-        }
-        return true;
-      });
-
-      allItems.push(...visibleItems);
+      // General menu (no specific types or no specific type provided)
+      generalItems.push(...config.items);
     });
 
-    return allItems;
+    // Return specific items if available, otherwise general items
+    return specificItems.length > 0 ? specificItems : generalItems;
   }
 
   /**

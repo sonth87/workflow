@@ -29,6 +29,7 @@ export function WorkflowActionsProvider({
       deleteNode: nodeActions.removeNode,
       duplicateNode: nodeActions.duplicateNode,
       toggleNodeCollapse: nodeActions.toggleNodeCollapse,
+      updateNodeData: nodeActions.updateNodeData,
       selectNode,
 
       // Edge actions

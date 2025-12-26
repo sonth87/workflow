@@ -10,6 +10,7 @@ interface ContextMenuActions {
   deleteNode?: (nodeId: string) => void;
   duplicateNode?: (nodeId: string) => void;
   toggleNodeCollapse?: (nodeId: string, collapsed: boolean) => void;
+  updateNodeData?: (nodeId: string, dataUpdates: Record<string, any>) => void;
   selectNode?: (nodeId: string) => void;
 
   // Edge actions

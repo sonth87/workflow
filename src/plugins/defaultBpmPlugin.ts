@@ -21,6 +21,7 @@ import {
 import {
   createDefaultNodeContextMenuItems,
   createDefaultEdgeContextMenuItems,
+  createNoteNodeContextMenuItems,
 } from "@/core/utils/contextMenuHelpers";
 import { contextMenuActionsRegistry } from "@/core/registry";
 import { Circle, ClipboardList, DiamondPlus } from "lucide-react";
@@ -282,6 +283,74 @@ const defaultNodes: PluginConfig["nodes"] = [
         },
       ],
     },
+  },
+
+  // Note Node
+  {
+    id: NodeType.NOTE,
+    type: NodeType.NOTE,
+    name: "Note",
+    config: {
+      ...createDefaultNodeConfig(NodeType.NOTE, CategoryType.OTHER, {
+        title: "Note",
+        description: "Annotation note",
+      }),
+      propertyDefinitions: [
+        {
+          id: "content",
+          name: "content",
+          type: "textarea",
+          label: "Content",
+          description: "Note content",
+          defaultValue: "Double click to edit note...",
+          required: false,
+          order: 0,
+        },
+        {
+          id: "color",
+          name: "color",
+          type: "select",
+          label: "Color",
+          description: "Note color",
+          defaultValue: "yellow",
+          required: false,
+          order: 1,
+          options: [
+            { label: "Yellow", value: "yellow" },
+            { label: "Blue", value: "blue" },
+            { label: "Green", value: "green" },
+            { label: "Pink", value: "pink" },
+            { label: "Purple", value: "purple" },
+            { label: "Orange", value: "orange" },
+          ],
+        },
+        {
+          id: "fontSize",
+          name: "fontSize",
+          type: "select",
+          label: "Font Size",
+          description: "Font size",
+          defaultValue: "base",
+          required: false,
+          order: 2,
+          options: [
+            { label: "Small", value: "sm" },
+            { label: "Normal", value: "base" },
+            { label: "Large", value: "lg" },
+          ],
+        },
+      ],
+    },
+  },
+  // Pool Node
+  {
+    id: NodeType.POOL,
+    type: NodeType.POOL,
+    name: "Pool",
+    config: createDefaultNodeConfig(NodeType.POOL, CategoryType.OTHER, {
+      title: "Pool",
+      description: "Swimlane pool",
+    }),
   },
 ];
 
@@ -685,6 +754,27 @@ const defaultContextMenus: Array<{
           ],
         },
       ],
+    },
+  },
+  {
+    id: "note-node-context-menu",
+    type: "context-menu",
+    name: "Note Node Context Menu",
+    config: {
+      id: "note-node-context-menu",
+      name: "Note Node Context Menu",
+      targetType: "node",
+      targetNodeTypes: ["note"],
+      items: createNoteNodeContextMenuItems(
+        // On color change
+        async (color: string, context: ContextMenuContext) => {
+          // For note nodes, update data.color directly
+          const action = contextMenuActionsRegistry.getAction("updateNodeData");
+          if (action && context.nodeId) {
+            action(context.nodeId, { color });
+          }
+        }
+      ),
     },
   },
 ];

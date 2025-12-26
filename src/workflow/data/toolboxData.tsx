@@ -4,6 +4,7 @@
 
 import type { IconConfig, NodeVisualConfig } from "@/core";
 import { CategoryType, NodeType } from "@/enum/workflow.enum";
+import { GalleryVerticalEnd } from "lucide-react";
 
 export interface NodeItem {
   type: NodeType;
@@ -121,5 +122,12 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
         />
       </svg>
     ),
+  },
+  {
+    name: "Other",
+    isOpen: false,
+    categoryType: CategoryType.OTHER,
+    nodes: [],
+    icon: <GalleryVerticalEnd size={18} className="text-yellow-300" />,
   },
 ];

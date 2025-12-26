@@ -1,28 +1,31 @@
 import { useState, useCallback } from "react";
 import { NodeResizer, type NodeProps, useReactFlow } from "@xyflow/react";
 import { Palette, Type } from "lucide-react";
-
-interface NoteData {
-  label: string;
-  content: string;
-  color?: "yellow" | "blue" | "green" | "pink" | "purple" | "orange";
-  fontSize?: "sm" | "base" | "lg";
-}
+import { cn, Popover } from "@sth87/shadcn-design-system";
 
 const colorClasses = {
-  yellow: "bg-yellow-100 border-yellow-300 text-yellow-900",
-  blue: "bg-blue-100 border-blue-300 text-blue-900",
-  green: "bg-green-100 border-green-300 text-green-900",
-  pink: "bg-pink-100 border-pink-300 text-pink-900",
-  purple: "bg-purple-100 border-purple-300 text-purple-900",
-  orange: "bg-orange-100 border-orange-300 text-orange-900",
+  yellow: "bg-[#fde68a]",
+  blue: "bg-[#bfdbfe]",
+  green: "bg-[#d9f99d]",
+  pink: "bg-[#fecdd3]",
+  purple: "bg-[#ddd6fe]",
+  orange: "bg-[#fed7aa]",
+  gray: "bg-[#e4e4e7]",
+  transparent: "bg-transparent",
 };
 
 const fontSizeClasses = {
+  xs: "text-xs",
   sm: "text-sm",
   base: "text-base",
   lg: "text-lg",
 };
+interface NoteData {
+  label: string;
+  content: string;
+  color?: keyof typeof colorClasses;
+  fontSize?: keyof typeof fontSizeClasses;
+}
 
 export function NoteNode({ id, data, selected }: NodeProps) {
   const { setNodes } = useReactFlow();
@@ -35,7 +38,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
     noteData.color || "yellow"
   );
   const [fontSize, setFontSize] = useState<NoteData["fontSize"]>(
-    noteData.fontSize || "base"
+    noteData.fontSize || "sm"
   );
   const [isEditing, setIsEditing] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -112,16 +115,26 @@ export function NoteNode({ id, data, selected }: NodeProps) {
         minWidth={150}
         minHeight={100}
         handleStyle={{
-          width: 6,
-          height: 6,
-          borderRadius: 3,
+          width: 8,
+          height: 8,
+          zIndex: 10,
         }}
+        handleClassName="bg-primary/50! border-primary! rounded-xs!"
+        lineClassName={cn(
+          "border-primary!"
+          // "ring-4! ring-primary/25!"
+        )}
       />
 
       <div
-        className={`relative border-2 rounded-lg shadow-md transition-all ${
+        className={cn(
+          "relative border-none rounded-lg transition-all",
           colorClasses[color || "yellow"]
-        } ${selected ? "ring-2 ring-primary ring-offset-2" : ""}`}
+        )}
+        onWheel={e => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
         style={{
           width: "100%",
           height: "100%",
@@ -131,21 +144,26 @@ export function NoteNode({ id, data, selected }: NodeProps) {
       >
         {/* Toolbar */}
         {selected && (
-          <div className="absolute -top-8 left-0 flex gap-1 bg-background border rounded shadow-sm p-1 nodrag">
+          <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex gap-1 bg-background border rounded shadow-sm p-1 nodrag">
             {/* Color Picker */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setShowColorPicker(!showColorPicker);
-                  setShowFontPicker(false);
-                }}
-                className="p-1 hover:bg-accent rounded transition-colors"
-                title="Change color"
-              >
-                <Palette className="w-4 h-4" />
-              </button>
-              {showColorPicker && (
-                <div className="absolute top-full left-0 mt-1 flex gap-1 bg-background border rounded shadow-lg p-2 z-50">
+            <Popover
+              open={showColorPicker}
+              onOpenChange={setShowColorPicker}
+              className="py-2 px-3"
+              trigger={
+                <button
+                  onClick={() => {
+                    setShowColorPicker(!showColorPicker);
+                    setShowFontPicker(false);
+                  }}
+                  className="p-1 hover:bg-accent rounded transition-colors"
+                  title="Change color"
+                >
+                  <Palette className="w-4 h-4" />
+                </button>
+              }
+              content={
+                <div className="flex gap-1">
                   {(
                     Object.keys(colorClasses) as Array<
                       keyof typeof colorClasses
@@ -154,31 +172,40 @@ export function NoteNode({ id, data, selected }: NodeProps) {
                     <button
                       key={c}
                       onClick={() => handleColorChange(c)}
-                      className={`w-6 h-6 rounded border-2 ${colorClasses[c]} ${
-                        color === c ? "ring-2 ring-primary" : ""
-                      }`}
+                      className={cn(
+                        "w-6 h-6 rounded-full border",
+                        colorClasses[c],
+                        {
+                          "border! border-primary!": color === c,
+                        }
+                      )}
                       title={c}
                     />
                   ))}
                 </div>
-              )}
-            </div>
+              }
+            />
 
             {/* Font Size Picker */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setShowFontPicker(!showFontPicker);
-                  setShowColorPicker(false);
-                }}
-                className="p-1 hover:bg-accent rounded transition-colors"
-                title="Change font size"
-              >
-                <Type className="w-4 h-4" />
-              </button>
-              {showFontPicker && (
-                <div className="absolute top-full left-0 mt-1 flex flex-col gap-1 bg-background border rounded shadow-lg p-2 z-50 min-w-20">
-                  {(["sm", "base", "lg"] as const).map(size => (
+            <Popover
+              open={showFontPicker}
+              onOpenChange={setShowFontPicker}
+              className="p-1"
+              trigger={
+                <button
+                  onClick={() => {
+                    setShowFontPicker(!showFontPicker);
+                    setShowColorPicker(false);
+                  }}
+                  className="p-1 hover:bg-accent rounded transition-colors"
+                  title="Change font size"
+                >
+                  <Type className="w-4 h-4" />
+                </button>
+              }
+              content={
+                <div className="flex flex-col gap-1">
+                  {(["xs", "sm", "base", "lg"] as const).map(size => (
                     <button
                       key={size}
                       onClick={() => handleFontSizeChange(size)}
@@ -194,8 +221,8 @@ export function NoteNode({ id, data, selected }: NodeProps) {
                     </button>
                   ))}
                 </div>
-              )}
-            </div>
+              }
+            />
           </div>
         )}
 
@@ -207,8 +234,12 @@ export function NoteNode({ id, data, selected }: NodeProps) {
               onChange={e => setContent(e.target.value)}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
+              onWheel={e => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
               autoFocus
-              className={`w-full h-full bg-transparent border-none resize-none focus:outline-none ${
+              className={`w-full h-full bg-transparent border-none resize-none focus:outline-none custom-scrollbar ${
                 fontSizeClasses[fontSize || "base"]
               } ${colorClasses[color || "yellow"]}`}
               placeholder="Type your note here..."
@@ -216,9 +247,17 @@ export function NoteNode({ id, data, selected }: NodeProps) {
           ) : (
             <div
               onDoubleClick={handleDoubleClick}
-              className={`w-full h-full whitespace-pre-wrap wrap-break-word cursor-text ${
-                fontSizeClasses[fontSize || "base"]
-              }`}
+              onWheel={e => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              className={cn(
+                "w-full h-full whitespace-pre-wrap wrap-break-word cursor-text overflow-auto custom-scrollbar",
+                {
+                  [fontSizeClasses[fontSize || "base"]]: true,
+                  [colorClasses[color || "yellow"]]: true,
+                }
+              )}
             >
               {content}
             </div>
@@ -230,7 +269,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
           className="absolute bottom-0 right-0 w-0 h-0"
           style={{
             borderStyle: "solid",
-            borderWidth: "0 0 20px 20px",
+            borderWidth: "0 0 10px 10px",
             borderColor: `transparent transparent ${
               color === "yellow"
                 ? "#fbbf24"
@@ -242,7 +281,11 @@ export function NoteNode({ id, data, selected }: NodeProps) {
                       ? "#f472b6"
                       : color === "purple"
                         ? "#a78bfa"
-                        : "#fb923c"
+                        : color === "orange"
+                          ? "#fb923c"
+                          : color === "gray"
+                            ? "#a1a1aa"
+                            : ""
             } transparent`,
           }}
         />
