@@ -21,7 +21,7 @@ export const getLayoutedElements = (
 
   const isHorizontal = direction === "horizontal";
   const dagreDirection = isHorizontal ? "LR" : "TB";
-  dagreGraph.setGraph({ rankdir: dagreDirection, nodesep: 50, ranksep: 50 });
+  dagreGraph.setGraph({ rankdir: dagreDirection, nodesep: 100, ranksep: 100 });
 
   nodes.forEach(node => {
     const width = node.measured?.width || nodeWidth;

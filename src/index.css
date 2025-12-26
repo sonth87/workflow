@@ -140,6 +140,66 @@ body {
   user-select: none !important;
 }
 
+.react-flow__minimap {
+  /* background-color: var(--color-background); */
+}
+
+.react-flow__minimap-mask {
+  fill-opacity: 0.3;
+}
+
 .indicator-glow {
-  box-shadow: 0 0 8px var(--color-primary);
+  box-shadow: 0 0 0 3px hsl(from var(--color-primary) h s l / 0.2);
+  transition-duration: 300ms;
+}
+
+.indicator-glow:hover {
+  animation: pulse1 1s infinite;
+  box-shadow:
+    rgb(228, 228, 231) 0px 0px 0px 3px,
+    hsl(from var(--color-primary) h s l) 0px 0px 3.94151px 0px,
+    hsl(from var(--color-primary) h s l) 0px 0px 7.88302px 0px,
+    hsl(from var(--color-primary) h s l) 0px 0px 11.8245px 0px,
+    hsl(from var(--color-primary) h s l) 0px 0px 15.766px 0px,
+    hsl(from var(--color-primary) h s l) 0px 0px 19.7075px 0px,
+    hsl(from var(--color-primary) h s l) 0px 0px 24.7075px 0px,
+    hsl(from var(--color-primary) h s l) 0px 0px 29.7075px 0px;
+}
+
+@keyframes pulse1 {
+  0% {
+    box-shadow:
+      rgb(228, 228, 231) 0px 0px 0px 3px,
+      hsl(from var(--color-primary) h s l) 0px 0px 3px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 5px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 8px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 10px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 14px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 20px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 25px 0px;
+  }
+
+  50% {
+    box-shadow:
+      rgb(228, 228, 231) 0px 0px 0px 3px,
+      hsl(from var(--color-primary) h s l) 0px 0px 4px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 8px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 12px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 16px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 19px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 25px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 29px 0px;
+  }
+
+  100% {
+    box-shadow:
+      rgb(228, 228, 231) 0px 0px 0px 3px,
+      hsl(from var(--color-primary) h s l) 0px 0px 3px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 5px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 8px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 10px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 14px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 20px 0px,
+      hsl(from var(--color-primary) h s l) 0px 0px 25px 0px;
+  }
 }

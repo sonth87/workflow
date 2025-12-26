@@ -132,7 +132,7 @@ export function Toolbox() {
   );
 
   return (
-    <aside className="h-full border border-border/50 bg-card overflow-y-auto rounded-2xl shadow-xl flex">
+    <aside className="h-full border border-border/50 bg-card rounded-2xl shadow-xl flex relative overflow-visible">
       <div className="px-2.5 py-4 space-y-1 flex-1 overflow-y-auto flex flex-col items-center">
         {builderCategories.map((category, index) => (
           <div
@@ -155,7 +155,7 @@ export function Toolbox() {
         <div className="h-px w-6 bg-border my-4" />
       </div>
       {selectedCategory && (
-        <div className="min-w-[320px] border-l border-border">
+        <div className="min-w-[320px] border-border absolute top-0 left-full border rounded-2xl z-10 bg-background">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h2 className="text-base text-ink800 font-medium flex-1">
               {selectedCategory?.name}

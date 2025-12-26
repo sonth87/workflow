@@ -30,6 +30,7 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { nodeTypes as builtInNodeTypes } from "./nodes";
 import { CustomNode } from "./nodes/CustomNodes";
 import { edgeTypes } from "./edges";
+import { ConnectionLinePreview } from "./edges/preview";
 import clsx from "clsx";
 import { ContextMenu } from "../ContextMenu";
 
@@ -80,6 +81,7 @@ function CanvasInner({
 
     return { ...builtInNodeTypes, ...customNodeTypes };
   }, []);
+
   const [isDragging, setIsDragging] = useState(false);
 
   // Handle node changes
@@ -429,8 +431,9 @@ function CanvasInner({
           markerEnd: { type: "arrowclosed" },
         }}
         connectionLineType={ConnectionLineType.Bezier}
+        connectionLineComponent={ConnectionLinePreview}
         snapGrid={[15, 15]}
-        snapToGrid={true}
+        // snapToGrid={true}
         selectNodesOnDrag={false}
         panOnDrag={isPanMode ? [0, 1, 2] : [1, 2]}
         selectionOnDrag={!isPanMode}
@@ -441,12 +444,15 @@ function CanvasInner({
         edgesReconnectable={!isPanMode}
         reconnectRadius={20}
         minZoom={0.2}
-        maxZoom={5}
+        maxZoom={3}
       >
         <Background gap={15} />
       </ReactFlow>
+      {/* <MiniMap zoomable pannable nodeClassName={nodeClassName} /> */}
       {showMinimap && (
         <MiniMap
+          zoomable
+          pannable
           nodeStrokeColor={n => {
             if (n.type === "input") return "#0041d0";
             if (n.type === "selectorNode") return "#3b82f6";
@@ -465,7 +471,7 @@ function CanvasInner({
               return "#fff";
             }
           }}
-          className="fill-transparent border border-border rounded-lg"
+          className="border border-border rounded-lg overflow-hidden"
         />
       )}
       {contextMenu && (

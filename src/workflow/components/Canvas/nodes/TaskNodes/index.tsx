@@ -1,6 +1,6 @@
-import { Handle, Position } from "@xyflow/react";
+import { Position } from "@xyflow/react";
 import type { CustomNodeProps } from "..";
-import { handleStyle } from "../styles";
+import { CustomHandle } from "../../handle";
 
 export function TaskNode({
   isConnecting,
@@ -9,19 +9,17 @@ export function TaskNode({
 }: CustomNodeProps) {
   return (
     <>
-      <Handle
+      <CustomHandle
         type="target"
         position={targetPosition}
         id="in"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={sourcePosition}
         id="out"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
     </>
   );
@@ -34,19 +32,17 @@ export function ServiceTaskNode({
 }: CustomNodeProps) {
   return (
     <>
-      <Handle
+      <CustomHandle
         type="target"
         position={targetPosition}
         id="in"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={sourcePosition}
         id="out"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
     </>
   );
@@ -59,19 +55,17 @@ export function NotificationNode({
 }: CustomNodeProps) {
   return (
     <>
-      <Handle
+      <CustomHandle
         type="target"
         position={targetPosition}
         id="in"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={sourcePosition}
         id="out"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
     </>
   );
@@ -84,19 +78,17 @@ export function TimeDelayNode({
 }: CustomNodeProps) {
   return (
     <>
-      <Handle
+      <CustomHandle
         type="target"
         position={targetPosition}
         id="in"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={sourcePosition}
         id="out"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
     </>
   );
@@ -109,19 +101,17 @@ export function SubflowNode({
 }: CustomNodeProps) {
   return (
     <>
-      <Handle
+      <CustomHandle
         type="target"
         position={targetPosition}
         id="in"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
-      <Handle
+      <CustomHandle
         type="source"
         position={sourcePosition}
         id="out"
         isConnectable={!isConnecting}
-        className={handleStyle}
       />
     </>
   );
