@@ -148,6 +148,11 @@ body {
   fill-opacity: 0.3;
 }
 
+.react-flow__handle:not(.connectionindicator):not(.connectingfrom)>.indicator-glow {
+  box-shadow: none;
+  background-color: var(--color-border);
+}
+
 .indicator-glow {
   box-shadow: 0 0 0 3px hsl(from var(--color-primary) h s l / 0.2);
   transition-duration: 300ms;
