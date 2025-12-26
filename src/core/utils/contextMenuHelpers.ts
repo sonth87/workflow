@@ -458,10 +458,17 @@ export function createNoteNodeContextMenuItems(
     { id: "transparent", label: "Transparent", color: "transparent" },
   ];
 
+  const noteFontSizes = [
+    { id: "xs", label: "Extra Small" },
+    { id: "sm", label: "Small" },
+    { id: "base", label: "Base" },
+    { id: "lg", label: "Large" },
+  ];
+
   return [
     {
       id: "change-color",
-      label: "Change Color",
+      label: "Color",
       icon: "",
       children: noteColors.map(noteColor => ({
         id: `color-${noteColor.id}`,
@@ -469,6 +476,21 @@ export function createNoteNodeContextMenuItems(
         color: noteColor.color,
         onClick: async (context: any) => {
           await onColorChange(noteColor.id, context);
+        },
+      })),
+    },
+    {
+      id: "change-font-size",
+      label: "Font Size",
+      icon: "",
+      children: noteFontSizes.map(size => ({
+        id: `font-size-${size.id}`,
+        label: size.label,
+        onClick: async (context: any) => {
+          const action = contextMenuActionsRegistry.getAction("updateNodeData");
+          if (action && context.nodeId) {
+            action(context.nodeId, { fontSize: size.id });
+          }
         },
       })),
     },

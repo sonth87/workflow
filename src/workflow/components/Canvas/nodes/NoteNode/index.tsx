@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { NodeResizer, type NodeProps, useReactFlow } from "@xyflow/react";
 import { Palette, Type } from "lucide-react";
 import { cn, Popover } from "@sth87/shadcn-design-system";
@@ -43,6 +43,19 @@ export function NoteNode({ id, data, selected }: NodeProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showFontPicker, setShowFontPicker] = useState(false);
+
+  // Sync state with data prop
+  useEffect(() => {
+    setContent(noteData.content || "Double click to edit note...");
+  }, [noteData.content]);
+
+  useEffect(() => {
+    setColor(noteData.color || "yellow");
+  }, [noteData.color]);
+
+  useEffect(() => {
+    setFontSize(noteData.fontSize || "sm");
+  }, [noteData.fontSize]);
 
   const updateNodeData = useCallback(
     (
@@ -217,7 +230,9 @@ export function NoteNode({ id, data, selected }: NodeProps) {
                         ? "Small"
                         : size === "base"
                           ? "Normal"
-                          : "Large"}
+                          : size === "xs"
+                            ? "Extra Small"
+                            : "Large"}
                     </button>
                   ))}
                 </div>
@@ -239,7 +254,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
                 e.preventDefault();
               }}
               autoFocus
-              className={`w-full h-full bg-transparent border-none resize-none focus:outline-none custom-scrollbar ${
+              className={`w-full h-full min-h-25 bg-transparent border-none resize-none focus:outline-none custom-scrollbar ${
                 fontSizeClasses[fontSize || "base"]
               } ${colorClasses[color || "yellow"]}`}
               placeholder="Type your note here..."
@@ -252,7 +267,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
                 e.preventDefault();
               }}
               className={cn(
-                "w-full h-full whitespace-pre-wrap wrap-break-word cursor-text overflow-auto custom-scrollbar",
+                "w-full h-full min-h-25 whitespace-pre-wrap wrap-break-word cursor-text overflow-auto custom-scrollbar",
                 {
                   [fontSizeClasses[fontSize || "base"]]: true,
                   [colorClasses[color || "yellow"]]: true,
