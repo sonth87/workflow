@@ -295,6 +295,8 @@ const defaultNodes: PluginConfig["nodes"] = [
         title: "Note",
         description: "Annotation note",
       }),
+      width: 250,
+      height: 200,
       propertyDefinitions: [
         {
           id: "content",

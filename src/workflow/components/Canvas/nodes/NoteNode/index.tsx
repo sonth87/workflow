@@ -149,7 +149,6 @@ export function NoteNode({ id, data, selected }: NodeProps) {
         )}
         onWheel={e => {
           e.stopPropagation();
-          e.preventDefault();
         }}
         style={{
           width: "100%",
@@ -254,7 +253,6 @@ export function NoteNode({ id, data, selected }: NodeProps) {
               onKeyDown={handleKeyDown}
               onWheel={e => {
                 e.stopPropagation();
-                e.preventDefault();
               }}
               autoFocus
               className={`w-full h-full min-h-25 bg-transparent border-none resize-none focus:outline-none custom-scrollbar ${
@@ -267,10 +265,9 @@ export function NoteNode({ id, data, selected }: NodeProps) {
               onDoubleClick={handleDoubleClick}
               onWheel={e => {
                 e.stopPropagation();
-                e.preventDefault();
               }}
               className={cn(
-                "markdown prose w-full h-full min-h-25 cursor-text overflow-auto custom-scrollbar",
+                "markdown prose w-full h-full min-h-25 cursor-text overflow-auto custom-scrollbar px-1",
                 {
                   [fontSizeClasses[fontSize || "base"]]: true,
                   [colorClasses[color || "yellow"]]: true,
