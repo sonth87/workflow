@@ -33,6 +33,7 @@ import {
   Cog,
   GitPullRequest,
   LayoutGrid,
+  MessageSquareText,
   StickyNote,
   Workflow,
   type LucideIcon,
@@ -245,6 +246,12 @@ const NODE_ICON_CONFIG: Record<NodeType | string, IconConfig> = {
     color: "#FBBF24",
     bgColor: "#FEF9C3",
     label: "Note",
+  },
+  [NodeType.ANNOTATION]: {
+    icon: MessageSquareText,
+    color: "#FBBF24",
+    bgColor: "#FEF9C3",
+    label: "Annotation",
   },
 };
 

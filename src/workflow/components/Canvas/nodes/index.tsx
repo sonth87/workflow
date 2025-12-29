@@ -17,6 +17,7 @@ import {
   TaskNode,
   TimeDelayNode,
 } from "./TaskNodes";
+import { AnnotationNode } from "./NoteNode/AnnotationNode";
 
 // Export shared styles
 export { handleStyle, nodeStyle } from "./styles";
@@ -130,4 +131,5 @@ export const nodeTypes = {
   [NodeType.SUBFLOW]: wrapWithBaseNode(SubflowNode, NodeType.SUBFLOW),
   [NodeType.POOL]: PoolNode,
   [NodeType.NOTE]: NoteNode,
+  [NodeType.ANNOTATION]: AnnotationNode,
 };

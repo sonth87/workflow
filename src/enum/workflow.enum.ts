@@ -30,6 +30,7 @@ export enum NodeType {
   SUBFLOW = "subflow",
   POOL = "pool",
   NOTE = "note",
+  ANNOTATION = "annotation",
 }
 
 export enum NotificationChannel {
