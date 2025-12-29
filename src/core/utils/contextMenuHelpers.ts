@@ -496,3 +496,76 @@ export function createNoteNodeContextMenuItems(
     },
   ];
 }
+
+/**
+ * Create default annotation node context menu items
+ */
+export function createAnnotationNodeContextMenuItems(
+  onColorChange: (color: string, context: any) => void | Promise<void>
+): ContextMenuItem[] {
+  const textColors = [
+    { id: "black", label: "Black", color: "#000000" },
+    { id: "white", label: "White", color: "#ffffff" },
+    { id: "red", label: "Red", color: "#ef4444" },
+    { id: "blue", label: "Blue", color: "#3b82f6" },
+    { id: "green", label: "Green", color: "#10b981" },
+    { id: "yellow", label: "Yellow", color: "#eab308" },
+    { id: "purple", label: "Purple", color: "#8b5cf6" },
+    { id: "gray", label: "Gray", color: "#6b7280" },
+  ];
+
+  const noteFontSizes = [
+    { id: "xs", label: "Extra Small" },
+    { id: "sm", label: "Small" },
+    { id: "base", label: "Base" },
+    { id: "lg", label: "Large" },
+  ];
+
+  return [
+    {
+      id: "change-color",
+      label: "Color",
+      icon: "",
+      children: textColors.map(textColor => ({
+        id: `color-${textColor.id}`,
+        label: textColor.label,
+        color: textColor.color,
+        onClick: async (context: any) => {
+          await onColorChange(textColor.id, context);
+        },
+      })),
+    },
+    {
+      id: "change-font-size",
+      label: "Font Size",
+      icon: "",
+      children: noteFontSizes.map(size => ({
+        id: `font-size-${size.id}`,
+        label: size.label,
+        onClick: async (context: any) => {
+          const action = contextMenuActionsRegistry.getAction("updateNodeData");
+          if (action && context.nodeId) {
+            action(context.nodeId, { fontSize: size.id });
+          }
+        },
+      })),
+    },
+    {
+      id: "separator-annotation",
+      label: "",
+      separator: true,
+    },
+    {
+      id: "flip-arrow",
+      label: "Flip Arrow",
+      icon: "↺",
+      onClick: async (context: any) => {
+        const action = contextMenuActionsRegistry.getAction("updateNodeData");
+        if (action && context.nodeId) {
+          const currentFlip = context.node?.data?.arrowFlip || false;
+          action(context.nodeId, { arrowFlip: !currentFlip });
+        }
+      },
+    },
+  ];
+}

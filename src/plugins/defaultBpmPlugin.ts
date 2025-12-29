@@ -22,6 +22,7 @@ import {
   createDefaultNodeContextMenuItems,
   createDefaultEdgeContextMenuItems,
   createNoteNodeContextMenuItems,
+  createAnnotationNodeContextMenuItems,
 } from "@/core/utils/contextMenuHelpers";
 import { contextMenuActionsRegistry } from "@/core/registry";
 import { Circle, ClipboardList, DiamondPlus } from "lucide-react";
@@ -741,6 +742,27 @@ const defaultContextMenus: Array<{
           const action = contextMenuActionsRegistry.getAction("updateNodeData");
           if (action && context.nodeId) {
             action(context.nodeId, { color });
+          }
+        }
+      ),
+    },
+  },
+  {
+    id: "annotation-node-context-menu",
+    type: "context-menu",
+    name: "Annotation Node Context Menu",
+    config: {
+      id: "annotation-node-context-menu",
+      name: "Annotation Node Context Menu",
+      targetType: "node",
+      targetNodeTypes: ["annotation"],
+      items: createAnnotationNodeContextMenuItems(
+        // On color change
+        async (color: string, context: ContextMenuContext) => {
+          // For annotation nodes, update data.textColor directly
+          const action = contextMenuActionsRegistry.getAction("updateNodeData");
+          if (action && context.nodeId) {
+            action(context.nodeId, { textColor: color });
           }
         }
       ),
