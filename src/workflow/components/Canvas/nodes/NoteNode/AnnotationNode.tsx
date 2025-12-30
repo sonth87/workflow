@@ -1,11 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import {
-  NodeResizer,
   type NodeProps,
   useReactFlow,
   useUpdateNodeInternals,
 } from "@xyflow/react";
-import { Palette, Type, ArrowUp, RotateCcw } from "lucide-react";
+import { Palette, Type, RotateCcw } from "lucide-react";
 import { cn, Popover } from "@sth87/shadcn-design-system";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -14,6 +13,9 @@ import { globalEventBus } from "@/core/events/EventBus";
 import { drag } from "d3-drag";
 import { select } from "d3-selection";
 import "./note.css";
+import NodeResizer from "../../resizer";
+
+const defaultContent = `**Double click** to edit me.`;
 
 const textColorClasses = {
   black: "!text-black",
@@ -60,7 +62,7 @@ export function AnnotationNode({ id, data, selected }: NodeProps) {
   const annotationData = (data as Partial<AnnotationData>) || {};
 
   const [content, setContent] = useState(
-    annotationData.content || "Double click to edit annotation..."
+    annotationData.content || defaultContent
   );
   const [textColor, setTextColor] = useState<AnnotationData["textColor"]>(
     annotationData.textColor || "black"
@@ -87,7 +89,7 @@ export function AnnotationNode({ id, data, selected }: NodeProps) {
 
   // Sync state with data prop
   useEffect(() => {
-    setContent(annotationData.content || "Double click to edit annotation...");
+    setContent(annotationData.content || defaultContent);
   }, [annotationData.content]);
 
   useEffect(() => {
@@ -241,9 +243,7 @@ export function AnnotationNode({ id, data, selected }: NodeProps) {
     (e: React.KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsEditing(false);
-        setContent(
-          annotationData.content || "Double click to edit annotation..."
-        );
+        setContent(annotationData.content || defaultContent);
       }
     },
     [annotationData.content]
@@ -320,32 +320,12 @@ export function AnnotationNode({ id, data, selected }: NodeProps) {
   return (
     <>
       <NodeResizer
-        isVisible={!!selected}
-        minWidth={50}
-        minHeight={50}
-        handleStyle={{
-          width: 8,
-          height: 8,
-          zIndex: 10,
-        }}
-        handleClassName="bg-primary/50! border-primary! rounded-xs!"
-        lineClassName={cn("border-primary!")}
-      />
-
-      <div
-        ref={containerRef}
-        className={cn(
-          "relative rounded-lg transition-all bg-transparent",
-          isEditing ? "nodrag shadow-lg" : ""
-        )}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        style={{
-          width: "100%",
-          height: "100%",
-          minWidth: 50,
-          minHeight: 50,
-        }}
+        selected={selected}
+        isEditing={isEditing}
+        className="border-none"
+        ref={containerRef}
       >
         {/* Toolbar */}
         {selected && (
@@ -497,7 +477,7 @@ export function AnnotationNode({ id, data, selected }: NodeProps) {
             </div>
           )}
         </div>
-      </div>
+      </NodeResizer>
     </>
   );
 }
