@@ -8,6 +8,7 @@ import { create } from "zustand";
 import { globalEventBus, WorkflowEventTypes } from "../events/EventBus";
 import type { BaseEdgeConfig, BaseNodeConfig } from "../types/base.types";
 import type { ValidationError } from "../validation/ValidationEngine";
+import { DEFAULT_LAYOUT_DIRECTION } from "../../workflow/constants/common";
 
 export interface WorkflowState {
   // Workflow metadata
@@ -109,7 +110,7 @@ const initialState: WorkflowState = {
     past: [],
     future: [],
   },
-  layoutDirection: "vertical",
+  layoutDirection: DEFAULT_LAYOUT_DIRECTION,
   compactView: false,
   panelStates: {
     toolbox: true,

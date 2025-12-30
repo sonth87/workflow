@@ -22,6 +22,7 @@ import {
   createDefaultNodeContextMenuItems,
   createDefaultEdgeContextMenuItems,
   createNoteNodeContextMenuItems,
+  createAnnotationNodeContextMenuItems,
 } from "@/core/utils/contextMenuHelpers";
 import { contextMenuActionsRegistry } from "@/core/registry";
 import { Circle, ClipboardList, DiamondPlus } from "lucide-react";
@@ -297,51 +298,18 @@ const defaultNodes: PluginConfig["nodes"] = [
       }),
       width: 250,
       height: 200,
-      propertyDefinitions: [
-        {
-          id: "content",
-          name: "content",
-          type: "textarea",
-          label: "Content",
-          description: "Note content",
-          defaultValue: "Double click to edit note...",
-          required: false,
-          order: 0,
-        },
-        {
-          id: "color",
-          name: "color",
-          type: "select",
-          label: "Color",
-          description: "Note color",
-          defaultValue: "yellow",
-          required: false,
-          order: 1,
-          options: [
-            { label: "Yellow", value: "yellow" },
-            { label: "Blue", value: "blue" },
-            { label: "Green", value: "green" },
-            { label: "Pink", value: "pink" },
-            { label: "Purple", value: "purple" },
-            { label: "Orange", value: "orange" },
-          ],
-        },
-        {
-          id: "fontSize",
-          name: "fontSize",
-          type: "select",
-          label: "Font Size",
-          description: "Font size",
-          defaultValue: "base",
-          required: false,
-          order: 2,
-          options: [
-            { label: "Small", value: "sm" },
-            { label: "Normal", value: "base" },
-            { label: "Large", value: "lg" },
-          ],
-        },
-      ],
+    },
+  },
+  {
+    id: NodeType.ANNOTATION,
+    type: NodeType.ANNOTATION,
+    name: "Annotation",
+    config: {
+      ...createDefaultNodeConfig(NodeType.ANNOTATION, CategoryType.OTHER, {
+        level: "1",
+        title: "Annotation",
+        description: "Annotation note",
+      }),
     },
   },
   // Pool Node
@@ -774,6 +742,27 @@ const defaultContextMenus: Array<{
           const action = contextMenuActionsRegistry.getAction("updateNodeData");
           if (action && context.nodeId) {
             action(context.nodeId, { color });
+          }
+        }
+      ),
+    },
+  },
+  {
+    id: "annotation-node-context-menu",
+    type: "context-menu",
+    name: "Annotation Node Context Menu",
+    config: {
+      id: "annotation-node-context-menu",
+      name: "Annotation Node Context Menu",
+      targetType: "node",
+      targetNodeTypes: ["annotation"],
+      items: createAnnotationNodeContextMenuItems(
+        // On color change
+        async (color: string, context: ContextMenuContext) => {
+          // For annotation nodes, update data.textColor directly
+          const action = contextMenuActionsRegistry.getAction("updateNodeData");
+          if (action && context.nodeId) {
+            action(context.nodeId, { textColor: color });
           }
         }
       ),

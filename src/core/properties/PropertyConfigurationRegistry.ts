@@ -58,10 +58,17 @@ class PropertyConfigurationRegistry {
   }
 
   /**
-   * Batch register nhiều edge configs
+   * Unregister configuration cho một node type
    */
-  registerEdgeConfigs(configs: EdgePropertyConfiguration[]): void {
-    configs.forEach(config => this.registerEdgeConfig(config));
+  unregisterNodeConfig(nodeType: string): boolean {
+    return this.nodeConfigs.delete(nodeType);
+  }
+
+  /**
+   * Unregister configuration cho một edge type
+   */
+  unregisterEdgeConfig(edgeType: string): boolean {
+    return this.edgeConfigs.delete(edgeType);
   }
 
   /**

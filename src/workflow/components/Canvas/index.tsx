@@ -25,6 +25,7 @@ import { validateConnection } from "@/utils/validation";
 import { NodeType } from "@/enum/workflow.enum";
 import type { ContextMenuContext } from "@/core/types/base.types";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { globalEventBus } from "@/core/events/EventBus";
 
 // Import node/edge types from workflow
 import { nodeTypes as builtInNodeTypes } from "./nodes";
@@ -83,6 +84,7 @@ function CanvasInner({
   }, []);
 
   const [isDragging, setIsDragging] = useState(false);
+  const [disableZoomOnScroll, setDisableZoomOnScroll] = useState(false);
 
   // Handle node changes
   const onNodesChange = useCallback(
@@ -354,6 +356,16 @@ function CanvasInner({
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
+  // Listen for note hover events to disable zoom on scroll
+  useEffect(() => {
+    const handleNoteHover = (event: any) => {
+      setDisableZoomOnScroll(event.payload);
+    };
+
+    globalEventBus.on("note-hover", handleNoteHover);
+    return () => globalEventBus.off("note-hover", handleNoteHover);
+  }, []);
+
   // Keyboard shortcuts handlers
   const handleDeleteSelection = useCallback(
     (nodeIds: string[], edgeIds: string[]) => {
@@ -445,6 +457,7 @@ function CanvasInner({
         reconnectRadius={20}
         minZoom={0.2}
         maxZoom={3}
+        zoomOnScroll={!disableZoomOnScroll}
       >
         <Background gap={15} />
       </ReactFlow>

@@ -1,10 +1,16 @@
 import { useState, useCallback, useEffect } from "react";
-import { NodeResizer, type NodeProps, useReactFlow } from "@xyflow/react";
+import { type NodeProps, useReactFlow } from "@xyflow/react";
 import { Palette, Type } from "lucide-react";
 import { cn, Popover } from "@sth87/shadcn-design-system";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
+import { globalEventBus } from "@/core/events/EventBus";
 import "./note.css";
+import NodeResizer from "../../resizer";
+
+const defaultContent = `## I'm a note 
+**Double click** to edit me.`;
 
 const colorClasses = {
   yellow: "bg-[#fde68a]",
@@ -34,9 +40,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
   const { setNodes } = useReactFlow();
   const noteData = (data as Partial<NoteData>) || {};
 
-  const [content, setContent] = useState(
-    noteData.content || "Double click to edit note..."
-  );
+  const [content, setContent] = useState(noteData.content || defaultContent);
   const [color, setColor] = useState<NoteData["color"]>(
     noteData.color || "yellow"
   );
@@ -49,7 +53,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
 
   // Sync state with data prop
   useEffect(() => {
-    setContent(noteData.content || "Double click to edit note...");
+    setContent(noteData.content || defaultContent);
   }, [noteData.content]);
 
   useEffect(() => {
@@ -124,38 +128,22 @@ export function NoteNode({ id, data, selected }: NodeProps) {
     [content, color, updateNodeData]
   );
 
+  const handleMouseEnter = useCallback(() => {
+    globalEventBus.emit("note-hover", true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    globalEventBus.emit("note-hover", false);
+  }, []);
+
   return (
     <>
       <NodeResizer
-        isVisible={!!selected}
-        minWidth={150}
-        minHeight={100}
-        handleStyle={{
-          width: 8,
-          height: 8,
-          zIndex: 10,
-        }}
-        handleClassName="bg-primary/50! border-primary! rounded-xs!"
-        lineClassName={cn(
-          "border-primary!"
-          // "ring-4! ring-primary/25!"
-        )}
-      />
-
-      <div
-        className={cn(
-          "relative border-none rounded-lg transition-all",
-          colorClasses[color || "yellow"]
-        )}
-        onWheel={e => {
-          e.stopPropagation();
-        }}
-        style={{
-          width: "100%",
-          height: "100%",
-          minWidth: 150,
-          minHeight: 100,
-        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        selected={selected}
+        className={colorClasses[color || "yellow"]}
+        isEditing={isEditing}
       >
         {/* Toolbar */}
         {selected && (
@@ -244,28 +232,29 @@ export function NoteNode({ id, data, selected }: NodeProps) {
         )}
 
         {/* Content */}
-        <div className="w-full h-full p-3 overflow-hidden">
+        <div className="w-full h-full p-3 overflow-hidden relative">
           {isEditing ? (
-            <textarea
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              onWheel={e => {
-                e.stopPropagation();
-              }}
-              autoFocus
-              className={`w-full h-full min-h-25 bg-transparent border-none resize-none focus:outline-none custom-scrollbar ${
-                fontSizeClasses[fontSize || "base"]
-              } ${colorClasses[color || "yellow"]}`}
-              placeholder="Type your note here..."
-            />
+            <>
+              <textarea
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                autoFocus
+                className={cn(
+                  "w-full h-full min-h-25 bg-transparent border-none resize-none focus:outline-none custom-scrollbar px-1",
+                  fontSizeClasses[fontSize || "base"],
+                  colorClasses[color || "yellow"]
+                )}
+                placeholder="Type your note here..."
+              />
+              <span className="absolute bottom-0 right-1 text-[8px]">
+                Styled with markdown
+              </span>
+            </>
           ) : (
             <div
               onDoubleClick={handleDoubleClick}
-              onWheel={e => {
-                e.stopPropagation();
-              }}
               className={cn(
                 "markdown prose w-full h-full min-h-25 cursor-text overflow-auto custom-scrollbar px-1",
                 {
@@ -274,7 +263,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
                 }
               )}
             >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
                 {content}
               </ReactMarkdown>
             </div>
@@ -282,7 +271,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
         </div>
 
         {/* Note corner fold effect */}
-        <div
+        {/* <div
           className="absolute bottom-0 right-0 w-0 h-0"
           style={{
             borderStyle: "solid",
@@ -305,8 +294,8 @@ export function NoteNode({ id, data, selected }: NodeProps) {
                             : ""
             } transparent`,
           }}
-        />
-      </div>
+        /> */}
+      </NodeResizer>
     </>
   );
 }

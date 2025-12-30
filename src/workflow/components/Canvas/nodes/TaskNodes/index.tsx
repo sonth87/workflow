@@ -1,11 +1,17 @@
 import { Position } from "@xyflow/react";
 import type { CustomNodeProps } from "..";
 import { CustomHandle } from "../../handle";
+import { DEFAULT_LAYOUT_DIRECTION } from "@/workflow/constants/common";
+
+const sPos =
+  DEFAULT_LAYOUT_DIRECTION === "horizontal" ? Position.Right : Position.Bottom;
+const tPos =
+  DEFAULT_LAYOUT_DIRECTION === "horizontal" ? Position.Left : Position.Top;
 
 export function TaskNode({
   isConnecting,
-  sourcePosition = Position.Bottom,
-  targetPosition = Position.Top,
+  sourcePosition = sPos,
+  targetPosition = tPos,
 }: CustomNodeProps) {
   return (
     <>
@@ -27,8 +33,8 @@ export function TaskNode({
 
 export function ServiceTaskNode({
   isConnecting,
-  sourcePosition = Position.Bottom,
-  targetPosition = Position.Top,
+  sourcePosition = sPos,
+  targetPosition = tPos,
 }: CustomNodeProps) {
   return (
     <>
@@ -50,8 +56,8 @@ export function ServiceTaskNode({
 
 export function NotificationNode({
   isConnecting,
-  sourcePosition = Position.Bottom,
-  targetPosition = Position.Top,
+  sourcePosition = sPos,
+  targetPosition = tPos,
 }: CustomNodeProps) {
   return (
     <>
@@ -73,8 +79,8 @@ export function NotificationNode({
 
 export function TimeDelayNode({
   isConnecting,
-  sourcePosition = Position.Bottom,
-  targetPosition = Position.Top,
+  sourcePosition = sPos,
+  targetPosition = tPos,
 }: CustomNodeProps) {
   return (
     <>
@@ -96,8 +102,8 @@ export function TimeDelayNode({
 
 export function SubflowNode({
   isConnecting,
-  sourcePosition = Position.Bottom,
-  targetPosition = Position.Top,
+  sourcePosition = sPos,
+  targetPosition = tPos,
 }: CustomNodeProps) {
   return (
     <>

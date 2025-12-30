@@ -5,6 +5,7 @@
 
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { useTheme } from "@/hooks/useTheme";
+import { DEFAULT_LAYOUT_DIRECTION } from "@/workflow/constants/common";
 import {
   useWorkflowEvents,
   useWorkflowImportExport,
@@ -35,7 +36,7 @@ interface HeaderProps {
 
 export function Header({
   onSave,
-  layoutDirection = "vertical",
+  layoutDirection = DEFAULT_LAYOUT_DIRECTION,
   onLayoutDirectionChange,
 }: HeaderProps) {
   const { workflowName, setWorkflowName, compactView, toggleCompactView } =

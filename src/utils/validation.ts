@@ -89,6 +89,11 @@ export const DEFAULT_VALIDATION_RULES: NodeValidationRules = {
     maxOutputConnections: 0,
     maxInputConnections: 0,
   },
+
+  [NodeType.ANNOTATION]: {
+    maxOutputConnections: 0,
+    maxInputConnections: 0,
+  },
 };
 
 // Get validation rules for a specific node type

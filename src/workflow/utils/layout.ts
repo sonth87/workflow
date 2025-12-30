@@ -19,7 +19,7 @@ export const getLayoutedElements = (
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-  const layoutHorizontal = direction === "vertical";
+  const layoutHorizontal = direction === "horizontal";
   const dagreDirection = layoutHorizontal ? "TB" : "LR";
   dagreGraph.setGraph({ rankdir: dagreDirection, nodesep: 100, ranksep: 100 });
 

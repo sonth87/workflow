@@ -7,7 +7,7 @@ export function ExclusiveGatewayNode({
   sourcePosition = Position.Bottom,
   targetPosition = Position.Top,
 }: CustomNodeProps) {
-  const isHorizontal = sourcePosition === Position.Right;
+  const isHorizontal = targetPosition === Position.Left;
   const out1Position = isHorizontal ? Position.Top : Position.Left;
   const out2Position = isHorizontal ? Position.Bottom : Position.Right;
 
@@ -63,7 +63,7 @@ export function ParallelGatewayJoinNode({
   sourcePosition = Position.Bottom,
   targetPosition = Position.Top,
 }: CustomNodeProps) {
-  const isHorizontal = sourcePosition === Position.Right;
+  const isHorizontal = targetPosition === Position.Left;
   const in2Position = isHorizontal ? Position.Top : Position.Left;
 
   return (

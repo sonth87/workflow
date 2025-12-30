@@ -94,7 +94,7 @@ export default function BaseNode(props: Props) {
     <div
       className={cn(
         compactView ? "group" : nodeStyle,
-        compactView ? "" : "min-w-70",
+        compactView ? "" : "min-w-52",
         {
           "border-primary ring-4":
             props.selected &&
