@@ -24,11 +24,11 @@ export function useNodeOperations() {
       position: { x: number; y: number },
       properties?: Record<string, unknown>
     ) => {
-      const layoutHorizontal = layoutDirection === "vertical";
+      const layoutHorizontal = layoutDirection === "horizontal";
       const node = nodeRegistry.createNode(nodeType, {
         position,
-        targetPosition: layoutHorizontal ? Position.Top : Position.Left,
-        sourcePosition: layoutHorizontal ? Position.Bottom : Position.Right,
+        targetPosition: layoutHorizontal ? Position.Left : Position.Top,
+        sourcePosition: layoutHorizontal ? Position.Right : Position.Bottom,
         properties: properties || {},
       });
 
@@ -178,6 +178,15 @@ export function useWorkflowImportExport() {
    * Export workflow to JSON file
    */
   const exportWorkflow = useCallback(() => {
+    // Clone nodes and remove icon from data since it's not serializable and should be derived from type
+    const exportableNodes = nodes.map(node => ({
+      ...node,
+      data: {
+        ...node.data,
+        icon: undefined, // Remove icon as it's not serializable and should be fetched from registry
+      },
+    }));
+
     const workflowData = {
       version: "1.0.0",
       metadata: {
@@ -185,7 +194,7 @@ export function useWorkflowImportExport() {
         description: workflowDescription,
         exportedAt: new Date().toISOString(),
       },
-      nodes,
+      nodes: exportableNodes,
       edges,
     };
 

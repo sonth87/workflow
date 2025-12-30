@@ -47,7 +47,13 @@ const wrapWithBaseNode = (
     const visualConfig = props.data?.visualConfig as
       | NodeVisualConfig
       | undefined;
-
+    console.log(
+      "Wrapping node:",
+      nodeType,
+      "with visualConfig:",
+      visualConfig,
+      props
+    );
     return (
       <BaseNode {...props} type={nodeType} visualConfig={visualConfig}>
         <Component {...props} />

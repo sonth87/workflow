@@ -11,13 +11,79 @@ import type {
 } from "../types/base.types";
 import type { ContextMenuConfig } from "../registry/ContextMenuRegistry";
 import type { CategoryConfig } from "../registry/CategoryRegistry";
+import type {
+  PropertyGroupDefinition,
+  PropertyFieldDefinition,
+} from "../properties";
+import type { PropertyDefinition } from "../types/base.types";
 import { nodeRegistry } from "../registry/NodeRegistry";
 import { edgeRegistry } from "../registry/EdgeRegistry";
 import { ruleRegistry } from "../registry/RuleRegistry";
 import { themeRegistry } from "../registry/ThemeRegistry";
 import { contextMenuRegistry } from "../registry/ContextMenuRegistry";
 import { categoryRegistry } from "../registry/CategoryRegistry";
+import { propertyRegistry } from "../properties";
 import { globalEventBus, WorkflowEventTypes } from "../events/EventBus";
+
+/**
+ * Convert propertyDefinitions array thành propertyGroups
+ */
+function convertPropertyDefinitionsToGroups(
+  propertyDefinitions?: PropertyDefinition[]
+): PropertyGroupDefinition[] {
+  if (!propertyDefinitions || propertyDefinitions.length === 0) {
+    return [];
+  }
+
+  // Group fields by group
+  const groupsMap = new Map<string, PropertyFieldDefinition[]>();
+
+  propertyDefinitions.forEach(propDef => {
+    const groupId = propDef.group || "basic";
+    if (!groupsMap.has(groupId)) {
+      groupsMap.set(groupId, []);
+    }
+
+    // Convert PropertyDefinition to PropertyFieldDefinition
+    const fieldDef: PropertyFieldDefinition = {
+      id: propDef.id,
+      label: propDef.label,
+      type: propDef.type as any, // Assume compatible
+      defaultValue: propDef.defaultValue,
+      required: propDef.required,
+      placeholder: propDef.placeholder,
+      helpText: propDef.description,
+      options: propDef.options
+        ? {
+            options: propDef.options.map(opt => ({
+              label: opt.label,
+              value: opt.value as string | number | boolean,
+            })),
+          }
+        : undefined,
+      order: 0, // Will be set later
+      group: groupId,
+    };
+
+    groupsMap.get(groupId)!.push(fieldDef);
+  });
+
+  // Convert to PropertyGroupDefinition array
+  const groups: PropertyGroupDefinition[] = [];
+  let order = 1;
+
+  groupsMap.forEach((fields, groupId) => {
+    // Sort fields by order (not implemented yet, assume insertion order)
+    groups.push({
+      id: groupId,
+      label: groupId.charAt(0).toUpperCase() + groupId.slice(1), // Capitalize
+      order: order++,
+      fields,
+    });
+  });
+
+  return groups;
+}
 
 /**
  * Plugin metadata
@@ -233,6 +299,19 @@ export class PluginManager {
     // Register nodes
     if (config.nodes) {
       nodeRegistry.registerMany(config.nodes);
+
+      // Register property configurations for nodes that have propertyDefinitions
+      config.nodes.forEach(node => {
+        if (node.config.propertyDefinitions) {
+          const propertyGroups = convertPropertyDefinitionsToGroups(
+            node.config.propertyDefinitions
+          );
+          propertyRegistry.registerNodeConfig({
+            nodeType: node.type,
+            propertyGroups,
+          });
+        }
+      });
     }
 
     // Register edges
@@ -265,6 +344,12 @@ export class PluginManager {
     // Unregister nodes
     if (config.nodes) {
       config.nodes.forEach(node => nodeRegistry.unregister(node.id));
+      // Unregister property configurations
+      config.nodes.forEach(node => {
+        if (node.config.propertyDefinitions) {
+          propertyRegistry.unregisterNodeConfig(node.type);
+        }
+      });
     }
 
     // Unregister edges

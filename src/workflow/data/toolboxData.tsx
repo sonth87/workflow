@@ -128,6 +128,6 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
     isOpen: false,
     categoryType: CategoryType.OTHER,
     nodes: [],
-    icon: <GalleryVerticalEnd size={18} className="text-yellow-300" />,
+    icon: <GalleryVerticalEnd size={18} className="text-orange-300" />,
   },
 ];
