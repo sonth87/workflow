@@ -25,6 +25,7 @@ import {
 import { getLayoutedElements } from "./utils/layout";
 import { Behavior } from "./components/Behavior";
 import { initializePropertySystem } from "@/core/properties";
+import { findTargetContainer, toRelativePosition } from "./utils/poolLaneRules";
 
 function WorkflowBuilderInner() {
   const { createNode } = useNodeOperations();
@@ -48,6 +49,35 @@ function WorkflowBuilderInner() {
   const handleNodeDrop = useCallback(
     (nodeType: string, position: { x: number; y: number }) => {
       createNode(nodeType, position);
+
+      // After creating node, check if it's inside a pool/lane and set parent
+      setTimeout(() => {
+        const { nodes: currentNodes } = useWorkflowStore.getState();
+        const newNode = currentNodes[currentNodes.length - 1]; // Get the newly created node
+
+        if (newNode && newNode.type !== "pool" && newNode.type !== "lane") {
+          const targetContainer = findTargetContainer(
+            newNode,
+            currentNodes,
+            false
+          );
+
+          if (targetContainer) {
+            const { updateNode } = useWorkflowStore.getState();
+            updateNode(newNode.id, {
+              // position: newNode.position,
+              parentId: targetContainer.id,
+              extent: targetContainer.data?.isLocked
+                ? ("parent" as const)
+                : undefined,
+              position: toRelativePosition(
+                newNode.position,
+                targetContainer.position
+              ),
+            });
+          }
+        }
+      }, 0);
     },
     [createNode]
   );

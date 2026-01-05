@@ -24,7 +24,10 @@ import { edgeRegistry } from "@/core/registry/EdgeRegistry";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { validateConnection } from "@/utils/validation";
 import { NodeType } from "@/enum/workflow.enum";
-import type { ContextMenuContext, BaseNodeConfig } from "@/core/types/base.types";
+import type {
+  ContextMenuContext,
+  BaseNodeConfig,
+} from "@/core/types/base.types";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { globalEventBus } from "@/core/events/EventBus";
 import {
@@ -102,9 +105,9 @@ function CanvasInner({
 
       // Post-process: Apply extent: 'parent' for nodes in locked containers
       const finalNodes = updatedNodes.map((node: any) => {
-        if (node.parentNode) {
-          const parent = updatedNodes.find((n: any) => n.id === node.parentNode);
-          
+        if (node.parentId) {
+          const parent = updatedNodes.find((n: any) => n.id === node.parentId);
+
           // RULE 4: Lanes inside Pool should not be draggable
           const isDraggable = canLaneBeDragged(node, updatedNodes);
           if (!isDraggable) {
@@ -114,7 +117,7 @@ function CanvasInner({
               extent: "parent" as const,
             };
           }
-          
+
           if (parent && parent.data?.isLocked) {
             // Node is in a locked container
             return {
@@ -123,15 +126,17 @@ function CanvasInner({
             };
           }
         }
-        
+
         // RULE 3: Lane must be in Pool (should not exist standalone)
         const standaloneCheck = canLaneExistStandalone(node);
         if (!standaloneCheck.allowed) {
-          console.warn("⚠️ Lane detected without parent Pool. This should not happen.");
+          console.warn(
+            "⚠️ Lane detected without parent Pool. This should not happen."
+          );
         }
-        
+
         // Clear extent if not in locked container
-        if (node.extent === "parent" && !node.parentNode) {
+        if (node.extent === "parent" && !node.parentId) {
           return {
             ...node,
             extent: undefined,
@@ -165,7 +170,7 @@ function CanvasInner({
   const onNodeDrag = useCallback(
     (_event: React.MouseEvent, node: BaseNodeConfig) => {
       // When dragging pool or lane, we don't need to do anything special
-      // ReactFlow handles parent-child movement automatically if parentNode is set correctly
+      // ReactFlow handles parent-child movement automatically if parentId is set correctly
       // This is just here for future extensions if needed
     },
     []
@@ -173,8 +178,11 @@ function CanvasInner({
 
   // Handle node drag stop
   const onNodeDragStop = useCallback(
-    (_event: React.MouseEvent, node: BaseNodeConfig, allNodes: BaseNodeConfig[]) => {
+    (_event: React.MouseEvent, node: BaseNodeConfig) => {
       setIsDragging(false);
+
+      // Get the latest nodes state
+      const allNodes = useWorkflowStore.getState().nodes;
 
       // RULE 3: Lane MUST be inside Pool (cannot be standalone)
       const standaloneCheck = canLaneExistStandalone(node);
@@ -186,8 +194,28 @@ function CanvasInner({
         return;
       }
 
+      // Calculate absolute position - node.position might be relative if it has a parent
+      const absolutePosition = node.parentId
+        ? (() => {
+            const parent = allNodes.find(n => n.id === node.parentId);
+            return parent
+              ? {
+                  x: node.position.x + parent.position.x,
+                  y: node.position.y + parent.position.y,
+                }
+              : node.position;
+          })()
+        : node.position;
+
+      // Use node with absolute position for container detection
+      const nodeWithAbsolutePosition = { ...node, position: absolutePosition };
+
       // Find target container using centralized logic (don't exclude locked - we'll check below)
-      const targetContainer = findTargetContainer(node, allNodes, false);
+      const targetContainer = findTargetContainer(
+        nodeWithAbsolutePosition,
+        allNodes,
+        false
+      );
 
       // SPECIAL HANDLING FOR LANE
       if (node.type === "lane" || node.data?.nodeType === "lane") {
@@ -205,13 +233,16 @@ function CanvasInner({
         }
 
         // If validation passed and lane is entering a pool
-        if (targetContainer && node.parentNode !== targetContainer.id) {
+        if (targetContainer && node.parentId !== targetContainer.id) {
           const { updateNode: updateNodeFn } = useWorkflowStore.getState();
           updateNodeFn(node.id, {
-            parentNode: targetContainer.id,
+            parentId: targetContainer.id,
             draggable: false, // RULE 4: Lanes in pool cannot be dragged
             extent: "parent" as const,
-            position: toRelativePosition(node.position, targetContainer.position),
+            position: toRelativePosition(
+              node.position,
+              targetContainer.position
+            ),
           });
         }
         return;
@@ -219,35 +250,53 @@ function CanvasInner({
 
       // NORMAL NODES handling
       const { updateNode: updateNodeFn } = useWorkflowStore.getState();
-      
+
       // Check if node is trying to leave a locked parent
-      if (node.parentNode && !targetContainer) {
-        const currentParent = allNodes.find(n => n.id === node.parentNode);
+      if (node.parentId && !targetContainer) {
+        const currentParent = allNodes.find(n => n.id === node.parentId);
         if (currentParent?.data?.isLocked) {
           // LOCKED MODE: Cannot drag node out of locked container
-          // Snap back to parent - do nothing (ReactFlow will revert)
+          // Force node back to parent with extent
+          updateNodeFn(node.id, {
+            parentId: currentParent.id,
+            extent: "parent" as const,
+            position: node.position, // Keep current relative position
+          });
           return;
         }
       }
-      
-      if (targetContainer && node.parentNode !== targetContainer.id) {
-        // Node moved INTO container
+
+      if (targetContainer && node.parentId !== targetContainer.id) {
+        // Node moved INTO container - ADD parentId
         updateNodeFn(node.id, {
-          parentNode: targetContainer.id,
-          extent: targetContainer.data?.isLocked ? ("parent" as const) : undefined,
-          position: toRelativePosition(node.position, targetContainer.position),
+          parentId: targetContainer.id,
+          extent: targetContainer.data?.isLocked
+            ? ("parent" as const)
+            : undefined,
+          position: toRelativePosition(
+            absolutePosition,
+            targetContainer.position
+          ),
         });
-      } else if (!targetContainer && node.parentNode) {
-        // Node moved OUT of unlocked container - convert to absolute position
-        const oldParent = allNodes.find(n => n.id === node.parentNode);
-        if (oldParent && !oldParent.data?.isLocked) {
+      } else if (!targetContainer && node.parentId) {
+        // Node moved OUT of container - REMOVE parentId
+        const oldParent = allNodes.find(n => n.id === node.parentId);
+        if (oldParent) {
+          // Always remove parentId when dragged out (unless it's locked, which is already checked above)
           updateNodeFn(node.id, {
-            parentNode: undefined,
+            parentId: undefined,
             extent: undefined,
-            position: {
-              x: node.position.x + oldParent.position.x,
-              y: node.position.y + oldParent.position.y,
-            },
+            position: absolutePosition, // Use calculated absolute position
+          });
+        }
+      }
+
+      // Ensure nodes inside locked containers always have extent: 'parent'
+      if (node.parentId) {
+        const currentParent = allNodes.find(n => n.id === node.parentId);
+        if (currentParent?.data?.isLocked && node.extent !== "parent") {
+          updateNodeFn(node.id, {
+            extent: "parent" as const,
           });
         }
       }

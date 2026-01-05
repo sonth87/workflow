@@ -121,7 +121,9 @@ function LaneNodeComponent({ data, selected, id }: LaneNodeProps) {
             onClick={handleToggleLock}
             className="p-1.5 hover:bg-green-100 rounded transition-colors"
             title={
-              isLocked ? "Unlock (cho phép kéo ra)" : "Lock (giữ nodes bên trong)"
+              isLocked
+                ? "Unlock (cho phép kéo ra)"
+                : "Lock (giữ nodes bên trong)"
             }
           >
             {isLocked ? (

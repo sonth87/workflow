@@ -25,7 +25,14 @@ import {
   createAnnotationNodeContextMenuItems,
 } from "@/core/utils/contextMenuHelpers";
 import { contextMenuActionsRegistry } from "@/core/registry";
-import { Circle, ClipboardList, DiamondPlus } from "lucide-react";
+import {
+  Circle,
+  ClipboardList,
+  DiamondPlus,
+  FlipVertical,
+  LockOpen,
+  Trash2,
+} from "lucide-react";
 
 // ============================================
 // Default Node Configurations
@@ -320,7 +327,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     config: {
       ...createDefaultNodeConfig(NodeType.POOL, CategoryType.OTHER, {
         title: "Pool",
-        description: "Container for organizing workflow elements by participant",
+        description:
+          "Container for organizing workflow elements by participant",
       }),
       nodeType: NodeType.POOL, // Store nodeType in config
       icon: {
@@ -583,29 +591,34 @@ const defaultRules: Array<{
     config: {
       id: "pool-lane-containment",
       name: "Pool/Lane Containment Rule",
-      description: "Lane cannot contain Pool or other Lanes. Pool can contain Lanes.",
+      description:
+        "Lane cannot contain Pool or other Lanes. Pool can contain Lanes.",
       type: "validation",
       enabled: true,
       priority: 3,
       scope: "node",
       condition: (context: any) => {
         const { node, nodes } = context;
-        
+
         // If this is a Pool or Lane trying to be a child of a Lane
         if (node.type === NodeType.POOL || node.type === NodeType.LANE) {
-          if (node.parentNode) {
-            const parent = nodes.find((n: BaseNodeConfig) => n.id === node.parentNode);
+          if (node.parentId) {
+            const parent = nodes.find(
+              (n: BaseNodeConfig) => n.id === node.parentId
+            );
             if (parent && parent.type === NodeType.LANE) {
               // Pool/Lane cannot be inside a Lane
               return false;
             }
           }
         }
-        
+
         return true;
       },
       action: (context: any) => {
-        console.warn("Validation failed: Pool/Lane cannot be placed inside a Lane");
+        console.warn(
+          "Validation failed: Pool/Lane cannot be placed inside a Lane"
+        );
       },
     },
   },
@@ -854,9 +867,10 @@ const defaultContextMenus: Array<{
         {
           id: "toggle-lock",
           label: "Toggle Lock Mode",
-          icon: "🔒",
+          icon: { type: "lucide", value: LockOpen },
           onClick: async (context: ContextMenuContext) => {
-            const action = contextMenuActionsRegistry.getAction("updateNodeData");
+            const action =
+              contextMenuActionsRegistry.getAction("updateNodeData");
             if (action && context.nodeId && context.node) {
               const currentLockState = context.node.data?.isLocked ?? false;
               action(context.nodeId, { isLocked: !currentLockState });
@@ -866,12 +880,15 @@ const defaultContextMenus: Array<{
         {
           id: "switch-orientation",
           label: "Switch Orientation",
-          icon: "🔄",
+          icon: { type: "lucide", value: FlipVertical },
           onClick: async (context: ContextMenuContext) => {
-            const action = contextMenuActionsRegistry.getAction("updateNodeData");
+            const action =
+              contextMenuActionsRegistry.getAction("updateNodeData");
             if (action && context.nodeId && context.node) {
-              const currentOrientation = context.node.data?.orientation || "horizontal";
-              const newOrientation = currentOrientation === "horizontal" ? "vertical" : "horizontal";
+              const currentOrientation =
+                context.node.data?.orientation || "horizontal";
+              const newOrientation =
+                currentOrientation === "horizontal" ? "vertical" : "horizontal";
               action(context.nodeId, { orientation: newOrientation });
             }
           },
@@ -884,7 +901,7 @@ const defaultContextMenus: Array<{
         {
           id: "delete-pool-lane",
           label: "Delete",
-          icon: "🗑️",
+          icon: { type: "lucide", value: Trash2, color: "red" },
           onClick: async (context: ContextMenuContext) => {
             const action = contextMenuActionsRegistry.getAction("deleteNode");
             if (action && context.nodeId) {

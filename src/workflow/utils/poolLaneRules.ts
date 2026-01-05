@@ -11,9 +11,9 @@ import type { BaseNodeConfig, DynamicStyle } from "@/core/types/base.types";
 function getContainerWidth(container: BaseNodeConfig): number {
   const nodeStyle = container.style as DynamicStyle | undefined;
   const dataStyle = container.data?.style as DynamicStyle | undefined;
-  
+
   const width = nodeStyle?.width ?? dataStyle?.width ?? 800;
-  return typeof width === 'number' ? width : 800;
+  return typeof width === "number" ? width : 800;
 }
 
 /**
@@ -22,9 +22,9 @@ function getContainerWidth(container: BaseNodeConfig): number {
 function getContainerHeight(container: BaseNodeConfig): number {
   const nodeStyle = container.style as DynamicStyle | undefined;
   const dataStyle = container.data?.style as DynamicStyle | undefined;
-  
+
   const height = nodeStyle?.height ?? dataStyle?.height ?? 300;
-  return typeof height === 'number' ? height : 300;
+  return typeof height === "number" ? height : 300;
 }
 
 /**
@@ -85,16 +85,14 @@ export function canLaneEnterPool(
 
   // Get all children of the pool (excluding the lane being checked)
   const poolChildren = allNodes.filter(
-    n => n.parentNode === pool.id && n.id !== lane.id
+    n => n.parentId === pool.id && n.id !== lane.id
   );
 
   // Check if pool has lanes
   const hasLanes = poolChildren.some(n => isLaneNode(n));
 
   // Check if pool has normal nodes (non-lane, non-pool)
-  const hasNodes = poolChildren.some(
-    n => !isLaneNode(n) && !isPoolNode(n)
-  );
+  const hasNodes = poolChildren.some(n => !isLaneNode(n) && !isPoolNode(n));
 
   // RULE 2 VALIDATION:
   // If pool has nodes but no lanes → BLOCK
@@ -123,7 +121,7 @@ export function canLaneExistStandalone(lane: BaseNodeConfig): {
   }
 
   // Lane without parent is NOT allowed
-  if (!lane.parentNode) {
+  if (!lane.parentId) {
     return {
       allowed: false,
       reason:
@@ -165,12 +163,12 @@ export function canLaneBeDragged(
   }
 
   // If lane has no parent, it can be dragged (will be caught by Rule 3)
-  if (!lane.parentNode) {
+  if (!lane.parentId) {
     return true;
   }
 
   // Find parent
-  const parent = allNodes.find(n => n.id === lane.parentNode);
+  const parent = allNodes.find(n => n.id === lane.parentId);
 
   // If parent is Pool, lane should NOT be draggable
   if (parent && isPoolNode(parent)) {

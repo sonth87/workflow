@@ -26,17 +26,21 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
     (e: React.MouseEvent) => {
       e.stopPropagation();
       const newLockState = !isLocked;
-      
-      // Update pool lock state
+
+      // Update pool lock state in both data and properties
       updateNode(id, {
         data: {
           ...data,
           isLocked: newLockState,
         },
+        properties: {
+          ...data.properties,
+          isLocked: newLockState,
+        },
       });
-      
+
       // Update all children nodes to set/clear extent based on lock state
-      const childrenNodes = nodes.filter(n => n.parentNode === id);
+      const childrenNodes = nodes.filter(n => n.parentId === id);
       childrenNodes.forEach(child => {
         updateNode(child.id, {
           extent: newLockState ? ("parent" as const) : undefined,
@@ -136,7 +140,11 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
           <button
             onClick={handleToggleLock}
             className="p-1.5 hover:bg-blue-100 rounded transition-colors"
-            title={isLocked ? "Unlock (cho phép kéo ra)" : "Lock (giữ nodes bên trong)"}
+            title={
+              isLocked
+                ? "Unlock (cho phép kéo ra)"
+                : "Lock (giữ nodes bên trong)"
+            }
           >
             {isLocked ? (
               <Lock size={16} className="text-blue-600" />
@@ -147,11 +155,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
           <button
             onClick={handleToggleOrientation}
             className="p-1.5 hover:bg-blue-100 rounded transition-colors"
-            title={
-              isHorizontal
-                ? "Chuyển sang dọc"
-                : "Chuyển sang ngang"
-            }
+            title={isHorizontal ? "Chuyển sang dọc" : "Chuyển sang ngang"}
           >
             {isHorizontal ? (
               <FlipVertical size={16} className="text-blue-600" />
