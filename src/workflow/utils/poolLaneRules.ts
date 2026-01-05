@@ -1,6 +1,7 @@
 /**
  * Pool & Lane Business Rules
- * Centralized validation logic for Pool and Lane containers
+ * Centralized validation logic for Pool containers
+ * Note: Lanes are now rendered as sections within Pool, not separate nodes
  */
 
 import type { BaseNodeConfig, DynamicStyle } from "@/core/types/base.types";
@@ -36,14 +37,16 @@ function isPoolNode(node: BaseNodeConfig): boolean {
 
 /**
  * Helper function to check if a node is a lane
+ * Note: This is deprecated as lanes are no longer separate nodes
+ * @deprecated Lanes are now sections within Pool
  */
 function isLaneNode(node: BaseNodeConfig): boolean {
   return node.type === "lane" || node.data?.nodeType === "lane";
 }
 
 /**
- * Rule 1: Check if a normal node can enter a Pool or Lane container
- * Normal nodes (tasks, events, gateways, etc.) can freely enter Pool/Lane
+ * Rule 1: Check if a normal node can enter a Pool container
+ * Normal nodes (tasks, events, gateways, etc.) can freely enter Pool
  */
 export function canNodeEnterContainer(
   node: BaseNodeConfig,
@@ -54,8 +57,8 @@ export function canNodeEnterContainer(
     return false;
   }
 
-  // Container must be pool or lane
-  if (!isPoolNode(container) && !isLaneNode(container)) {
+  // Container must be pool
+  if (!isPoolNode(container)) {
     return false;
   }
 
@@ -63,54 +66,24 @@ export function canNodeEnterContainer(
 }
 
 /**
- * Rule 2: Check if a Lane can enter a Pool
- * Lane can only enter Pool if:
- * - Pool is empty (no children), OR
- * - Pool already has Lanes (can add more lanes)
- * - Pool CANNOT have only Nodes (without lanes)
+ * Rule 2: Lane node functionality is deprecated
+ * Lanes are now rendered as sections within Pool component
+ * @deprecated
  */
 export function canLaneEnterPool(
   lane: BaseNodeConfig,
   pool: BaseNodeConfig,
   allNodes: BaseNodeConfig[]
 ): { allowed: boolean; reason?: string } {
-  // Must be lane and pool
-  if (!isLaneNode(lane)) {
-    return { allowed: false, reason: "Source must be a Lane" };
-  }
-
-  if (!isPoolNode(pool)) {
-    return { allowed: false, reason: "Target must be a Pool" };
-  }
-
-  // Get all children of the pool (excluding the lane being checked)
-  const poolChildren = allNodes.filter(
-    n => n.parentId === pool.id && n.id !== lane.id
-  );
-
-  // Check if pool has lanes
-  const hasLanes = poolChildren.some(n => isLaneNode(n));
-
-  // Check if pool has normal nodes (non-lane, non-pool)
-  const hasNodes = poolChildren.some(n => !isLaneNode(n) && !isPoolNode(n));
-
-  // RULE 2 VALIDATION:
-  // If pool has nodes but no lanes → BLOCK
-  if (hasNodes && !hasLanes) {
-    return {
-      allowed: false,
-      reason:
-        "Lane chỉ được kéo vào Pool trống hoặc Pool đã có Lane. Pool này đã có Nodes.",
-    };
-  }
-
-  // Otherwise allow (pool is empty OR pool has lanes)
-  return { allowed: true };
+  return {
+    allowed: false,
+    reason: "Lane nodes are deprecated. Lanes are now sections within Pool.",
+  };
 }
 
 /**
- * Rule 3: Check if Lane can exist standalone on canvas
- * Lane MUST be inside a Pool, cannot exist independently
+ * Rule 3: Lane node functionality is deprecated
+ * @deprecated
  */
 export function canLaneExistStandalone(lane: BaseNodeConfig): {
   allowed: boolean;
@@ -120,20 +93,15 @@ export function canLaneExistStandalone(lane: BaseNodeConfig): {
     return { allowed: true }; // Not a lane, not our concern
   }
 
-  // Lane without parent is NOT allowed
-  if (!lane.parentId) {
-    return {
-      allowed: false,
-      reason:
-        "Lane phải được đặt bên trong Pool. Vui lòng kéo Lane vào một Pool.",
-    };
-  }
-
-  return { allowed: true };
+  return {
+    allowed: false,
+    reason: "Lane nodes are deprecated. Use Pool with lane sections instead.",
+  };
 }
 
 /**
- * Rule 3b: Prevent Lane from being dropped directly on canvas from Toolbox
+ * Rule 3b: Prevent Lane from being dropped on canvas
+ * Lane nodes are deprecated in favor of Pool sections
  */
 export function canLaneBeDroppedOnCanvas(nodeType: string): {
   allowed: boolean;
@@ -143,7 +111,7 @@ export function canLaneBeDroppedOnCanvas(nodeType: string): {
     return {
       allowed: false,
       reason:
-        "Lane không thể được kéo trực tiếp ra canvas. Vui lòng kéo Lane vào Pool.",
+        "Lane không còn được hỗ trợ như node riêng. Sử dụng Pool và thêm lanes bên trong.",
     };
   }
 
@@ -151,8 +119,8 @@ export function canLaneBeDroppedOnCanvas(nodeType: string): {
 }
 
 /**
- * Rule 4: Check if Lane inside Pool can be dragged
- * Lanes inside Pool should not be draggable (only Pool can be dragged)
+ * Rule 4: Lane drag functionality is deprecated
+ * @deprecated
  */
 export function canLaneBeDragged(
   lane: BaseNodeConfig,
@@ -162,20 +130,8 @@ export function canLaneBeDragged(
     return true; // Not a lane, can be dragged normally
   }
 
-  // If lane has no parent, it can be dragged (will be caught by Rule 3)
-  if (!lane.parentId) {
-    return true;
-  }
-
-  // Find parent
-  const parent = allNodes.find(n => n.id === lane.parentId);
-
-  // If parent is Pool, lane should NOT be draggable
-  if (parent && isPoolNode(parent)) {
-    return false;
-  }
-
-  return true;
+  // Lane nodes should not be draggable (deprecated)
+  return false;
 }
 
 /**

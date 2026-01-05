@@ -10,7 +10,6 @@ import {
 } from "./GatewayNodes";
 import { NoteNode } from "./NoteNode";
 import PoolNode from "./PoolNode";
-import LaneNode from "./LaneNode";
 import {
   NotificationNode,
   ServiceTaskNode,
@@ -131,7 +130,6 @@ export const nodeTypes = {
   ),
   [NodeType.SUBFLOW]: wrapWithBaseNode(SubflowNode, NodeType.SUBFLOW),
   [NodeType.POOL]: PoolNode,
-  [NodeType.LANE]: LaneNode,
   [NodeType.NOTE]: NoteNode,
   [NodeType.ANNOTATION]: AnnotationNode,
 };

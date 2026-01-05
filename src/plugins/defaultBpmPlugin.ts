@@ -31,6 +31,9 @@ import {
   DiamondPlus,
   FlipVertical,
   LockOpen,
+  Palette,
+  PanelTopBottomDashed,
+  Plus,
   Trash2,
 } from "lucide-react";
 
@@ -333,7 +336,7 @@ const defaultNodes: PluginConfig["nodes"] = [
       nodeType: NodeType.POOL, // Store nodeType in config
       icon: {
         type: "lucide",
-        value: ClipboardList,
+        value: PanelTopBottomDashed,
         backgroundColor: "#3b82f6",
         color: "#ffffff",
       },
@@ -342,31 +345,17 @@ const defaultNodes: PluginConfig["nodes"] = [
       properties: {
         isLocked: false,
         orientation: "horizontal",
-        lanes: [],
-      },
-    },
-  },
-  // Lane Node
-  {
-    id: NodeType.LANE,
-    type: NodeType.LANE,
-    name: "Lane",
-    config: {
-      ...createDefaultNodeConfig(NodeType.LANE, CategoryType.OTHER, {
-        title: "Lane",
-        description: "Swimlane for organizing workflow elements by role",
-      }),
-      icon: {
-        type: "lucide",
-        value: DiamondPlus,
-        backgroundColor: "#10b981",
-        color: "#ffffff",
-      },
-      resizable: true,
-      draggable: true,
-      properties: {
-        isLocked: false,
-        orientation: "horizontal",
+        color: "yellow",
+        lanes: [
+          {
+            id: "lane-1",
+            label: "Lane 1",
+          },
+          {
+            id: "lane-2",
+            label: "Lane 2",
+          },
+        ],
       },
     },
   },
@@ -600,14 +589,14 @@ const defaultRules: Array<{
       condition: (context: any) => {
         const { node, nodes } = context;
 
-        // If this is a Pool or Lane trying to be a child of a Lane
-        if (node.type === NodeType.POOL || node.type === NodeType.LANE) {
+        // If this is a Pool trying to be a child (Pools cannot be nested)
+        if (node.type === NodeType.POOL) {
           if (node.parentId) {
             const parent = nodes.find(
               (n: BaseNodeConfig) => n.id === node.parentId
             );
-            if (parent && parent.type === NodeType.LANE) {
-              // Pool/Lane cannot be inside a Lane
+            if (parent && parent.type === NodeType.POOL) {
+              // Pool cannot be inside another Pool
               return false;
             }
           }
@@ -617,7 +606,7 @@ const defaultRules: Array<{
       },
       action: (context: any) => {
         console.warn(
-          "Validation failed: Pool/Lane cannot be placed inside a Lane"
+          "Validation failed: Pool cannot be nested inside another Pool"
         );
       },
     },
@@ -865,6 +854,132 @@ const defaultContextMenus: Array<{
       targetNodeTypes: ["pool", "lane"],
       items: [
         {
+          id: "add-lane",
+          label: "Add Lane",
+          icon: { type: "lucide", value: Plus },
+          onClick: async (context: ContextMenuContext) => {
+            const action =
+              contextMenuActionsRegistry.getAction("updateNodeData");
+            if (action && context.nodeId && context.node) {
+              const currentLanes =
+                (context.node.data?.lanes as Array<{
+                  id: string;
+                  label: string;
+                }>) || [];
+              const newLane = {
+                id: `lane-${Date.now()}`,
+                label: `Lane ${currentLanes.length + 1}`,
+              };
+              action(context.nodeId, { lanes: [...currentLanes, newLane] });
+            }
+          },
+          visible: (context: ContextMenuContext) =>
+            context.node?.type === "pool",
+        },
+        {
+          id: "separator-colors",
+          label: "",
+          separator: true,
+        },
+        {
+          id: "color-submenu",
+          label: "Change Color",
+          icon: { type: "lucide", value: Palette },
+          children: [
+            {
+              id: "color-yellow",
+              label: "Yellow",
+              color: "#fde68a",
+              onClick: async (context: ContextMenuContext) => {
+                const action =
+                  contextMenuActionsRegistry.getAction("updateNodeData");
+                if (action && context.nodeId) {
+                  action(context.nodeId, { color: "yellow" });
+                }
+              },
+            },
+            {
+              id: "color-blue",
+              label: "Blue",
+              color: "#bfdbfe",
+              onClick: async (context: ContextMenuContext) => {
+                const action =
+                  contextMenuActionsRegistry.getAction("updateNodeData");
+                if (action && context.nodeId) {
+                  action(context.nodeId, { color: "blue" });
+                }
+              },
+            },
+            {
+              id: "color-green",
+              label: "Green",
+              color: "#d9f99d",
+              onClick: async (context: ContextMenuContext) => {
+                const action =
+                  contextMenuActionsRegistry.getAction("updateNodeData");
+                if (action && context.nodeId) {
+                  action(context.nodeId, { color: "green" });
+                }
+              },
+            },
+            {
+              id: "color-pink",
+              label: "Pink",
+              color: "#fecdd3",
+              onClick: async (context: ContextMenuContext) => {
+                const action =
+                  contextMenuActionsRegistry.getAction("updateNodeData");
+                if (action && context.nodeId) {
+                  action(context.nodeId, { color: "pink" });
+                }
+              },
+            },
+            {
+              id: "color-purple",
+              label: "Purple",
+              color: "#ddd6fe",
+              onClick: async (context: ContextMenuContext) => {
+                const action =
+                  contextMenuActionsRegistry.getAction("updateNodeData");
+                if (action && context.nodeId) {
+                  action(context.nodeId, { color: "purple" });
+                }
+              },
+            },
+            {
+              id: "color-orange",
+              label: "Orange",
+              color: "#fed7aa",
+              onClick: async (context: ContextMenuContext) => {
+                const action =
+                  contextMenuActionsRegistry.getAction("updateNodeData");
+                if (action && context.nodeId) {
+                  action(context.nodeId, { color: "orange" });
+                }
+              },
+            },
+            {
+              id: "color-gray",
+              label: "Gray",
+              color: "#e4e4e7",
+              onClick: async (context: ContextMenuContext) => {
+                const action =
+                  contextMenuActionsRegistry.getAction("updateNodeData");
+                if (action && context.nodeId) {
+                  action(context.nodeId, { color: "gray" });
+                }
+              },
+            },
+          ],
+          visible: (context: ContextMenuContext) =>
+            context.node?.type === "pool",
+        },
+        {
+          id: "separator-1",
+          label: "",
+          separator: true,
+        },
+        {
           id: "toggle-lock",
           label: "Toggle Lock Mode",
           icon: { type: "lucide", value: LockOpen },
@@ -894,7 +1009,7 @@ const defaultContextMenus: Array<{
           },
         },
         {
-          id: "separator-1",
+          id: "separator-2",
           label: "",
           separator: true,
         },

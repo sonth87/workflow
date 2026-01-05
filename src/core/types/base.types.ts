@@ -477,6 +477,16 @@ export interface RegistryItem<T = unknown> {
 export type PoolLaneOrientation = "horizontal" | "vertical";
 
 /**
+ * Lane configuration within a Pool
+ */
+export interface LaneConfig {
+  id: string; // Unique identifier for this lane section
+  label: string; // Display label for the lane
+  size?: number; // Size in pixels (width for vertical, height for horizontal)
+  minSize?: number; // Minimum size constraint
+}
+
+/**
  * Pool Node Data - Container that can have multiple lanes
  */
 export interface PoolNodeData extends BaseNodeConfig {
@@ -484,14 +494,17 @@ export interface PoolNodeData extends BaseNodeConfig {
   // Pool specific properties
   isLocked?: boolean; // Lock mode - nodes cannot escape pool
   orientation?: PoolLaneOrientation; // horizontal or vertical layout
-  lanes?: string[]; // Array of lane IDs contained in this pool
+  lanes?: LaneConfig[]; // Array of lane configurations (sections within the pool)
+  color?: string; // Background color for the pool
   minWidth?: number;
   minHeight?: number;
   resizable?: boolean;
 }
 
 /**
- * Lane Node Data - Container inside pool or standalone
+ * Lane Node Data - DEPRECATED
+ * Lanes are now rendered as sections within Pool component
+ * @deprecated Use Pool with LaneConfig sections instead
  */
 export interface LaneNodeData extends BaseNodeConfig {
   nodeType: "lane";

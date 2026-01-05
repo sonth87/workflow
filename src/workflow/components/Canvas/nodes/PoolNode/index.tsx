@@ -1,11 +1,91 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { type NodeProps } from "@xyflow/react";
-import { cn } from "@sth87/shadcn-design-system";
-import type { PoolNodeData } from "@/core/types/base.types";
-import { Lock, Unlock, FlipHorizontal, FlipVertical } from "lucide-react";
+import { cn, Popover } from "@sth87/shadcn-design-system";
+import type { PoolNodeData, LaneConfig } from "@/core/types/base.types";
+import {
+  Lock,
+  Unlock,
+  FlipHorizontal,
+  FlipVertical,
+  Plus,
+  Palette,
+} from "lucide-react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { globalEventBus } from "@/core/events/EventBus";
 import NodeResizer from "../../resizer";
+
+const poolColorClasses = {
+  yellow: {
+    bg: "bg-[#fde68a]/10",
+    border: "border-[#fbbf24]",
+    header: "bg-[#fef3c7]",
+    headerBorder: "border-[#fbbf24]",
+    text: "text-[#78350f]",
+    lane: "bg-[#fef3c7]/10",
+    laneText: "text-[#92400e]",
+    laneBg: "bg-[#fef3c7]/60",
+  },
+  blue: {
+    bg: "bg-[#bfdbfe]/10",
+    border: "border-[#60a5fa]",
+    header: "bg-[#dbeafe]",
+    headerBorder: "border-[#60a5fa]",
+    text: "text-[#1e3a8a]",
+    lane: "bg-[#dbeafe]/10",
+    laneText: "text-[#1e40af]",
+    laneBg: "bg-[#dbeafe]/60",
+  },
+  green: {
+    bg: "bg-[#d9f99d]/10",
+    border: "border-[#84cc16]",
+    header: "bg-[#ecfccb]",
+    headerBorder: "border-[#84cc16]",
+    text: "text-[#365314]",
+    lane: "bg-[#ecfccb]/10",
+    laneText: "text-[#3f6212]",
+    laneBg: "bg-[#ecfccb]/60",
+  },
+  pink: {
+    bg: "bg-[#fecdd3]/10",
+    border: "border-[#fb7185]",
+    header: "bg-[#ffe4e6]",
+    headerBorder: "border-[#fb7185]",
+    text: "text-[#881337]",
+    lane: "bg-[#ffe4e6]/10",
+    laneText: "text-[#9f1239]",
+    laneBg: "bg-[#ffe4e6]/60",
+  },
+  purple: {
+    bg: "bg-[#ddd6fe]/10",
+    border: "border-[#a78bfa]",
+    header: "bg-[#ede9fe]",
+    headerBorder: "border-[#a78bfa]",
+    text: "text-[#4c1d95]",
+    lane: "bg-[#ede9fe]/10",
+    laneText: "text-[#5b21b6]",
+    laneBg: "bg-[#ede9fe]/60",
+  },
+  orange: {
+    bg: "bg-[#fed7aa]/10",
+    border: "border-[#fb923c]",
+    header: "bg-[#ffedd5]",
+    headerBorder: "border-[#fb923c]",
+    text: "text-[#7c2d12]",
+    lane: "bg-[#ffedd5]/10",
+    laneText: "text-[#9a3412]",
+    laneBg: "bg-[#ffedd5]/60",
+  },
+  gray: {
+    bg: "bg-[#e4e4e7]/10",
+    border: "border-[#d4d4d8]",
+    header: "bg-[#f4f4f5]",
+    headerBorder: "border-[#d4d4d8]",
+    text: "text-[#27272a]",
+    lane: "bg-[#f4f4f5]/10",
+    laneText: "text-[#3f3f46]",
+    laneBg: "bg-[#f4f4f5]/60",
+  },
+};
 
 export interface PoolNodeProps extends NodeProps {
   data: PoolNodeData;
@@ -16,6 +96,15 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
 
   const isHorizontal = data.orientation === "horizontal" || !data.orientation;
   const isLocked = data.isLocked ?? false;
+  const color = (data.color as keyof typeof poolColorClasses) || "gray";
+  const colorScheme = poolColorClasses[color];
+
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [editingLaneId, setEditingLaneId] = useState<string | null>(null);
+  const [editingLabel, setEditingLabel] = useState("");
+  const [resizingLaneIndex, setResizingLaneIndex] = useState<number | null>(
+    null
+  );
 
   // Default dimensions
   const defaultWidth = isHorizontal ? 800 : 300;
@@ -23,6 +112,174 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
 
   const minWidth = data.minWidth ?? defaultWidth;
   const minHeight = data.minHeight ?? defaultHeight;
+
+  // Check if pool has any child nodes
+  const hasChildNodes = useMemo(() => {
+    return nodes.some(n => n.parentId === id);
+  }, [nodes, id]);
+
+  // Calculate lane positions and sizes
+  const laneLayout = useMemo(() => {
+    if (!data.lanes || data.lanes.length === 0) return [];
+
+    const lanes = data.lanes;
+    const totalLanes = lanes.length;
+
+    // Get pool dimensions (from node width/height)
+    const poolNode = nodes.find(n => n.id === id);
+    const poolWidth = poolNode?.measured?.width ?? defaultWidth;
+    const poolHeight = poolNode?.measured?.height ?? defaultHeight;
+
+    // Subtract label bar size
+    const labelSize = 32; // 8 * 4 = 32px for label bar
+    const availableWidth = isHorizontal ? poolWidth - labelSize : poolWidth;
+    const availableHeight = isHorizontal ? poolHeight : poolHeight - labelSize;
+
+    let currentOffset = 0;
+
+    return lanes.map(lane => {
+      // Calculate size for this lane
+      let size: number;
+      if (lane.size !== undefined) {
+        size = lane.size;
+      } else {
+        // Distribute evenly
+        const totalSpace = isHorizontal ? availableHeight : availableWidth;
+        size = totalSpace / totalLanes;
+      }
+
+      const position = currentOffset;
+      currentOffset += size;
+
+      return {
+        ...lane,
+        position,
+        size,
+      };
+    });
+  }, [data.lanes, nodes, id, isHorizontal, defaultWidth, defaultHeight]);
+
+  const handleAddLane = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      const newLane: LaneConfig = {
+        id: `lane-${Date.now()}`,
+        label: `Lane ${(data.lanes?.length ?? 0) + 1}`,
+      };
+
+      updateNode(id, {
+        data: {
+          ...data,
+          lanes: [...(data.lanes ?? []), newLane],
+        },
+      });
+    },
+    [id, data, updateNode]
+  );
+
+  const handleColorChange = useCallback(
+    (newColor: keyof typeof poolColorClasses) => {
+      updateNode(id, {
+        data: {
+          ...data,
+          color: newColor,
+        },
+      });
+      setShowColorPicker(false);
+    },
+    [id, data, updateNode]
+  );
+
+  const handleLaneLabelDoubleClick = useCallback(
+    (lane: LaneConfig, e: React.MouseEvent) => {
+      e.stopPropagation();
+      setEditingLaneId(lane.id);
+      setEditingLabel(lane.label);
+    },
+    []
+  );
+
+  const handleLaneLabelChange = useCallback(
+    (laneId: string, newLabel: string) => {
+      const updatedLanes = data.lanes?.map(l =>
+        l.id === laneId ? { ...l, label: newLabel } : l
+      );
+      updateNode(id, {
+        data: {
+          ...data,
+          lanes: updatedLanes,
+        },
+      });
+      setEditingLaneId(null);
+    },
+    [id, data, updateNode]
+  );
+
+  const handleLaneLabelBlur = useCallback(() => {
+    if (editingLaneId) {
+      handleLaneLabelChange(editingLaneId, editingLabel);
+    }
+  }, [editingLaneId, editingLabel, handleLaneLabelChange]);
+
+  const handleLaneLabelKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleLaneLabelBlur();
+      } else if (e.key === "Escape") {
+        setEditingLaneId(null);
+      }
+    },
+    [handleLaneLabelBlur]
+  );
+
+  const handleDividerMouseDown = useCallback(
+    (laneIndex: number, e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      setResizingLaneIndex(laneIndex);
+
+      const startPos = isHorizontal ? e.clientY : e.clientX;
+      const startSize = laneLayout[laneIndex].size;
+      const nextStartSize = laneLayout[laneIndex + 1]?.size || 0;
+
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const currentPos = isHorizontal ? moveEvent.clientY : moveEvent.clientX;
+        const delta = currentPos - startPos;
+        const newSize = Math.max(
+          data.lanes?.[laneIndex]?.minSize || 50,
+          startSize + delta
+        );
+        const newNextSize = Math.max(
+          data.lanes?.[laneIndex + 1]?.minSize || 50,
+          nextStartSize - delta
+        );
+
+        const updatedLanes = data.lanes?.map((l, idx) => {
+          if (idx === laneIndex) return { ...l, size: newSize };
+          if (idx === laneIndex + 1) return { ...l, size: newNextSize };
+          return l;
+        });
+
+        updateNode(id, {
+          data: {
+            ...data,
+            lanes: updatedLanes,
+          },
+        });
+      };
+
+      const handleMouseUp = () => {
+        setResizingLaneIndex(null);
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    },
+    [laneLayout, data, id, isHorizontal, updateNode]
+  );
 
   const handleToggleLock = useCallback(
     (e: React.MouseEvent) => {
@@ -57,8 +314,10 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
       e.stopPropagation();
       const newOrientation = isHorizontal ? "vertical" : "horizontal";
       updateNode(id, {
-        ...data,
-        orientation: newOrientation,
+        data: {
+          ...data,
+          orientation: newOrientation,
+        },
       });
     },
     [id, data, isHorizontal, updateNode]
@@ -79,27 +338,28 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
       selected={selected}
       minWidth={minWidth}
       minHeight={minHeight}
-      // style={{
-      //   width: data.style?.width ?? defaultWidth,
-      //   height: data.style?.height ?? defaultHeight,
-      // }}
       className={cn(
-        "bg-blue-50/30 border-2 border-blue-300 rounded-lg overflow-visible",
-        {
-          "border-blue-500 ring-4 ring-blue-500/25": selected,
-        }
+        colorScheme.bg,
+        "border",
+        colorScheme.border,
+        "rounded-lg overflow-visible"
       )}
     >
       {/* Pool Header - Vertical label bar */}
       <div
         className={cn(
-          "absolute bg-blue-200 border-blue-400 flex items-center justify-center font-semibold text-blue-800 text-sm z-10",
+          "absolute",
+          colorScheme.header,
+          colorScheme.headerBorder,
+          "flex items-center justify-center font-semibold",
+          colorScheme.text,
+          "text-sm z-10",
           {
             // Horizontal: Label on left side (vertical bar)
-            "top-0 left-0 h-full w-8 border-r-2 writing-mode-vertical":
+            "top-0 left-0 h-full w-8 border-r writing-mode-vertical rounded-l-lg":
               isHorizontal,
             // Vertical: Label on top (horizontal bar)
-            "top-0 left-0 w-full h-8 border-b-2": !isHorizontal,
+            "top-0 left-0 w-full h-8 border-b-2 rounded-t-lg": !isHorizontal,
           }
         )}
       >
@@ -126,45 +386,179 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
           "left-0 top-8 right-0 bottom-0": !isHorizontal,
         })}
       >
-        {/* Empty state hint */}
-        {(!data.lanes || data.lanes.length === 0) && (
-          <div className="flex items-center justify-center h-full text-blue-400 text-sm">
-            {isLocked
-              ? "Kéo nodes vào đây (chế độ khóa)"
-              : "Kéo nodes vào/ra tự do"}
-          </div>
-        )}
+        {/* Render lanes */}
+        {laneLayout.length > 0
+          ? laneLayout.map((lane, index) => (
+              <div
+                key={lane.id}
+                className={cn(
+                  "absolute",
+                  colorScheme.border,
+                  colorScheme.lane,
+                  {
+                    "border-b-2": isHorizontal && index < laneLayout.length - 1,
+                    "border-r-2":
+                      !isHorizontal && index < laneLayout.length - 1,
+                  }
+                )}
+                style={
+                  isHorizontal
+                    ? {
+                        left: 0,
+                        right: 0,
+                        top: lane.position,
+                        height: lane.size,
+                      }
+                    : {
+                        top: 0,
+                        bottom: 0,
+                        left: lane.position,
+                        width: lane.size,
+                      }
+                }
+              >
+                {/* Lane Label */}
+                <div
+                  className={cn(
+                    "absolute text-xs font-medium",
+                    colorScheme.laneText,
+                    "flex items-center justify-center",
+                    colorScheme.laneBg,
+                    "px-2 rounded",
+                    {
+                      "left-2 top-2": true,
+                    }
+                  )}
+                  onDoubleClick={e => handleLaneLabelDoubleClick(lane, e)}
+                  style={{
+                    cursor: editingLaneId === lane.id ? "text" : "pointer",
+                  }}
+                >
+                  {editingLaneId === lane.id ? (
+                    <input
+                      type="text"
+                      value={editingLabel}
+                      onChange={e => setEditingLabel(e.target.value)}
+                      onBlur={handleLaneLabelBlur}
+                      onKeyDown={handleLaneLabelKeyDown}
+                      autoFocus
+                      className={cn(
+                        "bg-transparent border-none outline-none text-xs font-medium",
+                        colorScheme.laneText,
+                        "w-20"
+                      )}
+                      onClick={e => e.stopPropagation()}
+                    />
+                  ) : (
+                    <span>{lane.label}</span>
+                  )}
+                </div>
+
+                {/* Lane Resize Divider */}
+                {index < laneLayout.length - 1 && (
+                  <div
+                    className={cn(
+                      "absolute z-50 hover:bg-blue-400/50 transition-colors nodrag",
+                      {
+                        "bottom-0 left-0 right-0 h-1 cursor-row-resize":
+                          isHorizontal,
+                        "right-0 top-0 bottom-0 w-1 cursor-col-resize":
+                          !isHorizontal,
+                        "bg-blue-400/30": resizingLaneIndex === index,
+                      }
+                    )}
+                    onMouseDown={e => handleDividerMouseDown(index, e)}
+                    title="Drag to resize"
+                  />
+                )}
+              </div>
+            ))
+          : /* Empty state hint - only show if no lanes AND no children */
+            !hasChildNodes && (
+              <div
+                className={cn(
+                  "flex items-center justify-center h-full text-sm",
+                  colorScheme.text
+                )}
+              >
+                Nhấn + để thêm lanes
+              </div>
+            )}
       </div>
 
-      {/* Toolbar - Floating controls */}
+      {/* Toolbar - Floating controls (like NoteNode) */}
       {selected && (
-        <div className="absolute top-2 right-2 flex gap-1 bg-white/90 backdrop-blur-sm border border-blue-300 rounded-md p-1 shadow-sm z-20">
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex gap-1 bg-background rounded-md shadow-sm p-1 nodrag z-20">
+          <button
+            onClick={handleAddLane}
+            className="p-1 hover:bg-accent rounded transition-colors"
+            title="Thêm lane mới"
+          >
+            <Plus size={16} />
+          </button>
           <button
             onClick={handleToggleLock}
-            className="p-1.5 hover:bg-blue-100 rounded transition-colors"
+            className="p-1 hover:bg-accent rounded transition-colors"
             title={
               isLocked
                 ? "Unlock (cho phép kéo ra)"
                 : "Lock (giữ nodes bên trong)"
             }
           >
-            {isLocked ? (
-              <Lock size={16} className="text-blue-600" />
-            ) : (
-              <Unlock size={16} className="text-blue-400" />
-            )}
+            {isLocked ? <Lock size={16} /> : <Unlock size={16} />}
           </button>
           <button
             onClick={handleToggleOrientation}
-            className="p-1.5 hover:bg-blue-100 rounded transition-colors"
+            className="p-1 hover:bg-accent rounded transition-colors"
             title={isHorizontal ? "Chuyển sang dọc" : "Chuyển sang ngang"}
           >
             {isHorizontal ? (
-              <FlipVertical size={16} className="text-blue-600" />
+              <FlipVertical size={16} />
             ) : (
-              <FlipHorizontal size={16} className="text-blue-600" />
+              <FlipHorizontal size={16} />
             )}
           </button>
+
+          {/* Color Picker */}
+          <Popover
+            open={showColorPicker}
+            onOpenChange={setShowColorPicker}
+            className="py-2 px-3"
+            trigger={
+              <button
+                onClick={() => setShowColorPicker(!showColorPicker)}
+                className="p-1 hover:bg-accent rounded transition-colors"
+                title="Change color"
+              >
+                <Palette className="w-4 h-4" />
+              </button>
+            }
+            content={
+              <div className="flex gap-1">
+                {[
+                  { key: "yellow", bg: "bg-[#fde68a]" },
+                  { key: "blue", bg: "bg-[#bfdbfe]" },
+                  { key: "green", bg: "bg-[#d9f99d]" },
+                  { key: "pink", bg: "bg-[#fecdd3]" },
+                  { key: "purple", bg: "bg-[#ddd6fe]" },
+                  { key: "orange", bg: "bg-[#fed7aa]" },
+                  { key: "gray", bg: "bg-[#e4e4e7]" },
+                ].map(({ key, bg }) => (
+                  <button
+                    key={key}
+                    onClick={() =>
+                      handleColorChange(key as keyof typeof poolColorClasses)
+                    }
+                    className={cn("w-6 h-6 rounded-full border", bg, {
+                      "border-primary ring-primary/50": color === key,
+                      "border-gray-300": color !== key,
+                    })}
+                    title={key}
+                  />
+                ))}
+              </div>
+            }
+          />
         </div>
       )}
     </NodeResizer>
