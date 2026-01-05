@@ -1,9 +1,11 @@
 import { memo, useCallback } from "react";
-import { NodeResizer, type NodeProps } from "@xyflow/react";
+import { type NodeProps } from "@xyflow/react";
 import { cn } from "@sth87/shadcn-design-system";
 import type { PoolNodeData } from "@/core/types/base.types";
 import { Lock, Unlock, FlipHorizontal, FlipVertical } from "lucide-react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
+import { globalEventBus } from "@/core/events/EventBus";
+import NodeResizer from "../../resizer";
 
 export interface PoolNodeProps extends NodeProps {
   data: PoolNodeData;
@@ -19,8 +21,8 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
   const defaultWidth = isHorizontal ? 800 : 300;
   const defaultHeight = isHorizontal ? 300 : 600;
 
-  const minWidth = data.minWidth ?? (isHorizontal ? 400 : 200);
-  const minHeight = data.minHeight ?? (isHorizontal ? 200 : 400);
+  const minWidth = data.minWidth ?? defaultWidth;
+  const minHeight = data.minHeight ?? defaultHeight;
 
   const handleToggleLock = useCallback(
     (e: React.MouseEvent) => {
@@ -62,32 +64,32 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
     [id, data, isHorizontal, updateNode]
   );
 
+  const handleMouseEnter = useCallback(() => {
+    globalEventBus.emit("pool-hover", true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    globalEventBus.emit("pool-hover", false);
+  }, []);
+
   return (
-    <div
+    <NodeResizer
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      selected={selected}
+      minWidth={minWidth}
+      minHeight={minHeight}
+      // style={{
+      //   width: data.style?.width ?? defaultWidth,
+      //   height: data.style?.height ?? defaultHeight,
+      // }}
       className={cn(
-        "relative bg-blue-50/30 border-2 border-blue-300 rounded-lg overflow-visible",
+        "bg-blue-50/30 border-2 border-blue-300 rounded-lg overflow-visible",
         {
           "border-blue-500 ring-4 ring-blue-500/25": selected,
         }
       )}
-      style={{
-        width: data.style?.width ?? defaultWidth,
-        height: data.style?.height ?? defaultHeight,
-        minWidth,
-        minHeight,
-      }}
     >
-      {/* Resizer */}
-      {data.resizable !== false && (
-        <NodeResizer
-          minWidth={minWidth}
-          minHeight={minHeight}
-          isVisible={selected}
-          lineClassName="!border-blue-500"
-          handleClassName="!w-3 !h-3 !bg-blue-500"
-        />
-      )}
-
       {/* Pool Header - Vertical label bar */}
       <div
         className={cn(
@@ -165,7 +167,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
           </button>
         </div>
       )}
-    </div>
+    </NodeResizer>
   );
 }
 

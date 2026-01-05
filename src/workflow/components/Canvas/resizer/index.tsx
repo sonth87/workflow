@@ -8,19 +8,28 @@ type Props = {
   isEditing?: boolean;
   selected?: boolean;
   className?: string;
+  minWidth?: number;
+  minHeight?: number;
 };
 
 const NodeResizer = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
   (props, ref) => {
-    const { onMouseEnter, onMouseLeave, selected, className, isEditing } =
-      props;
+    const {
+      onMouseEnter,
+      onMouseLeave,
+      selected,
+      className,
+      isEditing,
+      minWidth = 150,
+      minHeight = 100,
+    } = props;
 
     return (
       <>
         <NodeResizerRoot
           isVisible={!!selected}
-          minWidth={150}
-          minHeight={100}
+          minWidth={minWidth}
+          minHeight={minHeight}
           handleStyle={{
             width: 8,
             height: 8,
@@ -45,8 +54,8 @@ const NodeResizer = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
           style={{
             width: "100%",
             height: "100%",
-            minWidth: 150,
-            minHeight: 100,
+            minWidth: minWidth,
+            minHeight: minHeight,
           }}
         >
           {props.children}
