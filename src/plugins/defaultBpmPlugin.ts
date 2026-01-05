@@ -317,10 +317,50 @@ const defaultNodes: PluginConfig["nodes"] = [
     id: NodeType.POOL,
     type: NodeType.POOL,
     name: "Pool",
-    config: createDefaultNodeConfig(NodeType.POOL, CategoryType.OTHER, {
-      title: "Pool",
-      description: "Swimlane pool",
-    }),
+    config: {
+      ...createDefaultNodeConfig(NodeType.POOL, CategoryType.OTHER, {
+        title: "Pool",
+        description: "Container for organizing workflow elements by participant",
+      }),
+      nodeType: NodeType.POOL, // Store nodeType in config
+      icon: {
+        type: "lucide",
+        value: ClipboardList,
+        backgroundColor: "#3b82f6",
+        color: "#ffffff",
+      },
+      resizable: true,
+      draggable: true,
+      properties: {
+        isLocked: false,
+        orientation: "horizontal",
+        lanes: [],
+      },
+    },
+  },
+  // Lane Node
+  {
+    id: NodeType.LANE,
+    type: NodeType.LANE,
+    name: "Lane",
+    config: {
+      ...createDefaultNodeConfig(NodeType.LANE, CategoryType.OTHER, {
+        title: "Lane",
+        description: "Swimlane for organizing workflow elements by role",
+      }),
+      icon: {
+        type: "lucide",
+        value: DiamondPlus,
+        backgroundColor: "#10b981",
+        color: "#ffffff",
+      },
+      resizable: true,
+      draggable: true,
+      properties: {
+        isLocked: false,
+        orientation: "horizontal",
+      },
+    },
   },
 ];
 
@@ -533,6 +573,39 @@ const defaultRules: Array<{
         return nodes.some(
           (n: BaseNodeConfig) => n.category === CategoryType.END
         );
+      },
+    },
+  },
+  {
+    id: "pool-lane-containment",
+    type: "validation",
+    name: "Pool/Lane Containment Rule",
+    config: {
+      id: "pool-lane-containment",
+      name: "Pool/Lane Containment Rule",
+      description: "Lane cannot contain Pool or other Lanes. Pool can contain Lanes.",
+      type: "validation",
+      enabled: true,
+      priority: 3,
+      scope: "node",
+      condition: (context: any) => {
+        const { node, nodes } = context;
+        
+        // If this is a Pool or Lane trying to be a child of a Lane
+        if (node.type === NodeType.POOL || node.type === NodeType.LANE) {
+          if (node.parentNode) {
+            const parent = nodes.find((n: BaseNodeConfig) => n.id === node.parentNode);
+            if (parent && parent.type === NodeType.LANE) {
+              // Pool/Lane cannot be inside a Lane
+              return false;
+            }
+          }
+        }
+        
+        return true;
+      },
+      action: (context: any) => {
+        console.warn("Validation failed: Pool/Lane cannot be placed inside a Lane");
       },
     },
   },
@@ -766,6 +839,60 @@ const defaultContextMenus: Array<{
           }
         }
       ),
+    },
+  },
+  {
+    id: "pool-lane-context-menu",
+    type: "context-menu",
+    name: "Pool/Lane Context Menu",
+    config: {
+      id: "pool-lane-context-menu",
+      name: "Pool/Lane Context Menu",
+      targetType: "node",
+      targetNodeTypes: ["pool", "lane"],
+      items: [
+        {
+          id: "toggle-lock",
+          label: "Toggle Lock Mode",
+          icon: "🔒",
+          onClick: async (context: ContextMenuContext) => {
+            const action = contextMenuActionsRegistry.getAction("updateNodeData");
+            if (action && context.nodeId && context.node) {
+              const currentLockState = context.node.data?.isLocked ?? false;
+              action(context.nodeId, { isLocked: !currentLockState });
+            }
+          },
+        },
+        {
+          id: "switch-orientation",
+          label: "Switch Orientation",
+          icon: "🔄",
+          onClick: async (context: ContextMenuContext) => {
+            const action = contextMenuActionsRegistry.getAction("updateNodeData");
+            if (action && context.nodeId && context.node) {
+              const currentOrientation = context.node.data?.orientation || "horizontal";
+              const newOrientation = currentOrientation === "horizontal" ? "vertical" : "horizontal";
+              action(context.nodeId, { orientation: newOrientation });
+            }
+          },
+        },
+        {
+          id: "separator-1",
+          label: "",
+          separator: true,
+        },
+        {
+          id: "delete-pool-lane",
+          label: "Delete",
+          icon: "🗑️",
+          onClick: async (context: ContextMenuContext) => {
+            const action = contextMenuActionsRegistry.getAction("deleteNode");
+            if (action && context.nodeId) {
+              action(context.nodeId);
+            }
+          },
+        },
+      ],
     },
   },
 ];

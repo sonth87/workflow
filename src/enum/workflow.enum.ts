@@ -29,6 +29,7 @@ export enum NodeType {
 
   SUBFLOW = "subflow",
   POOL = "pool",
+  LANE = "lane",
   NOTE = "note",
   ANNOTATION = "annotation",
 }

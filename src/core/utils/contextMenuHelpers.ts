@@ -445,7 +445,8 @@ export function createDefaultEdgeContextMenuItems(
  * Create note node context menu items (simplified)
  */
 export function createNoteNodeContextMenuItems(
-  onColorChange: (color: string, context: any) => void | Promise<void>
+  onColorChange?: (color: string, context: any) => void | Promise<void>,
+  onFontSizeChange?: (size: string, context: any) => void | Promise<void>
 ): ContextMenuItem[] {
   const noteColors = [
     { id: "yellow", label: "Yellow", color: "#fde68a" },
@@ -475,7 +476,11 @@ export function createNoteNodeContextMenuItems(
         label: noteColor.label,
         color: noteColor.color,
         onClick: async (context: any) => {
-          await onColorChange(noteColor.id, context);
+          const action = contextMenuActionsRegistry.getAction("updateNodeData");
+          if (action && context.nodeId) {
+            action(context.nodeId, { color: noteColor.color });
+          }
+          await onColorChange?.(noteColor.id, context);
         },
       })),
     },
@@ -491,6 +496,7 @@ export function createNoteNodeContextMenuItems(
           if (action && context.nodeId) {
             action(context.nodeId, { fontSize: size.id });
           }
+          await onFontSizeChange?.(size.id, context);
         },
       })),
     },
@@ -501,7 +507,8 @@ export function createNoteNodeContextMenuItems(
  * Create default annotation node context menu items
  */
 export function createAnnotationNodeContextMenuItems(
-  onColorChange: (color: string, context: any) => void | Promise<void>
+  onColorChange?: (color: string, context: any) => void | Promise<void>,
+  onFontSizeChange?: (size: string, context: any) => void | Promise<void>
 ): ContextMenuItem[] {
   const textColors = [
     { id: "black", label: "Black", color: "#000000" },
@@ -531,7 +538,11 @@ export function createAnnotationNodeContextMenuItems(
         label: textColor.label,
         color: textColor.color,
         onClick: async (context: any) => {
-          await onColorChange(textColor.id, context);
+          const action = contextMenuActionsRegistry.getAction("updateNodeData");
+          if (action && context.nodeId) {
+            action(context.nodeId, { color: textColor.color });
+          }
+          await onColorChange?.(textColor.id, context);
         },
       })),
     },
@@ -547,6 +558,7 @@ export function createAnnotationNodeContextMenuItems(
           if (action && context.nodeId) {
             action(context.nodeId, { fontSize: size.id });
           }
+          await onFontSizeChange?.(size.id, context);
         },
       })),
     },

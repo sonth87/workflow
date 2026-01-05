@@ -468,6 +468,43 @@ export interface RegistryItem<T = unknown> {
 }
 
 // ============================================
+// Pool & Lane Types
+// ============================================
+
+/**
+ * Orientation for Pool/Lane display
+ */
+export type PoolLaneOrientation = "horizontal" | "vertical";
+
+/**
+ * Pool Node Data - Container that can have multiple lanes
+ */
+export interface PoolNodeData extends BaseNodeConfig {
+  nodeType: "pool";
+  // Pool specific properties
+  isLocked?: boolean; // Lock mode - nodes cannot escape pool
+  orientation?: PoolLaneOrientation; // horizontal or vertical layout
+  lanes?: string[]; // Array of lane IDs contained in this pool
+  minWidth?: number;
+  minHeight?: number;
+  resizable?: boolean;
+}
+
+/**
+ * Lane Node Data - Container inside pool or standalone
+ */
+export interface LaneNodeData extends BaseNodeConfig {
+  nodeType: "lane";
+  // Lane specific properties
+  isLocked?: boolean; // Lock mode - nodes cannot escape lane
+  orientation?: PoolLaneOrientation; // horizontal or vertical layout
+  parentPoolId?: string; // Reference to parent pool if inside pool
+  minWidth?: number;
+  minHeight?: number;
+  resizable?: boolean;
+}
+
+// ============================================
 // Event System Types
 // ============================================
 
