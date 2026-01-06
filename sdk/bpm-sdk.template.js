@@ -11,6 +11,7 @@
   var domain = "$DOMAIN";
   var sourcePath = "$SOURCE_PATH";
   var buildVersion = "$BUILD_VERSION";
+  var useModuleType = "$USE_MODULE_TYPE" === "true";
 
   function getCurrentScript() {
     var cs = document.currentScript;
@@ -191,6 +192,9 @@
 
         var script = document.createElement("script");
         script.src = addVersion(url);
+        if (useModuleType) {
+          script.type = "module";
+        }
         script.async = false;
         script.onload = function () {
           self.loadedJS.push(url);

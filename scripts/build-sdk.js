@@ -56,6 +56,10 @@ function buildSDK() {
   console.log("  JS files:", jsFiles.length);
   console.log("  CSS files:", cssFiles.length);
 
+  // Detect if using ES modules (split chunks = multiple JS files)
+  const useModuleType = jsFiles.length > 1;
+  console.log("🔧 Module type:", useModuleType ? "ES Module" : "IIFE");
+
   // Generate build version
   const buildVersion = Date.now().toString();
 
@@ -64,6 +68,7 @@ function buildSDK() {
   template = template.replace("$DOMAIN", "");
   template = template.replace("$SOURCE_PATH", "");
   template = template.replace("$BUILD_VERSION", buildVersion);
+  template = template.replace("$USE_MODULE_TYPE", useModuleType.toString());
   template = template.replace("$CSS_FILES", cssFiles.join(","));
   template = template.replace("$JS_FILES", jsFiles.join(","));
 
