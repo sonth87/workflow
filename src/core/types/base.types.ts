@@ -482,7 +482,8 @@ export type PoolLaneOrientation = "horizontal" | "vertical";
 export interface LaneConfig {
   id: string; // Unique identifier for this lane section
   label: string; // Display label for the lane
-  size?: number; // Size in pixels (width for vertical, height for horizontal)
+  size?: number; // Size in pixels (width for vertical, height for horizontal) - DEPRECATED, use sizeRatio instead
+  sizeRatio?: number; // Size as ratio (0-1) of total available space - preferred over pixel-based size
   minSize?: number; // Minimum size constraint
 }
 

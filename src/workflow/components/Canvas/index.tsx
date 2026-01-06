@@ -585,6 +585,18 @@ function CanvasInner({
 
       // Delete nodes
       if (nodeIds.length > 0) {
+        // Check if any deleted node is a Note or Annotation node
+        const hasNoteNode = nodes.some(
+          node =>
+            nodeIds.includes(node.id) &&
+            (node.type === NodeType.NOTE || node.type === NodeType.ANNOTATION)
+        );
+
+        // If deleting a note node, reset zoom on scroll
+        if (hasNoteNode) {
+          globalEventBus.emit("note-hover", false);
+        }
+
         setNodes(nodes.filter(node => !nodeIds.includes(node.id)));
         // Also delete connected edges
         setEdges(
