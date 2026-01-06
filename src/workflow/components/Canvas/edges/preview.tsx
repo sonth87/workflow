@@ -53,6 +53,10 @@ export const ConnectionLinePreview: React.FC<ConnectionLineComponentProps> = ({
       break;
   }
 
+  const markerColor = "#3b82f6";
+
+  const isReversed = toX < fromX;
+
   return (
     <g>
       <path
@@ -71,32 +75,72 @@ export const ConnectionLinePreview: React.FC<ConnectionLineComponentProps> = ({
         />
       </path>
       {/* Optional: Add an arrow marker at the end */}
-      {/* <defs>
+      <defs>
         <marker
-          id={`arrow-on-connection-preview`}
-          markerWidth="12.5"
-          markerHeight="12.5"
-          viewBox="-10 -10 20 20"
+          id="connection-preview-arrow"
+          markerWidth="2"
+          markerHeight="2"
+          viewBox="-1 -1 4 2"
           orient="auto"
           refX="0"
           refY="0"
         >
-          <polyline
+          {/* <polyline
             stroke={markerColor}
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="1"
             fill={markerColor}
-            points="-5,-4 0,0 -5,4 -5,-4"
-          />
+            points="-1,-0.8 0,0 -1,0.8 -1,-0.8"
+          /> */}
+          <circle cx="0" cy="0" r="0.8" fill={markerColor} />
         </marker>
-      </defs> */}
+
+        <marker
+          id="connection-preview-arrow-start"
+          markerWidth="2"
+          markerHeight="2"
+          viewBox="-1 -1 4 2"
+          orient="auto"
+          refX="0"
+          refY="0"
+        >
+          {/* <polyline
+            stroke={markerColor}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1"
+            fill={markerColor}
+            points="1,0.8 0,0 1,-0.8 1,0.8"
+          /> */}
+          <circle cx="0" cy="0" r="0.8" fill={markerColor} />
+        </marker>
+
+        <marker
+          id="connection-preview-arrow-dragging"
+          markerWidth="2"
+          markerHeight="2"
+          viewBox="-1 -1 4 2"
+          orient="auto"
+          refX="0"
+          refY="0"
+        >
+          <circle cx="0" cy="0" r="0.8" fill={markerColor} />
+        </marker>
+      </defs>
       <path
         d={path}
         stroke="transparent"
         strokeWidth={10} // Invisible thicker path for better interaction
         fill="none"
-        markerEnd="url(#connection-preview-arrow)"
+        markerEnd={
+          isReversed
+            ? "url(#connection-preview-arrow-dragging)"
+            : "url(#connection-preview-arrow)"
+        }
+        markerStart={
+          isReversed ? "url(#connection-preview-arrow-start)" : undefined
+        }
       />
     </g>
   );

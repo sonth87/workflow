@@ -26,7 +26,7 @@
 
 .prose
   :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  color: var(--tw-prose-bold);
+  /* color: var(--tw-prose-bold); */
   font-weight: 600;
 }
 
@@ -455,7 +455,8 @@
 }
 
 .prose {
-  --tw-prose-body: #374151;
+  --tw-prose-body: #666;
+  /* --tw-prose-body: #374151;
   --tw-prose-headings: #111827;
   --tw-prose-lead: #4b5563;
   --tw-prose-links: #111827;
@@ -465,7 +466,7 @@
   --tw-prose-hr: #e5e7eb;
   --tw-prose-quotes: #111827;
   --tw-prose-quote-borders: #e5e7eb;
-  --tw-prose-captions: #6b7280;
+  --tw-prose-captions: #6b7280; */
   --tw-prose-kbd: #111827;
   --tw-prose-kbd-shadows: rgb(17 24 39 / 10%);
   --tw-prose-code: #111827;

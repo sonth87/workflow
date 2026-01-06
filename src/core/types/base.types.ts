@@ -468,6 +468,57 @@ export interface RegistryItem<T = unknown> {
 }
 
 // ============================================
+// Pool & Lane Types
+// ============================================
+
+/**
+ * Orientation for Pool/Lane display
+ */
+export type PoolLaneOrientation = "horizontal" | "vertical";
+
+/**
+ * Lane configuration within a Pool
+ */
+export interface LaneConfig {
+  id: string; // Unique identifier for this lane section
+  label: string; // Display label for the lane
+  size?: number; // Size in pixels (width for vertical, height for horizontal) - DEPRECATED, use sizeRatio instead
+  sizeRatio?: number; // Size as ratio (0-1) of total available space - preferred over pixel-based size
+  minSize?: number; // Minimum size constraint
+}
+
+/**
+ * Pool Node Data - Container that can have multiple lanes
+ */
+export interface PoolNodeData extends BaseNodeConfig {
+  nodeType: "pool";
+  // Pool specific properties
+  isLocked?: boolean; // Lock mode - nodes cannot escape pool
+  orientation?: PoolLaneOrientation; // horizontal or vertical layout
+  lanes?: LaneConfig[]; // Array of lane configurations (sections within the pool)
+  color?: string; // Background color for the pool
+  minWidth?: number;
+  minHeight?: number;
+  resizable?: boolean;
+}
+
+/**
+ * Lane Node Data - DEPRECATED
+ * Lanes are now rendered as sections within Pool component
+ * @deprecated Use Pool with LaneConfig sections instead
+ */
+export interface LaneNodeData extends BaseNodeConfig {
+  nodeType: "lane";
+  // Lane specific properties
+  isLocked?: boolean; // Lock mode - nodes cannot escape lane
+  orientation?: PoolLaneOrientation; // horizontal or vertical layout
+  parentPoolId?: string; // Reference to parent pool if inside pool
+  minWidth?: number;
+  minHeight?: number;
+  resizable?: boolean;
+}
+
+// ============================================
 // Event System Types
 // ============================================
 

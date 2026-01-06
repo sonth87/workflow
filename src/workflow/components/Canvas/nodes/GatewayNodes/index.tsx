@@ -8,7 +8,7 @@ export function ExclusiveGatewayNode({
   targetPosition = Position.Top,
 }: CustomNodeProps) {
   const isHorizontal = targetPosition === Position.Left;
-  const out1Position = isHorizontal ? Position.Top : Position.Left;
+  const out1Position = isHorizontal ? Position.Right : Position.Bottom;
   const out2Position = isHorizontal ? Position.Bottom : Position.Right;
 
   return (
@@ -22,15 +22,15 @@ export function ExclusiveGatewayNode({
       <CustomHandle
         type="source"
         position={out1Position}
-        id="out-1"
+        id="out"
         isConnectable={!isConnecting}
       />
-      <CustomHandle
+      {/* <CustomHandle
         type="source"
         position={out2Position}
         id="out-2"
         isConnectable={!isConnecting}
-      />
+      /> */}
     </>
   );
 }

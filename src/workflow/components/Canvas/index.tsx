@@ -15,6 +15,7 @@ import {
   type Connection,
   type NodeChange,
   type EdgeChange,
+  type Node,
   MiniMap,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -23,9 +24,20 @@ import { edgeRegistry } from "@/core/registry/EdgeRegistry";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { validateConnection } from "@/utils/validation";
 import { NodeType } from "@/enum/workflow.enum";
-import type { ContextMenuContext } from "@/core/types/base.types";
+import type {
+  ContextMenuContext,
+  BaseNodeConfig,
+} from "@/core/types/base.types";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { globalEventBus } from "@/core/events/EventBus";
+import {
+  canLaneBeDroppedOnCanvas,
+  canLaneBeDragged,
+  canLaneExistStandalone,
+  findTargetContainer,
+  toRelativePosition,
+  validateLaneOperation,
+} from "@/workflow/utils/poolLaneRules";
 
 // Import node/edge types from workflow
 import { nodeTypes as builtInNodeTypes } from "./nodes";
@@ -89,7 +101,51 @@ function CanvasInner({
   // Handle node changes
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      setNodes(applyNodeChanges(changes, nodes) as any);
+      const updatedNodes = applyNodeChanges(changes, nodes) as any;
+
+      // Post-process: Apply extent: 'parent' for nodes in locked containers
+      const finalNodes = updatedNodes.map((node: any) => {
+        if (node.parentId) {
+          const parent = updatedNodes.find((n: any) => n.id === node.parentId);
+
+          // RULE 4: Lanes inside Pool should not be draggable
+          const isDraggable = canLaneBeDragged(node, updatedNodes);
+          if (!isDraggable) {
+            return {
+              ...node,
+              draggable: false,
+              extent: "parent" as const,
+            };
+          }
+
+          if (parent && parent.data?.isLocked) {
+            // Node is in a locked container
+            return {
+              ...node,
+              extent: "parent" as const,
+            };
+          }
+        }
+
+        // RULE 3: Lane must be in Pool (should not exist standalone)
+        const standaloneCheck = canLaneExistStandalone(node);
+        if (!standaloneCheck.allowed) {
+          console.warn(
+            "⚠️ Lane detected without parent Pool. This should not happen."
+          );
+        }
+
+        // Clear extent if not in locked container
+        if (node.extent === "parent" && !node.parentId) {
+          return {
+            ...node,
+            extent: undefined,
+          };
+        }
+        return node;
+      });
+
+      setNodes(finalNodes);
     },
     [nodes, setNodes]
   );
@@ -110,10 +166,143 @@ function CanvasInner({
     }
   }, [isDragging, saveToHistory]);
 
+  // Handle node drag - ensure children move with parent
+  const onNodeDrag = useCallback(
+    (_event: React.MouseEvent, node: BaseNodeConfig) => {
+      // When dragging pool or lane, we don't need to do anything special
+      // ReactFlow handles parent-child movement automatically if parentId is set correctly
+      // This is just here for future extensions if needed
+    },
+    []
+  );
+
   // Handle node drag stop
-  const onNodeDragStop = useCallback(() => {
-    setIsDragging(false);
-  }, []);
+  const onNodeDragStop = useCallback(
+    (_event: React.MouseEvent, node: BaseNodeConfig) => {
+      setIsDragging(false);
+
+      // Get the latest nodes state
+      const allNodes = useWorkflowStore.getState().nodes;
+
+      // RULE 3: Lane MUST be inside Pool (cannot be standalone)
+      const standaloneCheck = canLaneExistStandalone(node);
+      if (!standaloneCheck.allowed) {
+        alert(standaloneCheck.reason);
+        // Remove the lane node if it's not in a pool
+        const { deleteNode } = useWorkflowStore.getState();
+        deleteNode(node.id);
+        return;
+      }
+
+      // Calculate absolute position - node.position might be relative if it has a parent
+      const absolutePosition = node.parentId
+        ? (() => {
+            const parent = allNodes.find(n => n.id === node.parentId);
+            return parent
+              ? {
+                  x: node.position.x + parent.position.x,
+                  y: node.position.y + parent.position.y,
+                }
+              : node.position;
+          })()
+        : node.position;
+
+      // Use node with absolute position for container detection
+      const nodeWithAbsolutePosition = { ...node, position: absolutePosition };
+
+      // Find target container using centralized logic (don't exclude locked - we'll check below)
+      const targetContainer = findTargetContainer(
+        nodeWithAbsolutePosition,
+        allNodes,
+        false
+      );
+
+      // SPECIAL HANDLING FOR LANE
+      if (node.type === "lane" || node.data?.nodeType === "lane") {
+        // Use centralized validation
+        const validation = validateLaneOperation(
+          "dragStop",
+          node,
+          targetContainer,
+          allNodes
+        );
+
+        if (!validation.valid) {
+          alert(validation.error);
+          return;
+        }
+
+        // If validation passed and lane is entering a pool
+        if (targetContainer && node.parentId !== targetContainer.id) {
+          const { updateNode: updateNodeFn } = useWorkflowStore.getState();
+          updateNodeFn(node.id, {
+            parentId: targetContainer.id,
+            draggable: false, // RULE 4: Lanes in pool cannot be dragged
+            extent: "parent" as const,
+            position: toRelativePosition(
+              node.position,
+              targetContainer.position
+            ),
+          });
+        }
+        return;
+      }
+
+      // NORMAL NODES handling
+      const { updateNode: updateNodeFn } = useWorkflowStore.getState();
+
+      // Check if node is trying to leave a locked parent
+      if (node.parentId && !targetContainer) {
+        const currentParent = allNodes.find(n => n.id === node.parentId);
+        if (currentParent?.data?.isLocked) {
+          // LOCKED MODE: Cannot drag node out of locked container
+          // Force node back to parent with extent
+          updateNodeFn(node.id, {
+            parentId: currentParent.id,
+            extent: "parent" as const,
+            position: node.position, // Keep current relative position
+          });
+          return;
+        }
+      }
+
+      if (targetContainer && node.parentId !== targetContainer.id) {
+        // Node moved INTO container - ADD parentId
+        updateNodeFn(node.id, {
+          parentId: targetContainer.id,
+          extent: targetContainer.data?.isLocked
+            ? ("parent" as const)
+            : undefined,
+          position: toRelativePosition(
+            absolutePosition,
+            targetContainer.position
+          ),
+        });
+      } else if (!targetContainer && node.parentId) {
+        // Node moved OUT of container - REMOVE parentId
+        const oldParent = allNodes.find(n => n.id === node.parentId);
+        if (oldParent) {
+          // Always remove parentId when dragged out (unless it's locked, which is already checked above)
+          updateNodeFn(node.id, {
+            parentId: undefined,
+            extent: undefined,
+            position: absolutePosition, // Use calculated absolute position
+          });
+        }
+      }
+
+      // Ensure nodes inside locked containers always have extent: 'parent'
+      if (node.parentId) {
+        const currentParent = allNodes.find(n => n.id === node.parentId);
+        if (currentParent?.data?.isLocked && node.extent !== "parent") {
+          updateNodeFn(node.id, {
+            extent: "parent" as const,
+          });
+        }
+      }
+    },
+    []
+  );
 
   // Handle connection with validation
   const onConnect = useCallback(
@@ -334,6 +523,28 @@ function CanvasInner({
         y: position.y - 35,
       };
 
+      // RULE 3: Prevent Lane from being dropped directly on canvas
+      // But allow drop if it's being dropped into a Pool
+      if (type === "lane") {
+        // Create a temporary node to check if it would be inside a pool
+        const tempNode: BaseNodeConfig = {
+          id: "temp",
+          type: "lane",
+          position: centeredPosition,
+          data: { nodeType: "lane" },
+        };
+
+        const targetContainer = findTargetContainer(tempNode, nodes, false);
+
+        // If no pool found at drop position, block the drop
+        if (!targetContainer || targetContainer.type !== "pool") {
+          alert(
+            "Lane không thể được kéo trực tiếp ra canvas. Vui lòng kéo Lane vào Pool."
+          );
+          return; // Block the drop
+        }
+      }
+
       // Auto-exit pan mode when dropping a node
       if (isPanMode && onPanModeChange) {
         onPanModeChange(false);
@@ -341,7 +552,7 @@ function CanvasInner({
 
       onNodeDrop?.(type, centeredPosition);
     },
-    [screenToFlowPosition, onNodeDrop, isPanMode, onPanModeChange]
+    [screenToFlowPosition, onNodeDrop, isPanMode, onPanModeChange, nodes]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -374,6 +585,18 @@ function CanvasInner({
 
       // Delete nodes
       if (nodeIds.length > 0) {
+        // Check if any deleted node is a Note or Annotation node
+        const hasNoteNode = nodes.some(
+          node =>
+            nodeIds.includes(node.id) &&
+            (node.type === NodeType.NOTE || node.type === NodeType.ANNOTATION)
+        );
+
+        // If deleting a note node, reset zoom on scroll
+        if (hasNoteNode) {
+          globalEventBus.emit("note-hover", false);
+        }
+
         setNodes(nodes.filter(node => !nodeIds.includes(node.id)));
         // Also delete connected edges
         setEdges(
@@ -436,6 +659,7 @@ function CanvasInner({
         onEdgeContextMenu={onEdgeContextMenu}
         onPaneContextMenu={onPaneContextMenu}
         onNodeDragStart={onNodeDragStart}
+        onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         defaultEdgeOptions={{
           type: "smooth",

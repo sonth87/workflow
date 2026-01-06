@@ -25,6 +25,7 @@ import {
 import { getLayoutedElements } from "./utils/layout";
 import { Behavior } from "./components/Behavior";
 import { initializePropertySystem } from "@/core/properties";
+import { findTargetContainer, toRelativePosition } from "./utils/poolLaneRules";
 
 function WorkflowBuilderInner() {
   const { createNode } = useNodeOperations();
@@ -48,6 +49,43 @@ function WorkflowBuilderInner() {
   const handleNodeDrop = useCallback(
     (nodeType: string, position: { x: number; y: number }) => {
       createNode(nodeType, position);
+
+      // After creating node, check if it's inside a pool/lane and set parent
+      setTimeout(() => {
+        const { nodes: currentNodes } = useWorkflowStore.getState();
+        const newNode = currentNodes[currentNodes.length - 1]; // Get the newly created node
+
+        if (newNode && newNode.type !== "pool") {
+          const targetContainer = findTargetContainer(
+            newNode,
+            currentNodes,
+            false
+          );
+
+          if (targetContainer) {
+            // For lane, only allow Pool as parent
+            if (newNode.type === "lane" && targetContainer.type !== "pool") {
+              return;
+            }
+
+            const { updateNode } = useWorkflowStore.getState();
+            updateNode(newNode.id, {
+              parentId: targetContainer.id,
+              extent: targetContainer.data?.isLocked
+                ? ("parent" as const)
+                : undefined,
+              position: toRelativePosition(
+                newNode.position,
+                targetContainer.position
+              ),
+              // Lane inside pool should not be draggable
+              ...(newNode.type === "lane" && targetContainer.type === "pool"
+                ? { draggable: false }
+                : {}),
+            });
+          }
+        }
+      }, 0);
     },
     [createNode]
   );

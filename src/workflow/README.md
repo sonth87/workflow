@@ -26,9 +26,6 @@ workflow/
 ```bash
 # Run new version (default)
 pnpm dev
-
-# Run old version (for comparison)
-pnpm dev:old
 ```
 
 ### Differences from Old Implementation
