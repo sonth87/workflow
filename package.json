@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:sdk": "tsc -b && vite build --config ./sdk/vite.config.sdk.ts && node scripts/build-sdk.js",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:sdk": "vite preview --outDir sdk-dist"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
