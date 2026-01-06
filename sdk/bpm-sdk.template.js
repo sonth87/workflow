@@ -97,6 +97,27 @@
   }
 
   BPM.prototype = {
+    injectImportMap: function () {
+      // Check if importmap already exists
+      if (document.querySelector('script[type="importmap"]')) {
+        return;
+      }
+
+      var importMap = {
+        imports: {
+          react: "https://esm.sh/react@19",
+          "react-dom": "https://esm.sh/react-dom@19",
+          "react/jsx-runtime": "https://esm.sh/react@19/jsx-runtime",
+          "@xyflow/react": "https://esm.sh/@xyflow/react@12",
+        },
+      };
+
+      var script = document.createElement("script");
+      script.type = "importmap";
+      script.textContent = JSON.stringify(importMap, null, 2);
+      document.head.appendChild(script);
+    },
+
     init: function () {
       this.selectors = document.querySelectorAll(this.options.selector);
       window.__SKYLINE_SDK_MANAGERS__[this.options.selector] = this;
@@ -106,6 +127,8 @@
         if (this.options.class) node.classList.add(this.options.class);
       }
 
+      // Inject importmap before loading resources
+      if (useModuleType) this.injectImportMap();
       this.loadResources();
     },
 
@@ -131,8 +154,31 @@
 
       Promise.all(cssPromises)
         .then(function () {
-          // Load JS files sequentially
-          return self.loadJSSequentially(jsFiles);
+          // For ES modules: Load vendors first, then main entry
+          // Sort files: vendors first, main last
+          if (useModuleType) {
+            var mainFile = jsFiles.find(function (f) {
+              return f.indexOf("/main.") > -1;
+            });
+            var vendorFiles = jsFiles.filter(function (f) {
+              return f !== mainFile;
+            });
+
+            // Load all vendor chunks in parallel
+            return Promise.all(
+              vendorFiles.map(function (file) {
+                return self.loadJS(buildAssetUrl(file));
+              })
+            ).then(function () {
+              // Then load main entry point
+              if (mainFile) {
+                return self.loadJS(buildAssetUrl(mainFile));
+              }
+            });
+          } else {
+            // For IIFE: Load sequentially
+            return self.loadJSSequentially(jsFiles);
+          }
         })
         .then(function () {
           window.__BPM_RESOURCES_LOADED__ = true;

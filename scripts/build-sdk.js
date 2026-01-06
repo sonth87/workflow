@@ -3,6 +3,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import JavaScriptObfuscator from "javascript-obfuscator";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,13 +65,45 @@ function buildSDK() {
   const buildVersion = Date.now().toString();
 
   // Replace placeholders
-  template = template.replace("$APS_LIST", "bpm");
   template = template.replace("$DOMAIN", "");
   template = template.replace("$SOURCE_PATH", "");
   template = template.replace("$BUILD_VERSION", buildVersion);
   template = template.replace("$USE_MODULE_TYPE", useModuleType.toString());
   template = template.replace("$CSS_FILES", cssFiles.join(","));
   template = template.replace("$JS_FILES", jsFiles.join(","));
+
+  // Obfuscate the SDK code
+  console.log("🔒 Obfuscating SDK code...");
+  try {
+    const obfuscated = JavaScriptObfuscator.obfuscate(template, {
+      compact: true,
+      identifierNamesGenerator: "hexadecimal",
+      renameGlobals: false,
+      selfDefending: true,
+      disableConsoleOutput: false,
+      stringArray: true,
+      stringArrayThreshold: 0.3,
+      stringArrayEncoding: ["base64"],
+      stringArrayShuffle: true,
+      stringArrayIndexShift: true,
+      simplify: true,
+      splitStrings: false,
+      rotateStringArray: true,
+      stringArrayCallsTransform: true,
+      stringArrayWrappersCount: 1,
+      debugProtection: false,
+      deadCodeInjection: false,
+      controlFlowFlattening: false,
+      numbersToExpressions: false,
+      transformObjectKeys: false,
+      unicodeEscapeSequence: false,
+    });
+    template = obfuscated.getObfuscatedCode();
+    console.log("✅ Obfuscation completed");
+  } catch (error) {
+    console.error("⚠️ Obfuscation failed:", error.message);
+    console.log("📝 Continuing with non-obfuscated code");
+  }
 
   // Write output
   fs.writeFileSync(OUTPUT_PATH, template, "utf-8");

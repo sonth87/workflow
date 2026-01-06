@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 // Build mode: single file hoặc split chunks
-const shouldSplitChunks = true; // process.env.SPLIT_CHUNKS !== "false";
+const shouldSplitChunks = false; // process.env.SPLIT_CHUNKS !== "false";
 
 console.log(
   `🔧 Build mode: ${shouldSplitChunks ? "Split Chunks" : "Single File"}`
@@ -21,9 +21,13 @@ export default defineConfig({
   build: {
     outDir: "sdk-dist",
     emptyOutDir: true,
-    minify: "esbuild",
-    target: "es2015",
+    minify: shouldSplitChunks ? "esbuild" : undefined,
+    target: shouldSplitChunks ? "es2015" : undefined,
     rollupOptions: {
+      // External dependencies - load từ CDN
+      external: shouldSplitChunks
+        ? ["react", "react-dom", "react/jsx-runtime", "@xyflow/react"]
+        : undefined,
       treeshake: {
         moduleSideEffects: "no-external",
         propertyReadSideEffects: false,
@@ -33,7 +37,7 @@ export default defineConfig({
         main: path.resolve(__dirname, "../src/sdk-entry.tsx"),
       },
       output: {
-        format: shouldSplitChunks ? "es" : "iife",
+        format: shouldSplitChunks ? "es" : undefined, // iife
         entryFileNames: "js/[name].[hash].js",
         chunkFileNames: "js/[name].[hash].js",
         assetFileNames: assetInfo => {
