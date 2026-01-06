@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BPM SDK - Quick Test</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      #bpm-container {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="bpm-container"></div>
+
+    <!-- Load SDK -->
+    <script src="./bpm-sdk.js"></script>
+
+    <!-- Initialize BPM -->
+    <script>
+      var bpm = new BPM({
+        selector: "#bpm-container",
+        options: {
+          pluginOptions: {
+            enableDefaultPlugin: true,
+            autoActivate: true,
+          },
+        },
+        onReady: function (instance) {
+          console.log("✅ BPM Workflow Builder is ready!");
+          console.log("Instance:", instance);
+        },
+        onError: function (error) {
+          console.error("❌ BPM Error:", error);
+        },
+      });
+    </script>
+  </body>
+</html>

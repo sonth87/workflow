@@ -4,6 +4,10 @@ import { customPlugin } from "./plugins/customPlugin";
 import { aiMLPlugin } from "./plugins/aiMLPlugin";
 // import { defaultBpmPlugin } from "./plugins/defaultBpmPlugin";
 
+import "./index.css";
+import "@sth87/shadcn-design-system/index.css";
+import "@sth87/shadcn-design-system/animation.css";
+
 function App() {
   return (
     <WorkflowBuilder
