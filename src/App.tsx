@@ -15,7 +15,7 @@ function App() {
         autoActivate: true,
 
         // Danh sách custom plugins
-        plugins: [customPlugin, aiMLPlugin],
+        // plugins: [customPlugin, aiMLPlugin],
       }}
     />
   );
