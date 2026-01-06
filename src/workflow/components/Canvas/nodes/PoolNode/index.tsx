@@ -717,21 +717,9 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
             onKeyDown={handleTitleKeyDown}
             autoFocus
             className={cn(
-              "bg-transparent border-none outline-none font-semibold text-md nodrag text-center",
-              colorScheme.text,
-              {
-                "rotate-180": isHorizontal,
-              }
+              "min-w-xs bg-white/70 border font-semibold nodrag text-center rounded px-3 py-1",
+              colorScheme.text
             )}
-            style={
-              isHorizontal
-                ? {
-                    writingMode: "vertical-rl",
-                    textOrientation: "mixed",
-                    minWidth: "80px",
-                  }
-                : { minWidth: "80px" }
-            }
             onClick={e => e.stopPropagation()}
           />
         ) : (
@@ -815,7 +803,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
                       onKeyDown={handleLaneLabelKeyDown}
                       autoFocus
                       className={cn(
-                        "bg-transparent border-none outline-none font-medium p-2 nodrag",
+                        "bg-transparent border outline-none font-medium px-3 py-2 rounded nodrag",
                         colorScheme.laneText,
                         "w-full"
                       )}

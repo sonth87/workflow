@@ -455,6 +455,7 @@
 }
 
 .prose {
+  --tw-prose-body: #666;
   /* --tw-prose-body: #374151;
   --tw-prose-headings: #111827;
   --tw-prose-lead: #4b5563;

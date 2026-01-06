@@ -342,21 +342,6 @@ const defaultNodes: PluginConfig["nodes"] = [
       },
       resizable: true,
       draggable: true,
-      properties: {
-        isLocked: false,
-        orientation: "horizontal",
-        color: "yellow",
-        lanes: [
-          {
-            id: "lane-1",
-            label: "Lane 1",
-          },
-          {
-            id: "lane-2",
-            label: "Lane 2",
-          },
-        ],
-      },
     },
   },
 ];
@@ -882,6 +867,40 @@ const defaultContextMenus: Array<{
           separator: true,
         },
         {
+          id: "toggle-lock",
+          label: "Toggle Lock Mode",
+          icon: { type: "lucide", value: LockOpen },
+          onClick: async (context: ContextMenuContext) => {
+            const action =
+              contextMenuActionsRegistry.getAction("updateNodeData");
+            if (action && context.nodeId && context.node) {
+              const currentLockState = context.node.data?.isLocked ?? false;
+              action(context.nodeId, { isLocked: !currentLockState });
+            }
+          },
+        },
+        {
+          id: "switch-orientation",
+          label: "Switch Orientation",
+          icon: { type: "lucide", value: FlipVertical },
+          onClick: async (context: ContextMenuContext) => {
+            const action =
+              contextMenuActionsRegistry.getAction("updateNodeData");
+            if (action && context.nodeId && context.node) {
+              const currentOrientation =
+                context.node.data?.orientation || "horizontal";
+              const newOrientation =
+                currentOrientation === "horizontal" ? "vertical" : "horizontal";
+              action(context.nodeId, { orientation: newOrientation });
+            }
+          },
+        },
+        {
+          id: "separator-2",
+          label: "",
+          separator: true,
+        },
+        {
           id: "color-submenu",
           label: "Change Color",
           icon: { type: "lucide", value: Palette },
@@ -980,42 +999,8 @@ const defaultContextMenus: Array<{
           separator: true,
         },
         {
-          id: "toggle-lock",
-          label: "Toggle Lock Mode",
-          icon: { type: "lucide", value: LockOpen },
-          onClick: async (context: ContextMenuContext) => {
-            const action =
-              contextMenuActionsRegistry.getAction("updateNodeData");
-            if (action && context.nodeId && context.node) {
-              const currentLockState = context.node.data?.isLocked ?? false;
-              action(context.nodeId, { isLocked: !currentLockState });
-            }
-          },
-        },
-        {
-          id: "switch-orientation",
-          label: "Switch Orientation",
-          icon: { type: "lucide", value: FlipVertical },
-          onClick: async (context: ContextMenuContext) => {
-            const action =
-              contextMenuActionsRegistry.getAction("updateNodeData");
-            if (action && context.nodeId && context.node) {
-              const currentOrientation =
-                context.node.data?.orientation || "horizontal";
-              const newOrientation =
-                currentOrientation === "horizontal" ? "vertical" : "horizontal";
-              action(context.nodeId, { orientation: newOrientation });
-            }
-          },
-        },
-        {
-          id: "separator-2",
-          label: "",
-          separator: true,
-        },
-        {
           id: "delete-pool-lane",
-          label: "Delete",
+          label: "Delete Pool",
           icon: { type: "lucide", value: Trash2, color: "red" },
           onClick: async (context: ContextMenuContext) => {
             const action = contextMenuActionsRegistry.getAction("deleteNode");
