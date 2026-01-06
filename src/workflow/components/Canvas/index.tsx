@@ -523,28 +523,6 @@ function CanvasInner({
         y: position.y - 35,
       };
 
-      // RULE 3: Prevent Lane from being dropped directly on canvas
-      // But allow drop if it's being dropped into a Pool
-      if (type === "lane") {
-        // Create a temporary node to check if it would be inside a pool
-        const tempNode: BaseNodeConfig = {
-          id: "temp",
-          type: "lane",
-          position: centeredPosition,
-          data: { nodeType: "lane" },
-        };
-
-        const targetContainer = findTargetContainer(tempNode, nodes, false);
-
-        // If no pool found at drop position, block the drop
-        if (!targetContainer || targetContainer.type !== "pool") {
-          alert(
-            "Lane không thể được kéo trực tiếp ra canvas. Vui lòng kéo Lane vào Pool."
-          );
-          return; // Block the drop
-        }
-      }
-
       // Auto-exit pan mode when dropping a node
       if (isPanMode && onPanModeChange) {
         onPanModeChange(false);
