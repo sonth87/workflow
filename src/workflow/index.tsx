@@ -1,14 +1,4 @@
-/**
- * Main Workflow Builder Component
- * Layout giống với workflow cũ
- */
-
 import { useCallback, useState } from "react";
-import {
-  WorkflowProvider,
-  type PluginOptions,
-} from "./context/WorkflowProvider";
-import { WorkflowActionsProvider } from "./context/WorkflowActionsProvider";
 import { Canvas } from "./components/Canvas";
 import { Toolbox } from "./components/Toolbox";
 import { PropertiesPanel } from "./components/PropertiesPanel";
@@ -17,17 +7,45 @@ import { ValidationPanel } from "./components/ValidationPanel";
 import { Toolbar } from "./components/Toolbar";
 import { useNodeOperations, useWorkflowValidation } from "./hooks/useWorkflow";
 import { useWorkflowStore } from "@/core/store/workflowStore";
-import {
-  ReactFlowProvider,
-  useReactFlow,
-  useUpdateNodeInternals,
-} from "@xyflow/react";
+import type { BaseNodeConfig } from "@/core/types/base.types";
+import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { getLayoutedElements } from "./utils/layout";
 import { Behavior } from "./components/Behavior";
-import { initializePropertySystem } from "@/core/properties";
 import { findTargetContainer, toRelativePosition } from "./utils/poolLaneRules";
+import { WorkflowCore, type WorkflowCoreProps } from "./WorkflowCore";
 
-function WorkflowBuilderInner() {
+// Re-export PluginOptions from WorkflowCore
+export type { PluginOptions } from "./context/WorkflowProvider";
+
+// UI Configuration for SDK
+export interface WorkflowUIConfig {
+  // Header controls
+  showHeader?: boolean;
+  showImportExport?: boolean;
+  showThemeToggle?: boolean;
+  showLayoutControls?: boolean;
+  showWorkflowName?: boolean;
+
+  // Sidebar panels
+  showToolbox?: boolean;
+  showPropertiesPanel?: boolean;
+  showValidationPanel?: boolean;
+
+  // Toolbar controls
+  showToolbar?: boolean;
+  showPanMode?: boolean;
+  showZoomControls?: boolean;
+  showMinimap?: boolean;
+
+  // Behavior
+  showBehavior?: boolean;
+  showRunButton?: boolean;
+
+  // Mode
+  mode?: "edit" | "view";
+}
+
+function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
   const { createNode } = useNodeOperations();
   const { validate } = useWorkflowValidation();
   const {
@@ -100,22 +118,16 @@ function WorkflowBuilderInner() {
       return;
     }
 
-    console.log("Running workflow...", { nodes, edges });
-    alert("Workflow execution started! Check console for details.");
-  }, [validate, nodes, edges]);
+    // Run workflow logic here
+    alert("Workflow execution started!");
+  }, [validate]);
 
   const handleSave = useCallback(async () => {
     await validate();
 
-    const workflowData = {
-      nodes,
-      edges,
-      timestamp: new Date().toISOString(),
-    };
-
-    console.log("Saving workflow...", workflowData);
-    alert("Workflow saved! Check console for details.");
-  }, [validate, nodes, edges]);
+    // Save workflow logic here
+    alert("Workflow saved!");
+  }, [validate]);
 
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
@@ -140,7 +152,7 @@ function WorkflowBuilderInner() {
         direction
       );
 
-      setNodes(layoutedNodes as any);
+      setNodes(layoutedNodes as BaseNodeConfig[]);
 
       setTimeout(() => {
         layoutedNodes.forEach(n => updateNodeInternals(n.id));
@@ -166,46 +178,76 @@ function WorkflowBuilderInner() {
     ? edges.find(e => e.id === selectedEdgeId)
     : undefined;
 
+  // Merge default UI config with provided config
+  const ui: Required<WorkflowUIConfig> = {
+    showHeader: true,
+    showImportExport: true,
+    showThemeToggle: true,
+    showLayoutControls: true,
+    showWorkflowName: true,
+    showToolbox: true,
+    showPropertiesPanel: true,
+    showValidationPanel: true,
+    showToolbar: true,
+    showPanMode: true,
+    showZoomControls: true,
+    showMinimap: true,
+    showBehavior: true,
+    showRunButton: true,
+    mode: "edit",
+    ...uiConfig,
+  };
+
+  const isViewMode = ui.mode === "view";
+
   return (
     <div className="flex flex-col h-screen w-screen">
-      <div className="">
-        <Header
-          onSave={handleSave}
-          layoutDirection={layoutDirection}
-          onLayoutDirectionChange={handleChangeLayoutDirection}
-        />
-      </div>
-      <div className="flex-1 bg-primaryA-100 overflow-hidden flex gap-2 px-2 pb-2">
-        <div>
-          <Toolbox />
+      {ui.showHeader && (
+        <div className="">
+          <Header
+            onSave={handleSave}
+            layoutDirection={layoutDirection}
+            onLayoutDirectionChange={handleChangeLayoutDirection}
+          />
         </div>
+      )}
+      <div className="flex-1 bg-primaryA-100 overflow-hidden flex gap-2 px-2 pb-2">
+        {ui.showToolbox && !isViewMode && (
+          <div>
+            <Toolbox />
+          </div>
+        )}
 
         <div className="flex-1 rounded-2xl overflow-hidden">
-          <Behavior onRun={handleRun} />
+          {ui.showBehavior && !isViewMode && <Behavior onRun={handleRun} />}
           <Canvas
-            onNodeDrop={handleNodeDrop}
+            onNodeDrop={isViewMode ? undefined : handleNodeDrop}
             isPanMode={isPanMode}
             onPanModeChange={setIsPanMode}
-            showMinimap={showMinimap}
+            showMinimap={ui.showMinimap && showMinimap}
           />
         </div>
 
-        {(selectedNode || selectedEdge) && (
+        {ui.showPropertiesPanel && (selectedNode || selectedEdge) && (
           <div className="relative h-full">
             <PropertiesPanel />
           </div>
         )}
 
-        <ValidationPanel onNodeSelect={handleNodeSelect} />
+        {ui.showValidationPanel && !isViewMode && (
+          <ValidationPanel onNodeSelect={handleNodeSelect} />
+        )}
 
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
-          <Toolbar
-            isPanMode={isPanMode}
-            onPanModeChange={setIsPanMode}
-            showMinimap={showMinimap}
-            onMinimapToggle={setShowMinimap}
-          />
-        </div>
+        {ui.showToolbar && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
+            <Toolbar
+              isPanMode={isPanMode}
+              onPanModeChange={setIsPanMode}
+              showMinimap={showMinimap}
+              onMinimapToggle={setShowMinimap}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -214,27 +256,38 @@ function WorkflowBuilderInner() {
 /**
  * Workflow Builder Props
  */
-export interface WorkflowBuilderProps {
+export interface WorkflowBuilderProps extends Omit<WorkflowCoreProps, "children"> {
   /**
-   * Plugin configuration options
-   * Configure which plugins to use and how to initialize them
+   * Optional: Custom layout component
+   * If not provided, uses default layout
    */
-  pluginOptions?: PluginOptions;
+  customLayout?: React.ComponentType<{ children?: React.ReactNode }>;
+
+  /**
+   * UI Configuration for showing/hiding components
+   */
+  uiConfig?: WorkflowUIConfig;
 }
 
+/**
+ * WorkflowBuilder - Default implementation with standard layout
+ * For custom layouts, use WorkflowCore instead
+ */
 export default function WorkflowBuilder({
   pluginOptions,
+  customLayout: CustomLayout,
+  initProperties = true,
+  uiConfig,
 }: WorkflowBuilderProps = {}) {
-  // Initialize property system
-  initializePropertySystem();
-
   return (
-    <WorkflowProvider pluginOptions={pluginOptions}>
-      <ReactFlowProvider>
-        <WorkflowActionsProvider>
-          <WorkflowBuilderInner />
-        </WorkflowActionsProvider>
-      </ReactFlowProvider>
-    </WorkflowProvider>
+    <WorkflowCore pluginOptions={pluginOptions} initProperties={initProperties}>
+      {CustomLayout ? (
+        <CustomLayout>
+          <WorkflowBuilderInner uiConfig={uiConfig} />
+        </CustomLayout>
+      ) : (
+        <WorkflowBuilderInner uiConfig={uiConfig} />
+      )}
+    </WorkflowCore>
   );
 }

@@ -6,10 +6,6 @@ import path from "path";
 // Build mode: single file hoặc split chunks
 const shouldSplitChunks = false; // process.env.SPLIT_CHUNKS !== "false";
 
-console.log(
-  `🔧 Build mode: ${shouldSplitChunks ? "Split Chunks" : "Single File"}`
-);
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [tailwindcss(), react()],

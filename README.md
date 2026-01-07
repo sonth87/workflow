@@ -1,5 +1,127 @@
 # BPM Core - Workflow Builder
 
+## 📋 Giới thiệu
+
+BPM Core là thư viện xây dựng workflow linh hoạt và modular cho Business Process Management (BPM), được phát triển với React và ReactFlow. Thư viện cung cấp giao diện kéo-thả trực quan để tạo, chỉnh sửa và quản lý các workflow phức tạp với hỗ trợ custom nodes, edges, validation rules và plugins.
+
+## 🎯 Yêu cầu
+
+### Tích hợp NPM Library
+
+- **Node.js** >= 16.0.0
+- **React** >= 18.0.0
+
+### Tích hợp SDK
+
+- Trình duyệt hiện đại hỗ trợ ES6+
+- Không yêu cầu framework dependencies
+
+### Yêu cầu Development
+
+```json
+{
+  "node": ">=16.0.0",
+  "pnpm": ">=8.0.0"
+}
+```
+
+## 🚀 Tích hợp
+
+BPM Core cung cấp **hai phương thức tích hợp** phù hợp với nhu cầu dự án của bạn:
+
+### Phương thức 1: NPM Library (Tùy biến đầy đủ)
+
+**Phù hợp cho:** Ứng dụng React cần tùy biến hoàn toàn và hỗ trợ TypeScript.
+
+```bash
+npm install bpm-core
+# hoặc
+pnpm add bpm-core
+# hoặc
+yarn add bpm-core
+```
+
+**Bắt đầu nhanh:**
+
+```tsx
+import { WorkflowBuilder } from "bpm-core";
+
+function App() {
+  return (
+    <WorkflowBuilder
+      uiConfig={{
+        showToolbox: true,
+        showPropertiesPanel: true,
+        showMinimap: true,
+        mode: "edit", // hoặc "view" cho chế độ chỉ xem
+      }}
+    />
+  );
+}
+```
+
+**Custom Layout:**
+
+```tsx
+import {
+  WorkflowCore,
+  Canvas,
+  Toolbox,
+  PropertiesPanel,
+  ImportButton,
+  ExportButton,
+} from "bpm-core";
+
+function CustomWorkflow() {
+  return (
+    <WorkflowCore>
+      <div style={{ display: "flex", height: "100vh" }}>
+        <aside>
+          <Toolbox />
+        </aside>
+        <main>
+          <Canvas />
+        </main>
+        <aside>
+          <PropertiesPanel />
+        </aside>
+      </div>
+    </WorkflowCore>
+  );
+}
+```
+
+### Phương thức 2: SDK Script (Cấu hình đơn giản)
+
+**Phù hợp cho:** Tích hợp nhanh, ứng dụng non-React, hoặc prototyping.
+
+```html
+<!DOCTYPE html>
+<html>
+  <body>
+    <div id="bpm-container"></div>
+
+    <!-- Load SDK -->
+    <script src="path/to/bpm-sdk.js"></script>
+
+    <!-- Khởi tạo -->
+    <script>
+      var bpm = new BPM({
+        selector: "#bpm-container",
+        options: {
+          ui: {
+            showToolbox: true,
+            showPropertiesPanel: true,
+            showMinimap: true,
+            mode: "edit", // hoặc "view"
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
+```
+
 ## 🏗️ System Architecture
 
 ```

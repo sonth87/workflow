@@ -24,12 +24,40 @@
 
     <!-- Initialize BPM -->
     <script>
+      // Example 1: Default configuration (all features enabled)
       var bpm = new BPM({
         selector: "#bpm-container",
         options: {
           pluginOptions: {
             enableDefaultPlugin: true,
             autoActivate: true,
+          },
+          // UI Configuration - show/hide components
+          ui: {
+            // Header controls
+            showHeader: true,
+            showImportExport: true,
+            showThemeToggle: true,
+            showLayoutControls: true,
+            showWorkflowName: true,
+
+            // Sidebar panels
+            showToolbox: true,
+            showPropertiesPanel: true,
+            showValidationPanel: true,
+
+            // Toolbar
+            showToolbar: true,
+            showPanMode: true,
+            showZoomControls: true,
+            showMinimap: true,
+
+            // Behavior
+            showBehavior: true,
+            showRunButton: true,
+
+            // Mode: 'edit' or 'view'
+            mode: "edit", // 'view' = readonly mode
           },
         },
         onReady: function (instance) {
@@ -40,6 +68,40 @@
           console.error("❌ BPM Error:", error);
         },
       });
+
+      // Example 2: View-only mode (commented out)
+      /*
+      var bpmViewOnly = new BPM({
+        selector: "#bpm-container",
+        options: {
+          ui: {
+            showToolbox: false,
+            showBehavior: false,
+            showValidationPanel: false,
+            showImportExport: false,
+            mode: 'view' // Read-only mode
+          }
+        }
+      });
+      */
+
+      // Example 3: Minimal mode (commented out)
+      /*
+      var bpmMinimal = new BPM({
+        selector: "#bpm-container",
+        options: {
+          ui: {
+            showHeader: false,
+            showToolbox: false,
+            showPropertiesPanel: false,
+            showValidationPanel: false,
+            showBehavior: false,
+            showToolbar: true, // Only show zoom/pan controls
+            mode: 'edit'
+          }
+        }
+      });
+      */
     </script>
   </body>
 </html>

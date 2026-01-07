@@ -1,36 +1,60 @@
 // SDK Entry Point
+import { createElement } from "react";
 import { createRoot } from "react-dom/client";
-import WorkflowBuilder from "./workflow";
+import type { Root } from "react-dom/client";
+// Import as named export then assign to WorkflowBuilder
+import * as WorkflowModule from "./workflow/index.js";
+import type { PluginOptions, WorkflowUIConfig, WorkflowBuilderProps } from "./workflow";
+
+const WorkflowBuilder = WorkflowModule.default;
 import "@xyflow/react/dist/style.css";
 import "./index.css";
 import "@sth87/shadcn-design-system/index.css";
 import "@sth87/shadcn-design-system/animation.css";
 
-// Expose global API
+// Use WorkflowUIConfig directly from workflow export
+type BPMUIConfig = WorkflowUIConfig;
+
 interface BPMConfig {
   container?: string | HTMLElement;
-  pluginOptions?: {
-    enableDefaultPlugin?: boolean;
-    autoActivate?: boolean;
-    plugins?: any[];
-  };
+  pluginOptions?: PluginOptions;
+  ui?: BPMUIConfig;
   onReady?: () => void;
   onError?: (error: Error) => void;
 }
 
 class BPMCore {
-  private root: any = null;
+  private root: Root | null = null;
   private container: HTMLElement | null = null;
   private config: BPMConfig;
 
   constructor(config: BPMConfig) {
-    this.config = config;
+    this.config = {
+      ...config,
+      ui: {
+        showHeader: true,
+        showImportExport: true,
+        showThemeToggle: true,
+        showLayoutControls: true,
+        showWorkflowName: true,
+        showToolbox: true,
+        showPropertiesPanel: true,
+        showValidationPanel: true,
+        showToolbar: true,
+        showPanMode: true,
+        showZoomControls: true,
+        showMinimap: true,
+        showBehavior: true,
+        showRunButton: true,
+        mode: "edit",
+        ...config.ui,
+      },
+    };
     this.init();
   }
 
   private init() {
     try {
-      // Get container
       if (typeof this.config.container === "string") {
         this.container = document.querySelector(this.config.container);
       } else if (this.config.container instanceof HTMLElement) {
@@ -41,17 +65,18 @@ class BPMCore {
         throw new Error("BPM: Container not found");
       }
 
-      // Create React root and render
       this.root = createRoot(this.container);
-      this.root.render(
-        <WorkflowBuilder pluginOptions={this.config.pluginOptions || {}} />
-      );
+      const props: WorkflowBuilderProps = {
+        pluginOptions: this.config.pluginOptions || {},
+        uiConfig: this.config.ui,
+      };
+      this.root.render(createElement(WorkflowBuilder as React.ComponentType<WorkflowBuilderProps>, props));
 
-      // Call ready callback
       if (typeof this.config.onReady === "function") {
-        // Wait for next tick to ensure render is complete
         setTimeout(() => {
-          this.config.onReady!();
+          if (this.config.onReady) {
+            this.config.onReady();
+          }
         }, 0);
       }
     } catch (error) {
@@ -71,41 +96,51 @@ class BPMCore {
   }
 
   update(config: Partial<BPMConfig>) {
-    this.config = { ...this.config, ...config };
+    this.config = {
+      ...this.config,
+      ...config,
+      ui: { ...this.config.ui, ...config.ui },
+    };
     if (this.root && this.container) {
-      this.root.render(
-        <WorkflowBuilder pluginOptions={this.config.pluginOptions || {}} />
-      );
+      const props: WorkflowBuilderProps = {
+        pluginOptions: this.config.pluginOptions || {},
+        uiConfig: this.config.ui,
+      };
+      this.root.render(createElement(WorkflowBuilder as React.ComponentType<WorkflowBuilderProps>, props));
     }
   }
 }
 
-// Register renderer for SDK loader
 if (typeof window !== "undefined") {
-  (window as any).__BPM_CORE__ = BPMCore;
+  interface WindowWithBPM extends Window {
+    __BPM_CORE__: typeof BPMCore;
+    __SKYLINE_SDK_REQUESTS__?: {
+      bpm?: Array<{ selector?: string; options?: BPMConfig }>;
+    };
+    __SKYLINE_SDK_RENDERERS__?: {
+      bpm?: (request: { selector?: string; options?: BPMConfig }) => void;
+    };
+    BPM: typeof BPMCore;
+  }
 
-  // Process pending requests from SDK loader
-  const requests = (window as any).__SKYLINE_SDK_REQUESTS__?.["bpm"] || [];
-  requests.forEach((request: any) => {
+  const win = window as unknown as WindowWithBPM;
+  win.__BPM_CORE__ = BPMCore;
+  win.BPM = BPMCore;
+
+  const requests = win.__SKYLINE_SDK_REQUESTS__?.bpm || [];
+  requests.forEach((request) => {
     try {
       const container = request.selector || request.options?.container;
-      new BPMCore({
-        container,
-        ...request.options,
-      });
+      new BPMCore({ container, ...request.options });
     } catch (error) {
       console.error("Error processing BPM request:", error);
     }
   });
 
-  // Register renderer for future requests
-  if ((window as any).__SKYLINE_SDK_RENDERERS__) {
-    (window as any).__SKYLINE_SDK_RENDERERS__["bpm"] = function (request: any) {
+  if (win.__SKYLINE_SDK_RENDERERS__) {
+    win.__SKYLINE_SDK_RENDERERS__.bpm = function (request) {
       const container = request.selector || request.options?.container;
-      new BPMCore({
-        container,
-        ...request.options,
-      });
+      new BPMCore({ container, ...request.options });
     };
   }
 }
