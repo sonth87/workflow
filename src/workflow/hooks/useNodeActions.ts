@@ -133,8 +133,8 @@ export function useNodeActions() {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
-        // Clone data deeply
-        data: node.data ? JSON.parse(JSON.stringify(node.data)) : undefined,
+        // Clone data shallowly
+        data: node.data ? { ...node.data } : {},
         // Reset selection state
         selected: false,
       };

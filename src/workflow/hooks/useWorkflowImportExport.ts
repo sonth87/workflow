@@ -89,35 +89,32 @@ export function useWorkflowImportExport() {
   /**
    * Import workflow from file
    */
-  const uploadWorkflow = useCallback(
-    (): Promise<WorkflowData> => {
-      return new Promise((resolve, reject) => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".json";
+  const uploadWorkflow = useCallback((): Promise<WorkflowData> => {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
 
-        input.onchange = async (e: Event) => {
-          const file = (e.target as HTMLInputElement).files?.[0];
-          if (!file) {
-            reject(new Error("No file selected"));
-            return;
-          }
+      input.onchange = async (e: Event) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) {
+          reject(new Error("No file selected"));
+          return;
+        }
 
-          try {
-            const text = await file.text();
-            const data = JSON.parse(text) as WorkflowData;
-            importWorkflow(data);
-            resolve(data);
-          } catch (error) {
-            reject(error);
-          }
-        };
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text) as WorkflowData;
+          importWorkflow(data);
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      };
 
-        input.click();
-      });
-    },
-    [importWorkflow]
-  );
+      input.click();
+    });
+  }, [importWorkflow]);
 
   return {
     exportWorkflow,

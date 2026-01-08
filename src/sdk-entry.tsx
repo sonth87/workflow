@@ -4,7 +4,11 @@ import { createRoot } from "react-dom/client";
 import type { Root } from "react-dom/client";
 // Import as named export then assign to WorkflowBuilder
 import * as WorkflowModule from "./workflow/index.js";
-import type { PluginOptions, WorkflowUIConfig, WorkflowBuilderProps } from "./workflow";
+import type {
+  PluginOptions,
+  WorkflowUIConfig,
+  WorkflowBuilderProps,
+} from "./workflow";
 
 const WorkflowBuilder = WorkflowModule.default;
 import "@xyflow/react/dist/style.css";
@@ -70,7 +74,12 @@ class BPMCore {
         pluginOptions: this.config.pluginOptions || {},
         uiConfig: this.config.ui,
       };
-      this.root.render(createElement(WorkflowBuilder as React.ComponentType<WorkflowBuilderProps>, props));
+      this.root.render(
+        createElement(
+          WorkflowBuilder as React.ComponentType<WorkflowBuilderProps>,
+          props
+        )
+      );
 
       if (typeof this.config.onReady === "function") {
         setTimeout(() => {
@@ -106,7 +115,12 @@ class BPMCore {
         pluginOptions: this.config.pluginOptions || {},
         uiConfig: this.config.ui,
       };
-      this.root.render(createElement(WorkflowBuilder as React.ComponentType<WorkflowBuilderProps>, props));
+      this.root.render(
+        createElement(
+          WorkflowBuilder as React.ComponentType<WorkflowBuilderProps>,
+          props
+        )
+      );
     }
   }
 }
@@ -128,7 +142,7 @@ if (typeof window !== "undefined") {
   win.BPM = BPMCore;
 
   const requests = win.__SKYLINE_SDK_REQUESTS__?.bpm || [];
-  requests.forEach((request) => {
+  requests.forEach(request => {
     try {
       const container = request.selector || request.options?.container;
       new BPMCore({ container, ...request.options });

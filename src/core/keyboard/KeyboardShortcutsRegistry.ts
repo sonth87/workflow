@@ -125,6 +125,7 @@ export class KeyboardShortcutsRegistry implements IKeyboardShortcutsRegistry {
 
   /**
    * Find a shortcut that matches the keyboard event
+   * Prioritizes shortcuts with modifiers over simple keys
    */
   findShortcut(event: KeyboardEvent): KeyboardShortcut | undefined {
     // Skip if focus is on input/textarea (unless allowInInput is true)
@@ -134,16 +135,44 @@ export class KeyboardShortcutsRegistry implements IKeyboardShortcutsRegistry {
       target.tagName === "TEXTAREA" ||
       target.isContentEditable;
 
+    let bestMatch: KeyboardShortcut | undefined;
+    let bestMatchHasModifier = false;
+
     for (const shortcut of this.shortcuts.values()) {
       if (!shortcut.enabled) continue;
       if (isInput && !shortcut.allowInInput) continue;
 
       if (this.matchesShortcut(event, shortcut)) {
-        return shortcut;
+        const hasModifier = this.shortcutHasModifier(shortcut);
+
+        // Prioritize shortcuts with modifiers over simple keys
+        if (!bestMatch || (hasModifier && !bestMatchHasModifier)) {
+          bestMatch = shortcut;
+          bestMatchHasModifier = hasModifier;
+        }
       }
     }
 
-    return undefined;
+    return bestMatch;
+  }
+
+  /**
+   * Check if a shortcut has any modifiers
+   */
+  private shortcutHasModifier(shortcut: KeyboardShortcut): boolean {
+    const keys = Array.isArray(shortcut.keys) ? shortcut.keys : [shortcut.keys];
+
+    for (const key of keys) {
+      if (typeof key === "string") {
+        if (key.includes("+")) return true;
+      } else {
+        if (key.ctrl || key.cmd || key.meta || key.alt || key.shift) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**

@@ -256,7 +256,10 @@ function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
 /**
  * Workflow Builder Props
  */
-export interface WorkflowBuilderProps extends Omit<WorkflowCoreProps, "children"> {
+export interface WorkflowBuilderProps extends Omit<
+  WorkflowCoreProps,
+  "children"
+> {
   /**
    * Optional: Custom layout component
    * If not provided, uses default layout

@@ -48,6 +48,12 @@ export interface WorkflowState {
   // Loading states
   isLoading: boolean;
   isSaving: boolean;
+
+  // Clipboard
+  clipboard: {
+    nodes: BaseNodeConfig[];
+    edges: BaseEdgeConfig[];
+  } | null;
 }
 
 export interface WorkflowActions {
@@ -94,6 +100,17 @@ export interface WorkflowActions {
   togglePanel: (panel: keyof WorkflowState["panelStates"]) => void;
   setLoading: (isLoading: boolean) => void;
   setSaving: (isSaving: boolean) => void;
+
+  // Clipboard actions
+  copyNodesToClipboard: (
+    nodes: BaseNodeConfig[],
+    edges: BaseEdgeConfig[]
+  ) => void;
+  getClipboard: () => {
+    nodes: BaseNodeConfig[];
+    edges: BaseEdgeConfig[];
+  } | null;
+  clearClipboard: () => void;
 }
 
 const initialState: WorkflowState = {
@@ -119,6 +136,7 @@ const initialState: WorkflowState = {
   },
   isLoading: false,
   isSaving: false,
+  clipboard: null,
 };
 
 export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
@@ -353,6 +371,19 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
 
     setSaving: isSaving => {
       set({ isSaving });
+    },
+
+    // Clipboard actions
+    copyNodesToClipboard: (nodes, edges) => {
+      set({ clipboard: { nodes, edges } });
+    },
+
+    getClipboard: () => {
+      return get().clipboard;
+    },
+
+    clearClipboard: () => {
+      set({ clipboard: null });
     },
   })
 );

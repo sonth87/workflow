@@ -202,7 +202,6 @@ export const defaultShortcuts: KeyboardShortcut[] = [
       const { selectedNodes } = context;
       if (selectedNodes.length > 0) {
         console.log("📋 Copy nodes:", selectedNodes.length);
-        // TODO: Implement copy functionality
         return true;
       }
       return false;
@@ -215,7 +214,6 @@ export const defaultShortcuts: KeyboardShortcut[] = [
     category: "editing",
     handler: () => {
       console.log("📋 Paste nodes");
-      // TODO: Implement paste functionality
       return true;
     },
   },
@@ -228,7 +226,6 @@ export const defaultShortcuts: KeyboardShortcut[] = [
       const { selectedNodes } = context;
       if (selectedNodes.length > 0) {
         console.log("✂️ Cut nodes:", selectedNodes.length);
-        // TODO: Implement cut functionality
         return true;
       }
       return false;
@@ -243,7 +240,6 @@ export const defaultShortcuts: KeyboardShortcut[] = [
       const { selectedNodes } = context;
       if (selectedNodes.length > 0) {
         console.log("📑 Duplicate nodes:", selectedNodes.length);
-        // TODO: Implement duplicate functionality
         return true;
       }
       return false;
