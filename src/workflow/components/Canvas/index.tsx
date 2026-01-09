@@ -29,6 +29,7 @@ import type {
   BaseNodeConfig,
 } from "@/core/types/base.types";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useClipboard } from "@/workflow/hooks/useClipboard";
 import { globalEventBus } from "@/core/events/EventBus";
 import {
   canLaneBeDroppedOnCanvas,
@@ -602,6 +603,65 @@ function CanvasInner({
     );
   }, [nodes, setNodes]);
 
+  // Use clipboard hook
+  const { handleCopy, handlePaste, handleCut, handleDuplicate } =
+    useClipboard();
+
+  const handleCopyWrapper = useCallback(
+    (nodesToCopy: Node[]) => {
+      handleCopy(nodesToCopy);
+    },
+    [handleCopy]
+  );
+
+  const handlePasteWrapper = useCallback(() => {
+    saveToHistory();
+    const result = handlePaste();
+
+    // Select the pasted nodes
+    if (result && result.nodes.length > 0) {
+      const pastedNodeIds = result.nodes.map(n => n.id);
+      setNodes(
+        nodes.map(node => ({
+          ...node,
+          selected: pastedNodeIds.includes(node.id),
+        }))
+      );
+    }
+  }, [handlePaste, saveToHistory, setNodes, nodes]);
+
+  const handleCutWrapper = useCallback(
+    (nodesToCut: Node[]) => {
+      saveToHistory();
+      handleCut(nodesToCut);
+    },
+    [handleCut, saveToHistory]
+  );
+
+  const handleDuplicateWrapper = useCallback(
+    (nodesToDuplicate: Node[]) => {
+      const nodesBefore = nodes.length;
+      saveToHistory();
+      handleDuplicate(nodesToDuplicate);
+
+      // After duplication, select the newly created nodes
+      // We'll do this in the next render cycle
+      setTimeout(() => {
+        const nodesAfter = nodes.length;
+        if (nodesAfter > nodesBefore) {
+          // Select all nodes that were just added
+          setNodes(
+            nodes.map((node, idx) => ({
+              ...node,
+              selected: idx >= nodesBefore,
+            }))
+          );
+        }
+      }, 0);
+    },
+    [handleDuplicate, saveToHistory, nodes, setNodes]
+  );
+
   // Use keyboard shortcuts hook
   useKeyboardShortcuts(nodes, edges, {
     handlers: {
@@ -610,6 +670,10 @@ function CanvasInner({
       onClearSelection: clearSelection,
       onUndo: undo,
       onRedo: redo,
+      onCopy: handleCopyWrapper,
+      onPaste: handlePasteWrapper,
+      onCut: handleCutWrapper,
+      onDuplicate: handleDuplicateWrapper,
     },
   });
 

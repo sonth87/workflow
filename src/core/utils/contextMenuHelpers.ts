@@ -13,6 +13,13 @@ import { contextMenuActionsRegistry } from "../registry/ContextMenuActionsRegist
 import { Copy, Settings2, Tags, Trash2 } from "lucide-react";
 
 /**
+ * Generate unique separator ID
+ */
+function generateSeparatorId(): string {
+  return `separator-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+}
+
+/**
  * Create color submenu items from color palettes
  */
 export function createColorMenuItems(
@@ -40,7 +47,7 @@ export function createColorMenuItems(
       },
     },
     {
-      id: "separator-color",
+      id: generateSeparatorId(),
       label: "",
       separator: true,
     },
@@ -195,7 +202,7 @@ export function createDefaultNodeContextMenuItems(
       children: createNodeBorderStyleMenuItems(onBorderStyleChange),
     },
     {
-      id: "separator-0",
+      id: generateSeparatorId(),
       label: "",
       separator: true,
     },
@@ -214,7 +221,7 @@ export function createDefaultNodeContextMenuItems(
       },
     },
     {
-      id: "separator-1",
+      id: generateSeparatorId(),
       label: "",
       separator: true,
     },
@@ -234,7 +241,7 @@ export function createDefaultNodeContextMenuItems(
     },
     createDeleteMenuItem(onDelete),
     {
-      id: "separator-2",
+      id: generateSeparatorId(),
       label: "",
       separator: true,
     },
@@ -378,7 +385,7 @@ export function createDefaultEdgeContextMenuItems(
   return [
     createColorPickerMenuItem(onColorChange),
     {
-      id: "separator-0",
+      id: generateSeparatorId(),
       label: "",
       separator: true,
     },
@@ -400,7 +407,7 @@ export function createDefaultEdgeContextMenuItems(
       children: createEdgeAnimationMenuItems(onAnimationChange),
     },
     {
-      id: "separator-1",
+      id: generateSeparatorId(),
       label: "",
       separator: true,
     },
@@ -414,7 +421,7 @@ export function createDefaultEdgeContextMenuItems(
       children: createEdgeLabelMenuItems(onAddLabel),
     },
     {
-      id: "separator-2",
+      id: generateSeparatorId(),
       label: "",
       separator: true,
     },
@@ -433,7 +440,7 @@ export function createDefaultEdgeContextMenuItems(
       },
     },
     {
-      id: "separator-3",
+      id: generateSeparatorId(),
       label: "",
       separator: true,
     },
@@ -563,7 +570,7 @@ export function createAnnotationNodeContextMenuItems(
       })),
     },
     {
-      id: "separator-annotation",
+      id: generateSeparatorId(),
       label: "",
       separator: true,
     },
