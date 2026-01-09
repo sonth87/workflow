@@ -7,13 +7,7 @@ import { useCallback, useRef } from "react";
 import { useReactFlow, type Node, type Edge } from "@xyflow/react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
-
-/**
- * Generate a unique ID for nodes
- */
-function generateId(nodeType: string): string {
-  return `${nodeType}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-}
+import { createDuplicatedNode, generateId } from "@/utils/nodeDuplication";
 
 /**
  * Converts ReactFlow nodes to base node config for storage
@@ -179,19 +173,7 @@ export function useClipboard() {
       if (!newId) {
         throw new Error("Failed to generate new ID for pasted node");
       }
-
-      return {
-        id: newId,
-        type: node.type,
-        position: {
-          x: node.position.x + offsetX,
-          y: node.position.y + offsetY,
-        },
-        data: { ...node.data },
-        selected: false,
-        zIndex: node.zIndex,
-        metadata: node.metadata,
-      } as Node;
+      return createDuplicatedNode(node, offsetX, offsetY, true, newId) as Node;
     });
 
     // Create new edges with remapped source/target

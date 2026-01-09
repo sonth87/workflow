@@ -7,6 +7,7 @@ import { useCallback } from "react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import type { BaseNodeConfig } from "@/core/types/base.types";
 import { paletteToNodeVisualConfig } from "@/core/utils/contextMenuHelpers";
+import { createDuplicatedNode } from "@/utils/nodeDuplication";
 
 export function useNodeActions() {
   const { nodes, updateNode, deleteNode } = useWorkflowStore();
@@ -114,30 +115,8 @@ export function useNodeActions() {
       const node = nodes.find(n => n.id === nodeId);
       if (!node) return;
 
-      // Generate new unique ID
-      const newId = `${node.type}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-
-      // Clone the node with new ID and offset position
-      const duplicatedNode: BaseNodeConfig = {
-        ...node,
-        id: newId,
-        position: {
-          x: node.position.x + 30, // Offset by 30px to the right
-          y: node.position.y + 30, // Offset by 30px down
-        },
-        // Update metadata if exists
-        metadata: {
-          ...node.metadata,
-          id: newId,
-          title: `${node.metadata.title} (Copy)`,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        // Clone data shallowly
-        data: node.data ? { ...node.data } : {},
-        // Reset selection state
-        selected: false,
-      };
+      // Create duplicated node
+      const duplicatedNode = createDuplicatedNode(node, 30, 30, true);
 
       // Add the duplicated node to the store
       const { addNode } = useWorkflowStore.getState();
