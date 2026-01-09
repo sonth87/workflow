@@ -15,7 +15,7 @@ export const getLayoutedElements = (
   nodes: Node[],
   edges: Edge[],
   direction: LayoutDirection
-) => {
+): { nodes: Node[]; edges: Edge[] } => {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
 
