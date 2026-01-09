@@ -122,8 +122,8 @@ export function useNodeActions() {
         ...node,
         id: newId,
         position: {
-          x: node.position.x + 50, // Offset by 50px to the right
-          y: node.position.y + 50, // Offset by 50px down
+          x: node.position.x + 30, // Offset by 30px to the right
+          y: node.position.y + 30, // Offset by 30px down
         },
         // Update metadata if exists
         metadata: {
