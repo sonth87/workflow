@@ -1010,7 +1010,7 @@ const defaultContextMenus: Array<{
           label: "Delete Pool",
           icon: { type: "lucide", value: Trash2, color: "red" },
           onClick: async (context: ContextMenuContext) => {
-            const action = contextMenuActionsRegistry.getAction("deleteNode");
+            const action = contextMenuActionsRegistry.getAction("deletePoolWithConfirmation");
             if (action && context.nodeId) {
               action(context.nodeId);
             }
