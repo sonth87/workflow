@@ -7,6 +7,38 @@
 import type { BaseNodeConfig, DynamicStyle } from "@/core/types/base.types";
 
 /**
+ * Sort nodes so that parent nodes always appear before their children
+ * This is required by React Flow to avoid "parent node not found" warnings
+ */
+export function sortNodesByParentChild(
+  nodes: BaseNodeConfig[]
+): BaseNodeConfig[] {
+  const sorted: BaseNodeConfig[] = [];
+  const visited = new Set<string>();
+  const nodeMap = new Map(nodes.map(n => [n.id, n]));
+
+  function visit(node: BaseNodeConfig) {
+    if (visited.has(node.id)) return;
+    visited.add(node.id);
+
+    // If node has a parent, visit parent first
+    if (node.parentId) {
+      const parent = nodeMap.get(node.parentId);
+      if (parent) {
+        visit(parent);
+      }
+    }
+
+    sorted.push(node);
+  }
+
+  // Visit all nodes
+  nodes.forEach(node => visit(node));
+
+  return sorted;
+}
+
+/**
  * Safely get width from container style
  */
 function getContainerWidth(container: BaseNodeConfig): number {

@@ -38,6 +38,7 @@ import {
   findTargetContainer,
   toRelativePosition,
   validateLaneOperation,
+  sortNodesByParentChild,
 } from "@/workflow/utils/poolLaneRules";
 
 // Import node/edge types from workflow
@@ -245,6 +246,11 @@ function CanvasInner({
               targetContainer.position
             ),
           });
+
+          // Sort nodes to ensure parent appears before child
+          const currentNodes = useWorkflowStore.getState().nodes;
+          const sortedNodes = sortNodesByParentChild(currentNodes);
+          useWorkflowStore.getState().setNodes(sortedNodes);
         }
         return;
       }
@@ -279,6 +285,11 @@ function CanvasInner({
             targetContainer.position
           ),
         });
+
+        // Sort nodes to ensure parent appears before child
+        const currentNodes = useWorkflowStore.getState().nodes;
+        const sortedNodes = sortNodesByParentChild(currentNodes);
+        useWorkflowStore.getState().setNodes(sortedNodes);
       } else if (!targetContainer && node.parentId) {
         // Node moved OUT of container - REMOVE parentId
         const oldParent = allNodes.find(n => n.id === node.parentId);
