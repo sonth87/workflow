@@ -195,25 +195,6 @@ export function createDefaultNodeContextMenuItems(
 ): ContextMenuItem[] {
   return [
     {
-      id: "appearance",
-      label: "Appearance",
-      icon: "",
-      children: [
-        createColorPickerMenuItem(onColorChange),
-        {
-          id: "change-border-style",
-          label: "Border Style",
-          icon: "",
-          children: createNodeBorderStyleMenuItems(onBorderStyleChange),
-        },
-      ],
-    },
-    {
-      id: generateSeparatorId(),
-      label: "",
-      separator: true,
-    },
-    {
       id: "properties",
       label: "Properties",
       icon: {
@@ -226,6 +207,25 @@ export function createDefaultNodeContextMenuItems(
           action(context.nodeId);
         }
       },
+    },
+    {
+      id: generateSeparatorId(),
+      label: "",
+      separator: true,
+    },
+    {
+      id: "appearance",
+      label: "Appearance",
+      icon: "",
+      children: [
+        createColorPickerMenuItem(onColorChange),
+        {
+          id: "change-border-style",
+          label: "Border Style",
+          icon: "",
+          children: createNodeBorderStyleMenuItems(onBorderStyleChange),
+        },
+      ],
     },
     {
       id: generateSeparatorId(),
@@ -247,29 +247,6 @@ export function createDefaultNodeContextMenuItems(
       },
     },
     createDeleteMenuItem(onDelete),
-    {
-      id: generateSeparatorId(),
-      label: "",
-      separator: true,
-    },
-    {
-      id: "collapse",
-      label: "Collapse",
-      icon: "▼",
-      onClick: async (context: any) => {
-        console.log("Collapse node:", context.nodeId);
-      },
-      visible: (context: any) => !context.node?.collapsed,
-    },
-    {
-      id: "expand",
-      label: "Expand",
-      icon: "▶",
-      onClick: async (context: any) => {
-        console.log("Expand node:", context.nodeId);
-      },
-      visible: (context: any) => context.node?.collapsed === true,
-    },
   ];
 }
 
@@ -502,7 +479,8 @@ export function createNoteNodeContextMenuItems(
             label: noteColor.label,
             color: noteColor.color,
             onClick: async (context: any) => {
-              const action = contextMenuActionsRegistry.getAction("updateNodeData");
+              const action =
+                contextMenuActionsRegistry.getAction("updateNodeData");
               if (action && context.nodeId) {
                 action(context.nodeId, { color: noteColor.color });
               }
@@ -517,14 +495,15 @@ export function createNoteNodeContextMenuItems(
           children: noteFontSizes.map(size => ({
             id: `font-size-${size.id}`,
             label: size.label,
-        onClick: async (context: any) => {
-          const action = contextMenuActionsRegistry.getAction("updateNodeData");
-          if (action && context.nodeId) {
-            action(context.nodeId, { fontSize: size.id });
-          }
-          await onFontSizeChange?.(size.id, context);
-        },
-      })),
+            onClick: async (context: any) => {
+              const action =
+                contextMenuActionsRegistry.getAction("updateNodeData");
+              if (action && context.nodeId) {
+                action(context.nodeId, { fontSize: size.id });
+              }
+              await onFontSizeChange?.(size.id, context);
+            },
+          })),
         },
       ],
     },
@@ -571,7 +550,8 @@ export function createAnnotationNodeContextMenuItems(
             label: textColor.label,
             color: textColor.color,
             onClick: async (context: any) => {
-              const action = contextMenuActionsRegistry.getAction("updateNodeData");
+              const action =
+                contextMenuActionsRegistry.getAction("updateNodeData");
               if (action && context.nodeId) {
                 action(context.nodeId, { color: textColor.color });
               }
@@ -587,7 +567,8 @@ export function createAnnotationNodeContextMenuItems(
             id: `font-size-${size.id}`,
             label: size.label,
             onClick: async (context: any) => {
-              const action = contextMenuActionsRegistry.getAction("updateNodeData");
+              const action =
+                contextMenuActionsRegistry.getAction("updateNodeData");
               if (action && context.nodeId) {
                 action(context.nodeId, { fontSize: size.id });
               }

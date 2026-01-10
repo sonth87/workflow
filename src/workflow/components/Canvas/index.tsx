@@ -22,6 +22,7 @@ import "@xyflow/react/dist/style.css";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { edgeRegistry } from "@/core/registry/EdgeRegistry";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
+import { contextMenuActionsRegistry } from "@/core/registry";
 import { validateConnection } from "@/utils/validation";
 import { NodeType } from "@/enum/workflow.enum";
 import type {
@@ -32,12 +33,8 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useClipboard } from "@/workflow/hooks/useClipboard";
 import { globalEventBus } from "@/core/events/EventBus";
 import {
-  canLaneBeDroppedOnCanvas,
-  canLaneBeDragged,
-  canLaneExistStandalone,
   findTargetContainer,
   toRelativePosition,
-  validateLaneOperation,
   sortNodesByParentChild,
 } from "@/workflow/utils/poolLaneRules";
 
@@ -110,16 +107,6 @@ function CanvasInner({
         if (node.parentId) {
           const parent = updatedNodes.find((n: any) => n.id === node.parentId);
 
-          // RULE 4: Lanes inside Pool should not be draggable
-          const isDraggable = canLaneBeDragged(node, updatedNodes);
-          if (!isDraggable) {
-            return {
-              ...node,
-              draggable: false,
-              extent: "parent" as const,
-            };
-          }
-
           if (parent && parent.data?.isLocked) {
             // Node is in a locked container
             return {
@@ -127,14 +114,6 @@ function CanvasInner({
               extent: "parent" as const,
             };
           }
-        }
-
-        // RULE 3: Lane must be in Pool (should not exist standalone)
-        const standaloneCheck = canLaneExistStandalone(node);
-        if (!standaloneCheck.allowed) {
-          console.warn(
-            "⚠️ Lane detected without parent Pool. This should not happen."
-          );
         }
 
         // Clear extent if not in locked container
@@ -186,16 +165,6 @@ function CanvasInner({
       // Get the latest nodes state
       const allNodes = useWorkflowStore.getState().nodes;
 
-      // RULE 3: Lane MUST be inside Pool (cannot be standalone)
-      const standaloneCheck = canLaneExistStandalone(node);
-      if (!standaloneCheck.allowed) {
-        alert(standaloneCheck.reason);
-        // Remove the lane node if it's not in a pool
-        const { deleteNode } = useWorkflowStore.getState();
-        deleteNode(node.id);
-        return;
-      }
-
       // Calculate absolute position - node.position might be relative if it has a parent
       const absolutePosition = node.parentId
         ? (() => {
@@ -219,43 +188,7 @@ function CanvasInner({
         false
       );
 
-      // SPECIAL HANDLING FOR LANE
-      if (node.type === "lane" || node.data?.nodeType === "lane") {
-        // Use centralized validation
-        const validation = validateLaneOperation(
-          "dragStop",
-          node,
-          targetContainer,
-          allNodes
-        );
-
-        if (!validation.valid) {
-          alert(validation.error);
-          return;
-        }
-
-        // If validation passed and lane is entering a pool
-        if (targetContainer && node.parentId !== targetContainer.id) {
-          const { updateNode: updateNodeFn } = useWorkflowStore.getState();
-          updateNodeFn(node.id, {
-            parentId: targetContainer.id,
-            draggable: false, // RULE 4: Lanes in pool cannot be dragged
-            extent: "parent" as const,
-            position: toRelativePosition(
-              node.position,
-              targetContainer.position
-            ),
-          });
-
-          // Sort nodes to ensure parent appears before child
-          const currentNodes = useWorkflowStore.getState().nodes;
-          const sortedNodes = sortNodesByParentChild(currentNodes);
-          useWorkflowStore.getState().setNodes(sortedNodes);
-        }
-        return;
-      }
-
-      // NORMAL NODES handling
+      // Node drag handling
       const { updateNode: updateNodeFn } = useWorkflowStore.getState();
 
       // Check if node is trying to leave a locked parent
@@ -347,7 +280,6 @@ function CanvasInner({
       );
 
       if (!validation.valid) {
-        console.warn("Connection validation failed:", validation.message);
         alert(`Cannot create connection: ${validation.message}`);
         return;
       }
@@ -401,7 +333,6 @@ function CanvasInner({
 
       for (const node of nodes) {
         if (hasCycle(node.id, visited, recStack)) {
-          console.warn("❌ Cycle detected! Cannot create this connection.");
           alert(
             "❌ Cannot create connection: This would create a circular loop in the workflow!"
           );
@@ -570,35 +501,90 @@ function CanvasInner({
   // Keyboard shortcuts handlers
   const handleDeleteSelection = useCallback(
     (nodeIds: string[], edgeIds: string[]) => {
-      // Save history before deletion
-      saveToHistory();
+      // Check if any of the selected nodes is a pool
+      const poolNodes = nodeIds.filter(nodeId => {
+        const node = nodes.find(n => n.id === nodeId);
+        return node?.type === "pool";
+      });
 
-      // Delete nodes
-      if (nodeIds.length > 0) {
-        // Check if any deleted node is a Note or Annotation node
-        const hasNoteNode = nodes.some(
-          node =>
-            nodeIds.includes(node.id) &&
-            (node.type === NodeType.NOTE || node.type === NodeType.ANNOTATION)
+      // If there are pool nodes, handle them with confirmation
+      if (poolNodes.length > 0) {
+        // Get the deletePoolWithConfirmation action from registry
+        const deletePoolWithConfirmation = contextMenuActionsRegistry.getAction(
+          "deletePoolWithConfirmation"
         );
 
-        // If deleting a note node, reset zoom on scroll
-        if (hasNoteNode) {
-          globalEventBus.emit("note-hover", false);
+        if (deletePoolWithConfirmation) {
+          // Handle pool deletion with confirmation
+          poolNodes.forEach(poolId => {
+            deletePoolWithConfirmation(poolId);
+          });
+
+          // Handle non-pool nodes
+          const nonPoolNodeIds = nodeIds.filter(
+            nodeId => !poolNodes.includes(nodeId)
+          );
+
+          if (nonPoolNodeIds.length > 0) {
+            saveToHistory();
+
+            // Check if any deleted node is a Note or Annotation node
+            const hasNoteNode = nodes.some(
+              node =>
+                nonPoolNodeIds.includes(node.id) &&
+                (node.type === NodeType.NOTE ||
+                  node.type === NodeType.ANNOTATION)
+            );
+
+            // If deleting a note node, reset zoom on scroll
+            if (hasNoteNode) {
+              globalEventBus.emit("note-hover", false);
+            }
+
+            setNodes(nodes.filter(node => !nonPoolNodeIds.includes(node.id)));
+            // Also delete connected edges
+            setEdges(
+              edges.filter(
+                edge =>
+                  !nonPoolNodeIds.includes(edge.source) &&
+                  !nonPoolNodeIds.includes(edge.target)
+              )
+            );
+          }
         }
+      } else {
+        // No pool nodes, delete normally
+        // Save history before deletion
+        saveToHistory();
 
-        setNodes(nodes.filter(node => !nodeIds.includes(node.id)));
-        // Also delete connected edges
-        setEdges(
-          edges.filter(
-            edge =>
-              !nodeIds.includes(edge.source) && !nodeIds.includes(edge.target)
-          )
-        );
+        // Delete nodes
+        if (nodeIds.length > 0) {
+          // Check if any deleted node is a Note or Annotation node
+          const hasNoteNode = nodes.some(
+            node =>
+              nodeIds.includes(node.id) &&
+              (node.type === NodeType.NOTE || node.type === NodeType.ANNOTATION)
+          );
+
+          // If deleting a note node, reset zoom on scroll
+          if (hasNoteNode) {
+            globalEventBus.emit("note-hover", false);
+          }
+
+          setNodes(nodes.filter(node => !nodeIds.includes(node.id)));
+          // Also delete connected edges
+          setEdges(
+            edges.filter(
+              edge =>
+                !nodeIds.includes(edge.source) && !nodeIds.includes(edge.target)
+            )
+          );
+        }
       }
 
       // Delete edges
       if (edgeIds.length > 0) {
+        saveToHistory();
         setEdges(edges.filter(edge => !edgeIds.includes(edge.id)));
       }
     },
