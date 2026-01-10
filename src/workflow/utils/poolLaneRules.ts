@@ -7,13 +7,54 @@
 import type { BaseNodeConfig, DynamicStyle } from "@/core/types/base.types";
 
 /**
+ * Sort nodes so that parent nodes always appear before their children
+ * This is required by React Flow to avoid "parent node not found" warnings
+ */
+export function sortNodesByParentChild(
+  nodes: BaseNodeConfig[]
+): BaseNodeConfig[] {
+  const sorted: BaseNodeConfig[] = [];
+  const visited = new Set<string>();
+  const nodeMap = new Map(nodes.map(n => [n.id, n]));
+
+  function visit(node: BaseNodeConfig) {
+    if (visited.has(node.id)) return;
+    visited.add(node.id);
+
+    // If node has a parent, visit parent first
+    if (node.parentId) {
+      const parent = nodeMap.get(node.parentId);
+      if (parent) {
+        visit(parent);
+      }
+    }
+
+    sorted.push(node);
+  }
+
+  // Visit all nodes
+  nodes.forEach(node => visit(node));
+
+  return sorted;
+}
+
+/**
  * Safely get width from container style
  */
 function getContainerWidth(container: BaseNodeConfig): number {
+  // Check multiple sources for width in order of priority:
+  // 1. Direct width property (set by ReactFlow after resizing)
+  // 2. Measured width (actual rendered size)
+  // 3. Style width (from node.style)
+  // 4. Data style width (from node.data.style)
+  // 5. Default fallback
+  const directWidth = (container as any).width;
+  const measuredWidth = (container as any).measured?.width;
   const nodeStyle = container.style as DynamicStyle | undefined;
   const dataStyle = container.data?.style as DynamicStyle | undefined;
 
-  const width = nodeStyle?.width ?? dataStyle?.width ?? 800;
+  const width =
+    directWidth ?? measuredWidth ?? nodeStyle?.width ?? dataStyle?.width ?? 800;
   return typeof width === "number" ? width : 800;
 }
 
@@ -21,10 +62,23 @@ function getContainerWidth(container: BaseNodeConfig): number {
  * Safely get height from container style
  */
 function getContainerHeight(container: BaseNodeConfig): number {
+  // Check multiple sources for height in order of priority:
+  // 1. Direct height property (set by ReactFlow after resizing)
+  // 2. Measured height (actual rendered size)
+  // 3. Style height (from node.style)
+  // 4. Data style height (from node.data.style)
+  // 5. Default fallback
+  const directHeight = (container as any).height;
+  const measuredHeight = (container as any).measured?.height;
   const nodeStyle = container.style as DynamicStyle | undefined;
   const dataStyle = container.data?.style as DynamicStyle | undefined;
 
-  const height = nodeStyle?.height ?? dataStyle?.height ?? 300;
+  const height =
+    directHeight ??
+    measuredHeight ??
+    nodeStyle?.height ??
+    dataStyle?.height ??
+    300;
   return typeof height === "number" ? height : 300;
 }
 
@@ -36,15 +90,6 @@ function isPoolNode(node: BaseNodeConfig): boolean {
 }
 
 /**
- * Helper function to check if a node is a lane
- * Note: This is deprecated as lanes are no longer separate nodes
- * @deprecated Lanes are now sections within Pool
- */
-function isLaneNode(node: BaseNodeConfig): boolean {
-  return node.type === "lane" || node.data?.nodeType === "lane";
-}
-
-/**
  * Rule 1: Check if a normal node can enter a Pool container
  * Normal nodes (tasks, events, gateways, etc.) can freely enter Pool
  */
@@ -52,8 +97,8 @@ export function canNodeEnterContainer(
   node: BaseNodeConfig,
   container: BaseNodeConfig
 ): boolean {
-  // Only apply to normal nodes (not pool or lane)
-  if (isPoolNode(node) || isLaneNode(node)) {
+  // Only apply to normal nodes (not pool)
+  if (isPoolNode(node)) {
     return false;
   }
 
@@ -63,75 +108,6 @@ export function canNodeEnterContainer(
   }
 
   return true;
-}
-
-/**
- * Rule 2: Lane node functionality is deprecated
- * Lanes are now rendered as sections within Pool component
- * @deprecated
- */
-export function canLaneEnterPool(
-  lane: BaseNodeConfig,
-  pool: BaseNodeConfig,
-  allNodes: BaseNodeConfig[]
-): { allowed: boolean; reason?: string } {
-  return {
-    allowed: false,
-    reason: "Lane nodes are deprecated. Lanes are now sections within Pool.",
-  };
-}
-
-/**
- * Rule 3: Lane node functionality is deprecated
- * @deprecated
- */
-export function canLaneExistStandalone(lane: BaseNodeConfig): {
-  allowed: boolean;
-  reason?: string;
-} {
-  if (!isLaneNode(lane)) {
-    return { allowed: true }; // Not a lane, not our concern
-  }
-
-  return {
-    allowed: false,
-    reason: "Lane nodes are deprecated. Use Pool with lane sections instead.",
-  };
-}
-
-/**
- * Rule 3b: Prevent Lane from being dropped on canvas
- * Lane nodes are deprecated in favor of Pool sections
- */
-export function canLaneBeDroppedOnCanvas(nodeType: string): {
-  allowed: boolean;
-  reason?: string;
-} {
-  if (nodeType === "lane") {
-    return {
-      allowed: false,
-      reason:
-        "Lane không còn được hỗ trợ như node riêng. Sử dụng Pool và thêm lanes bên trong.",
-    };
-  }
-
-  return { allowed: true };
-}
-
-/**
- * Rule 4: Lane drag functionality is deprecated
- * @deprecated
- */
-export function canLaneBeDragged(
-  lane: BaseNodeConfig,
-  allNodes: BaseNodeConfig[]
-): boolean {
-  if (!isLaneNode(lane)) {
-    return true; // Not a lane, can be dragged normally
-  }
-
-  // Lane nodes should not be draggable (deprecated)
-  return false;
 }
 
 /**
@@ -148,21 +124,26 @@ export function isNodeInsideContainer(
     y: node.position.y + nodeCenterOffset.y,
   };
 
+  // Get container dimensions
+  const containerWidth = getContainerWidth(container);
+  const containerHeight = getContainerHeight(container);
+
   // Get container bounds
   const containerBounds = {
     left: container.position.x,
     top: container.position.y,
-    right: container.position.x + getContainerWidth(container),
-    bottom: container.position.y + getContainerHeight(container),
+    right: container.position.x + containerWidth,
+    bottom: container.position.y + containerHeight,
   };
 
-  // Check if node center is inside container
-  return (
+  // Debug logging to help troubleshoot collision detection
+  const isInside =
     nodeCenter.x >= containerBounds.left &&
     nodeCenter.x <= containerBounds.right &&
     nodeCenter.y >= containerBounds.top &&
-    nodeCenter.y <= containerBounds.bottom
-  );
+    nodeCenter.y <= containerBounds.bottom;
+
+  return isInside;
 }
 
 /**
@@ -177,7 +158,7 @@ export function findTargetContainer(
   // Find all potential containers
   const containers = allNodes.filter(
     n =>
-      (isPoolNode(n) || isLaneNode(n)) &&
+      isPoolNode(n) &&
       n.id !== node.id &&
       (!excludeLockedContainers || !n.data?.isLocked)
   );
@@ -236,44 +217,4 @@ export function toAbsolutePosition(
     x: relativePosition.x + containerPosition.x,
     y: relativePosition.y + containerPosition.y,
   };
-}
-
-/**
- * Comprehensive validation for Lane operations
- */
-export function validateLaneOperation(
-  operation: "drop" | "dragStop" | "create",
-  lane: BaseNodeConfig,
-  targetContainer: BaseNodeConfig | null,
-  allNodes: BaseNodeConfig[]
-): { valid: boolean; error?: string } {
-  // Rule 3: Lane cannot be dropped on canvas
-  if (operation === "drop" && !targetContainer) {
-    return {
-      valid: false,
-      error:
-        "Lane không thể được kéo trực tiếp ra canvas. Vui lòng kéo Lane vào Pool.",
-    };
-  }
-
-  // Lane can only be dropped into Pool (not into another Lane)
-  if (targetContainer && !isPoolNode(targetContainer)) {
-    return {
-      valid: false,
-      error: "Lane chỉ có thể được kéo vào Pool.",
-    };
-  }
-
-  // Rule 2: Check if lane can enter pool
-  if (targetContainer && isPoolNode(targetContainer)) {
-    const canEnter = canLaneEnterPool(lane, targetContainer, allNodes);
-    if (!canEnter.allowed) {
-      return {
-        valid: false,
-        error: canEnter.reason,
-      };
-    }
-  }
-
-  return { valid: true };
 }

@@ -1,11 +1,26 @@
 {
   "name": "bpm-core",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
+  "main": "./lib-dist/bpm-core.cjs.js",
+  "module": "./lib-dist/bpm-core.es.js",
+  "types": "./lib-dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib-dist/index.d.ts",
+      "import": "./lib-dist/bpm-core.es.js",
+      "require": "./lib-dist/bpm-core.cjs.js"
+    },
+    "./styles": "./lib-dist/bpm-core.css"
+  },
+  "files": [
+    "lib-dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:lib": "node scripts/build-lib.js",
     "build:sdk": "tsc -b && vite build --config ./sdk/vite.config.sdk.ts && node scripts/build-sdk.js",
     "lint": "eslint .",
     "format": "prettier --write .",

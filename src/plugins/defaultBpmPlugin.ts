@@ -896,105 +896,112 @@ const defaultContextMenus: Array<{
           },
         },
         {
-          id: "separator-2",
+          id: "separator-1",
           label: "",
           separator: true,
         },
         {
-          id: "color-submenu",
-          label: "Change Color",
-          icon: { type: "lucide", value: Palette },
+          id: "appearance",
+          label: "Appearance",
+          icon: "",
           children: [
             {
-              id: "color-yellow",
-              label: "Yellow",
-              color: "#fde68a",
-              onClick: async (context: ContextMenuContext) => {
-                const action =
-                  contextMenuActionsRegistry.getAction("updateNodeData");
-                if (action && context.nodeId) {
-                  action(context.nodeId, { color: "yellow" });
-                }
-              },
-            },
-            {
-              id: "color-blue",
-              label: "Blue",
-              color: "#bfdbfe",
-              onClick: async (context: ContextMenuContext) => {
-                const action =
-                  contextMenuActionsRegistry.getAction("updateNodeData");
-                if (action && context.nodeId) {
-                  action(context.nodeId, { color: "blue" });
-                }
-              },
-            },
-            {
-              id: "color-green",
-              label: "Green",
-              color: "#d9f99d",
-              onClick: async (context: ContextMenuContext) => {
-                const action =
-                  contextMenuActionsRegistry.getAction("updateNodeData");
-                if (action && context.nodeId) {
-                  action(context.nodeId, { color: "green" });
-                }
-              },
-            },
-            {
-              id: "color-pink",
-              label: "Pink",
-              color: "#fecdd3",
-              onClick: async (context: ContextMenuContext) => {
-                const action =
-                  contextMenuActionsRegistry.getAction("updateNodeData");
-                if (action && context.nodeId) {
-                  action(context.nodeId, { color: "pink" });
-                }
-              },
-            },
-            {
-              id: "color-purple",
-              label: "Purple",
-              color: "#ddd6fe",
-              onClick: async (context: ContextMenuContext) => {
-                const action =
-                  contextMenuActionsRegistry.getAction("updateNodeData");
-                if (action && context.nodeId) {
-                  action(context.nodeId, { color: "purple" });
-                }
-              },
-            },
-            {
-              id: "color-orange",
-              label: "Orange",
-              color: "#fed7aa",
-              onClick: async (context: ContextMenuContext) => {
-                const action =
-                  contextMenuActionsRegistry.getAction("updateNodeData");
-                if (action && context.nodeId) {
-                  action(context.nodeId, { color: "orange" });
-                }
-              },
-            },
-            {
-              id: "color-gray",
-              label: "Gray",
-              color: "#e4e4e7",
-              onClick: async (context: ContextMenuContext) => {
-                const action =
-                  contextMenuActionsRegistry.getAction("updateNodeData");
-                if (action && context.nodeId) {
-                  action(context.nodeId, { color: "gray" });
-                }
-              },
+              id: "color-submenu",
+              label: "Change Color",
+              icon: { type: "lucide", value: Palette },
+              children: [
+                {
+                  id: "color-yellow",
+                  label: "Yellow",
+                  color: "#fde68a",
+                  onClick: async (context: ContextMenuContext) => {
+                    const action =
+                      contextMenuActionsRegistry.getAction("updateNodeData");
+                    if (action && context.nodeId) {
+                      action(context.nodeId, { color: "yellow" });
+                    }
+                  },
+                },
+                {
+                  id: "color-blue",
+                  label: "Blue",
+                  color: "#bfdbfe",
+                  onClick: async (context: ContextMenuContext) => {
+                    const action =
+                      contextMenuActionsRegistry.getAction("updateNodeData");
+                    if (action && context.nodeId) {
+                      action(context.nodeId, { color: "blue" });
+                    }
+                  },
+                },
+                {
+                  id: "color-green",
+                  label: "Green",
+                  color: "#d9f99d",
+                  onClick: async (context: ContextMenuContext) => {
+                    const action =
+                      contextMenuActionsRegistry.getAction("updateNodeData");
+                    if (action && context.nodeId) {
+                      action(context.nodeId, { color: "green" });
+                    }
+                  },
+                },
+                {
+                  id: "color-pink",
+                  label: "Pink",
+                  color: "#fecdd3",
+                  onClick: async (context: ContextMenuContext) => {
+                    const action =
+                      contextMenuActionsRegistry.getAction("updateNodeData");
+                    if (action && context.nodeId) {
+                      action(context.nodeId, { color: "pink" });
+                    }
+                  },
+                },
+                {
+                  id: "color-purple",
+                  label: "Purple",
+                  color: "#ddd6fe",
+                  onClick: async (context: ContextMenuContext) => {
+                    const action =
+                      contextMenuActionsRegistry.getAction("updateNodeData");
+                    if (action && context.nodeId) {
+                      action(context.nodeId, { color: "purple" });
+                    }
+                  },
+                },
+                {
+                  id: "color-orange",
+                  label: "Orange",
+                  color: "#fed7aa",
+                  onClick: async (context: ContextMenuContext) => {
+                    const action =
+                      contextMenuActionsRegistry.getAction("updateNodeData");
+                    if (action && context.nodeId) {
+                      action(context.nodeId, { color: "orange" });
+                    }
+                  },
+                },
+                {
+                  id: "color-gray",
+                  label: "Gray",
+                  color: "#e4e4e7",
+                  onClick: async (context: ContextMenuContext) => {
+                    const action =
+                      contextMenuActionsRegistry.getAction("updateNodeData");
+                    if (action && context.nodeId) {
+                      action(context.nodeId, { color: "gray" });
+                    }
+                  },
+                },
+              ],
             },
           ],
           visible: (context: ContextMenuContext) =>
             context.node?.type === "pool",
         },
         {
-          id: "separator-1",
+          id: "separator-appearance",
           label: "",
           separator: true,
         },
@@ -1003,7 +1010,7 @@ const defaultContextMenus: Array<{
           label: "Delete Pool",
           icon: { type: "lucide", value: Trash2, color: "red" },
           onClick: async (context: ContextMenuContext) => {
-            const action = contextMenuActionsRegistry.getAction("deleteNode");
+            const action = contextMenuActionsRegistry.getAction("deletePoolWithConfirmation");
             if (action && context.nodeId) {
               action(context.nodeId);
             }

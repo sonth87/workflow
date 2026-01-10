@@ -11,7 +11,11 @@ import type { BaseNodeConfig } from "@/core/types/base.types";
 import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { getLayoutedElements } from "./utils/layout";
 import { Behavior } from "./components/Behavior";
-import { findTargetContainer, toRelativePosition } from "./utils/poolLaneRules";
+import {
+  findTargetContainer,
+  toRelativePosition,
+  sortNodesByParentChild,
+} from "./utils/poolLaneRules";
 import { WorkflowCore, type WorkflowCoreProps } from "./WorkflowCore";
 
 // Re-export PluginOptions from WorkflowCore
@@ -101,6 +105,11 @@ function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
                 ? { draggable: false }
                 : {}),
             });
+
+            // Sort nodes to ensure parent appears before child
+            const updatedNodes = useWorkflowStore.getState().nodes;
+            const sortedNodes = sortNodesByParentChild(updatedNodes);
+            useWorkflowStore.getState().setNodes(sortedNodes);
           }
         }
       }, 0);

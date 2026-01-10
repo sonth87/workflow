@@ -194,18 +194,6 @@ export function createDefaultNodeContextMenuItems(
   onDelete: (context: any) => void | Promise<void>
 ): ContextMenuItem[] {
   return [
-    createColorPickerMenuItem(onColorChange),
-    {
-      id: "change-border-style",
-      label: "Border Style",
-      icon: "",
-      children: createNodeBorderStyleMenuItems(onBorderStyleChange),
-    },
-    {
-      id: generateSeparatorId(),
-      label: "",
-      separator: true,
-    },
     {
       id: "properties",
       label: "Properties",
@@ -219,6 +207,25 @@ export function createDefaultNodeContextMenuItems(
           action(context.nodeId);
         }
       },
+    },
+    {
+      id: generateSeparatorId(),
+      label: "",
+      separator: true,
+    },
+    {
+      id: "appearance",
+      label: "Appearance",
+      icon: "",
+      children: [
+        createColorPickerMenuItem(onColorChange),
+        {
+          id: "change-border-style",
+          label: "Border Style",
+          icon: "",
+          children: createNodeBorderStyleMenuItems(onBorderStyleChange),
+        },
+      ],
     },
     {
       id: generateSeparatorId(),
@@ -240,29 +247,6 @@ export function createDefaultNodeContextMenuItems(
       },
     },
     createDeleteMenuItem(onDelete),
-    {
-      id: generateSeparatorId(),
-      label: "",
-      separator: true,
-    },
-    {
-      id: "collapse",
-      label: "Collapse",
-      icon: "▼",
-      onClick: async (context: any) => {
-        console.log("Collapse node:", context.nodeId);
-      },
-      visible: (context: any) => !context.node?.collapsed,
-    },
-    {
-      id: "expand",
-      label: "Expand",
-      icon: "▶",
-      onClick: async (context: any) => {
-        console.log("Expand node:", context.nodeId);
-      },
-      visible: (context: any) => context.node?.collapsed === true,
-    },
   ];
 }
 
@@ -383,28 +367,35 @@ export function createDefaultEdgeContextMenuItems(
   onDelete: (context: any) => void | Promise<void>
 ): ContextMenuItem[] {
   return [
-    createColorPickerMenuItem(onColorChange),
     {
-      id: generateSeparatorId(),
-      label: "",
-      separator: true,
-    },
-    {
-      id: "change-path-type",
-      label: "Path Type",
-      icon: "⤴",
-      children: createPathTypeMenuItems(onPathTypeChange),
-    },
-    {
-      id: "change-path-style",
-      label: "Path Style",
-      icon: "━",
-      children: createEdgePathStyleMenuItems(onPathStyleChange),
-    },
-    {
-      id: "change-animation",
-      label: "Animation",
-      children: createEdgeAnimationMenuItems(onAnimationChange),
+      id: "appearance",
+      label: "Appearance",
+      icon: "",
+      children: [
+        createColorPickerMenuItem(onColorChange),
+        {
+          id: generateSeparatorId(),
+          label: "",
+          separator: true,
+        },
+        {
+          id: "change-path-type",
+          label: "Path Type",
+          icon: "⤴",
+          children: createPathTypeMenuItems(onPathTypeChange),
+        },
+        {
+          id: "change-path-style",
+          label: "Path Style",
+          icon: "━",
+          children: createEdgePathStyleMenuItems(onPathStyleChange),
+        },
+        {
+          id: "change-animation",
+          label: "Animation",
+          children: createEdgeAnimationMenuItems(onAnimationChange),
+        },
+      ],
     },
     {
       id: generateSeparatorId(),
@@ -475,37 +466,46 @@ export function createNoteNodeContextMenuItems(
 
   return [
     {
-      id: "change-color",
-      label: "Color",
+      id: "appearance",
+      label: "Appearance",
       icon: "",
-      children: noteColors.map(noteColor => ({
-        id: `color-${noteColor.id}`,
-        label: noteColor.label,
-        color: noteColor.color,
-        onClick: async (context: any) => {
-          const action = contextMenuActionsRegistry.getAction("updateNodeData");
-          if (action && context.nodeId) {
-            action(context.nodeId, { color: noteColor.color });
-          }
-          await onColorChange?.(noteColor.id, context);
+      children: [
+        {
+          id: "change-color",
+          label: "Color",
+          icon: "",
+          children: noteColors.map(noteColor => ({
+            id: `color-${noteColor.id}`,
+            label: noteColor.label,
+            color: noteColor.color,
+            onClick: async (context: any) => {
+              const action =
+                contextMenuActionsRegistry.getAction("updateNodeData");
+              if (action && context.nodeId) {
+                action(context.nodeId, { color: noteColor.color });
+              }
+              await onColorChange?.(noteColor.id, context);
+            },
+          })),
         },
-      })),
-    },
-    {
-      id: "change-font-size",
-      label: "Font Size",
-      icon: "",
-      children: noteFontSizes.map(size => ({
-        id: `font-size-${size.id}`,
-        label: size.label,
-        onClick: async (context: any) => {
-          const action = contextMenuActionsRegistry.getAction("updateNodeData");
-          if (action && context.nodeId) {
-            action(context.nodeId, { fontSize: size.id });
-          }
-          await onFontSizeChange?.(size.id, context);
+        {
+          id: "change-font-size",
+          label: "Font Size",
+          icon: "",
+          children: noteFontSizes.map(size => ({
+            id: `font-size-${size.id}`,
+            label: size.label,
+            onClick: async (context: any) => {
+              const action =
+                contextMenuActionsRegistry.getAction("updateNodeData");
+              if (action && context.nodeId) {
+                action(context.nodeId, { fontSize: size.id });
+              }
+              await onFontSizeChange?.(size.id, context);
+            },
+          })),
         },
-      })),
+      ],
     },
   ];
 }
@@ -537,37 +537,46 @@ export function createAnnotationNodeContextMenuItems(
 
   return [
     {
-      id: "change-color",
-      label: "Color",
+      id: "appearance",
+      label: "Appearance",
       icon: "",
-      children: textColors.map(textColor => ({
-        id: `color-${textColor.id}`,
-        label: textColor.label,
-        color: textColor.color,
-        onClick: async (context: any) => {
-          const action = contextMenuActionsRegistry.getAction("updateNodeData");
-          if (action && context.nodeId) {
-            action(context.nodeId, { color: textColor.color });
-          }
-          await onColorChange?.(textColor.id, context);
+      children: [
+        {
+          id: "change-color",
+          label: "Color",
+          icon: "",
+          children: textColors.map(textColor => ({
+            id: `color-${textColor.id}`,
+            label: textColor.label,
+            color: textColor.color,
+            onClick: async (context: any) => {
+              const action =
+                contextMenuActionsRegistry.getAction("updateNodeData");
+              if (action && context.nodeId) {
+                action(context.nodeId, { color: textColor.color });
+              }
+              await onColorChange?.(textColor.id, context);
+            },
+          })),
         },
-      })),
-    },
-    {
-      id: "change-font-size",
-      label: "Font Size",
-      icon: "",
-      children: noteFontSizes.map(size => ({
-        id: `font-size-${size.id}`,
-        label: size.label,
-        onClick: async (context: any) => {
-          const action = contextMenuActionsRegistry.getAction("updateNodeData");
-          if (action && context.nodeId) {
-            action(context.nodeId, { fontSize: size.id });
-          }
-          await onFontSizeChange?.(size.id, context);
+        {
+          id: "change-font-size",
+          label: "Font Size",
+          icon: "",
+          children: noteFontSizes.map(size => ({
+            id: `font-size-${size.id}`,
+            label: size.label,
+            onClick: async (context: any) => {
+              const action =
+                contextMenuActionsRegistry.getAction("updateNodeData");
+              if (action && context.nodeId) {
+                action(context.nodeId, { fontSize: size.id });
+              }
+              await onFontSizeChange?.(size.id, context);
+            },
+          })),
         },
-      })),
+      ],
     },
     {
       id: generateSeparatorId(),

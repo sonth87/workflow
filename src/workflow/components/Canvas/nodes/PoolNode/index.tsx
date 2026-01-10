@@ -123,16 +123,14 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
   }, [nodes, id]);
 
   // Calculate lane positions and sizes based on ratios
+  const poolNode = useMemo(() => nodes.find(n => n.id === id), [nodes, id]);
+  const poolWidth = poolNode?.measured?.width ?? defaultWidth;
+  const poolHeight = poolNode?.measured?.height ?? defaultHeight;
+
   const laneLayout = useMemo(() => {
     if (!data.lanes || data.lanes.length === 0) return [];
 
     const lanes = data.lanes;
-    const totalLanes = lanes.length;
-
-    // Get pool dimensions (from node width/height)
-    const poolNode = nodes.find(n => n.id === id);
-    const poolWidth = poolNode?.measured?.width ?? defaultWidth;
-    const poolHeight = poolNode?.measured?.height ?? defaultHeight;
 
     // Subtract label bar size
     const labelSize = 32; // 8 * 4 = 32px for label bar
@@ -140,59 +138,25 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
     const availableHeight = isHorizontal ? poolHeight : poolHeight - labelSize;
     const totalSpace = isHorizontal ? availableHeight : availableWidth;
 
-    // Separate lanes with and without sizeRatio
-    const lanesWithRatio = lanes.filter(l => l.sizeRatio !== undefined);
-    const lanesWithoutRatio = lanes.filter(l => l.sizeRatio === undefined);
-
-    // Calculate space allocated to lanes with ratio
-    const allocatedSpace = lanesWithRatio.reduce(
-      (sum, lane) => sum + lane.sizeRatio! * totalSpace,
-      0
-    );
-
-    // Remaining space distributed evenly to lanes without ratio
-    const remainingSpace = totalSpace - allocatedSpace;
-    const evenSize =
-      lanesWithoutRatio.length > 0
-        ? remainingSpace / lanesWithoutRatio.length
-        : 0;
-
-    let currentOffset = 0;
-
     return lanes.map(lane => {
-      // Calculate size for this lane
-      let size: number;
+      // Calculate size ratio (0-1) for flex-basis
+      let flexRatio: number;
       if (lane.sizeRatio !== undefined) {
-        // Use ratio-based sizing
-        size = Math.max(lane.minSize ?? 50, lane.sizeRatio * totalSpace);
+        flexRatio = lane.sizeRatio;
       } else if (lane.size !== undefined) {
         // Backward compatibility: convert old pixel size to ratio
-        size = lane.size;
+        flexRatio = lane.size / totalSpace;
       } else {
         // Distribute evenly
-        size = Math.max(lane.minSize ?? 50, evenSize);
+        flexRatio = 1 / lanes.length;
       }
-
-      const position = currentOffset;
-      currentOffset += size;
 
       return {
         ...lane,
-        position,
-        size,
+        flexRatio,
       };
     });
-  }, [
-    data.lanes,
-    nodes,
-    id,
-    isHorizontal,
-    defaultWidth,
-    defaultHeight,
-    // Track pool dimensions for responsive sizing
-    nodes.find(n => n.id === id)?.measured?.width,
-    nodes.find(n => n.id === id)?.measured?.height,
-  ]);
+  }, [data.lanes, isHorizontal, poolWidth, poolHeight]);
 
   const handleDeleteLane = useCallback(
     (laneId: string, e?: React.MouseEvent) => {
@@ -445,19 +409,24 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
       setResizingLaneIndex(laneIndex);
 
       const startPos = isHorizontal ? e.clientY : e.clientX;
-      const startSize = laneLayout[laneIndex].size;
-      const nextStartSize = laneLayout[laneIndex + 1]?.size || 0;
+
+      // Get current flex ratios
+      const currentRatio =
+        data.lanes?.[laneIndex]?.sizeRatio ?? 1 / (data.lanes?.length ?? 1);
+      const nextRatio =
+        data.lanes?.[laneIndex + 1]?.sizeRatio ?? 1 / (data.lanes?.length ?? 1);
 
       // Get pool dimensions for ratio calculation
-      const poolNode = nodes.find(n => n.id === id);
-      const poolWidth = poolNode?.measured?.width ?? defaultWidth;
-      const poolHeight = poolNode?.measured?.height ?? defaultHeight;
       const labelSize = 32;
       const availableWidth = isHorizontal ? poolWidth - labelSize : poolWidth;
       const availableHeight = isHorizontal
         ? poolHeight
         : poolHeight - labelSize;
       const totalSpace = isHorizontal ? availableHeight : availableWidth;
+
+      // Calculate current pixel sizes from ratios
+      const startSize = currentRatio * totalSpace;
+      const nextStartSize = nextRatio * totalSpace;
 
       const handleMouseMove = (moveEvent: MouseEvent) => {
         const currentPos = isHorizontal ? moveEvent.clientY : moveEvent.clientX;
@@ -499,16 +468,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [
-      laneLayout,
-      data,
-      id,
-      isHorizontal,
-      updateNode,
-      nodes,
-      defaultWidth,
-      defaultHeight,
-    ]
+    [data, id, isHorizontal, updateNode, poolWidth, poolHeight]
   );
 
   const handleToggleLock = useCallback(
@@ -544,8 +504,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
       e.stopPropagation();
       const newOrientation = isHorizontal ? "vertical" : "horizontal";
 
-      // Get current pool node to access measured dimensions
-      const poolNode = nodes.find(n => n.id === id);
+      // Use memoized poolNode to access measured dimensions
       const currentWidth =
         poolNode?.measured?.width ?? (isHorizontal ? 650 : 300);
       const currentHeight =
@@ -575,7 +534,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
         },
       });
     },
-    [id, data, isHorizontal, updateNode, nodes]
+    [id, data, isHorizontal, updateNode, poolNode]
   );
 
   const handleMouseEnter = useCallback(() => {
@@ -740,11 +699,11 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
 
       {/* Pool Content Area */}
       <div
-        className={cn("absolute", {
-          // Horizontal: content starts after left label
-          "left-10 top-0 right-0 bottom-0": isHorizontal,
-          // Vertical: content starts after top label
-          "left-0 top-10 right-0 bottom-0": !isHorizontal,
+        className={cn("absolute flex", {
+          // Horizontal: content starts after left label, lanes stack vertically
+          "left-10 top-0 right-0 bottom-0 flex-col": isHorizontal,
+          // Vertical: content starts after top label, lanes stack horizontally
+          "left-0 top-10 right-0 bottom-0 flex-row": !isHorizontal,
         })}
       >
         {/* Render lanes */}
@@ -753,7 +712,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
               <div
                 key={lane.id}
                 className={cn(
-                  "absolute group",
+                  "relative group",
                   colorScheme.border,
                   colorScheme.lane,
                   {
@@ -761,21 +720,11 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
                     "border-r": !isHorizontal && index < laneLayout.length - 1,
                   }
                 )}
-                style={
-                  isHorizontal
-                    ? {
-                        left: 0,
-                        right: 0,
-                        top: lane.position,
-                        height: lane.size,
-                      }
-                    : {
-                        top: 0,
-                        bottom: 0,
-                        left: lane.position,
-                        width: lane.size,
-                      }
-                }
+                style={{
+                  flex: `${lane.flexRatio} 1 0`,
+                  minHeight: isHorizontal ? (lane.minSize ?? 50) : undefined,
+                  minWidth: !isHorizontal ? (lane.minSize ?? 50) : undefined,
+                }}
               >
                 {/* Lane Label */}
                 <div
@@ -847,7 +796,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
                       }
                     )}
                     onMouseDown={e => handleDividerMouseDown(index, e)}
-                    title="Drag to resize"
+                    title="Kéo để thay đổi kích thước"
                   />
                 )}
               </div>

@@ -189,12 +189,27 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
 
     deleteNode: nodeId => {
       get().saveToHistory();
-      set(state => ({
-        nodes: state.nodes.filter(node => node.id !== nodeId),
-        edges: state.edges.filter(
-          edge => edge.source !== nodeId && edge.target !== nodeId
-        ),
-      }));
+      set(state => {
+        const nodeToDelete = state.nodes.find(node => node.id === nodeId);
+
+        // If deleting a pool, also delete all child nodes
+        const nodesToDelete = new Set([nodeId]);
+        if (nodeToDelete?.type === "pool") {
+          state.nodes.forEach(node => {
+            if (node.parentId === nodeId) {
+              nodesToDelete.add(node.id);
+            }
+          });
+        }
+
+        return {
+          nodes: state.nodes.filter(node => !nodesToDelete.has(node.id)),
+          edges: state.edges.filter(
+            edge =>
+              !nodesToDelete.has(edge.source) && !nodesToDelete.has(edge.target)
+          ),
+        };
+      });
       globalEventBus.emit(WorkflowEventTypes.NODE_DELETED, { nodeId });
     },
 

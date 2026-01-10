@@ -1,0 +1,40 @@
+# Source files
+src/
+scripts/
+
+# Config files
+*.config.ts
+*.config.js
+tsconfig*.json
+.eslintrc*
+.prettierrc*
+
+# Development
+node_modules/
+.git/
+.vscode/
+*.log
+
+# Build outputs (except lib-dist)
+sdk-dist/
+dist/
+
+# Examples and docs
+examples/
+readme/
+public/
+
+# Tests
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# Misc
+.DS_Store
+*.local
+.env*
+!.env.example
+
+# Keep only lib-dist for npm package
+!lib-dist/

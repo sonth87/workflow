@@ -36,7 +36,7 @@ export function JsonControl({
             ? value
             : JSON.stringify(value, null, 2) || ""
         }
-        onChange={e => {
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
           try {
             onChange(JSON.parse(e.target.value));
           } catch {

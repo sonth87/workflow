@@ -26,7 +26,7 @@ export function TextAreaControl({
     <div className="space-y-1.5">
       <Textarea
         value={(value as string) || ""}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onChange(e.target.value)}
         placeholder={definition.placeholder}
         label={definition.label}
         rows={3}
