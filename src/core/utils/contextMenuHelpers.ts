@@ -7,10 +7,20 @@ import type {
   ContextMenuItem,
   NodeVisualConfig,
   EdgeVisualConfig,
+  ContextMenuContext,
 } from "../types/base.types";
 import { themeRegistry } from "../registry/ThemeRegistry";
 import { contextMenuActionsRegistry } from "../registry/ContextMenuActionsRegistry";
-import { Copy, Settings2, Tags, Trash2 } from "lucide-react";
+import { nodeRegistry } from "../registry/NodeRegistry";
+import { CategoryType } from "@/enum/workflow.enum";
+import {
+  Copy,
+  Highlighter,
+  Settings2,
+  Tags,
+  Trash2,
+  ArrowLeftRight,
+} from "lucide-react";
 
 /**
  * Generate unique separator ID
@@ -85,6 +95,81 @@ export function createDeleteMenuItem(
     },
     onClick: onDelete,
   };
+}
+
+/**
+ * Create change type menu item with submenu for nodes in the same category
+ */
+export function createChangeTypeMenuItem(
+  onTypeChange: (
+    targetNodeType: string,
+    context: ContextMenuContext
+  ) => void | Promise<void>
+): ContextMenuItem {
+  return {
+    id: "change-type",
+    label: "Change Type",
+    icon: {
+      type: "lucide",
+      value: ArrowLeftRight,
+    },
+    visible: (context: ContextMenuContext) => {
+      // Only show for nodes with category START, TASK, GATEWAY, END
+      if (!context.node) return false;
+      const category = context.node.category as string;
+      return [
+        CategoryType.START,
+        CategoryType.TASK,
+        CategoryType.GATEWAY,
+        CategoryType.END,
+      ].includes(category as CategoryType);
+    },
+    children: [], // Will be populated dynamically based on context
+    // Store the callback for later use
+    _onTypeChange: onTypeChange as any,
+  };
+}
+
+/**
+ * Get category label for Change Type menu
+ */
+export function getCategoryTypeLabel(category: string): string {
+  const labels: Record<string, string> = {
+    [CategoryType.START]: "Start Type",
+    [CategoryType.TASK]: "Task Type",
+    [CategoryType.GATEWAY]: "Gateway Type",
+    [CategoryType.END]: "End Type",
+  };
+  return labels[category] || "Change Type";
+}
+
+/**
+ * Create dynamic change type submenu items based on node category
+ */
+export function createChangeTypeSubmenuItems(
+  context: ContextMenuContext,
+  onTypeChange: (
+    targetNodeType: string,
+    context: ContextMenuContext
+  ) => void | Promise<void>
+): ContextMenuItem[] {
+  if (!context.node) return [];
+
+  const currentNodeType = context.node.nodeType;
+  const category = context.node.category as string;
+
+  // Get all nodes in the same category from registry
+  const nodesInCategory = nodeRegistry.getByCategory(category);
+
+  // Create menu items for each node type
+  return nodesInCategory.map(item => ({
+    id: `change-type-${item.id}`,
+    label: item.name || item.id,
+    disabled: item.id === currentNodeType, // Disable current node type
+    onClick: async (ctx: ContextMenuContext) => {
+      await onTypeChange(item.id, ctx);
+    },
+  }));
 }
 
 /**
@@ -191,9 +276,38 @@ export function createDefaultNodeContextMenuItems(
     borderStyle: string,
     context: any
   ) => void | Promise<void>,
-  onDelete: (context: any) => void | Promise<void>
+  onDelete: (context: any) => void | Promise<void>,
+  onTypeChange?: (
+    targetNodeType: string,
+    context: ContextMenuContext
+  ) => void | Promise<void>
 ): ContextMenuItem[] {
-  return [
+  const menuItems: ContextMenuItem[] = [];
+
+  // Add Change Type menu item at the top for applicable nodes
+  if (onTypeChange) {
+    const changeTypeItem = createChangeTypeMenuItem(onTypeChange);
+    // Override label to be dynamic based on category
+    changeTypeItem.label = ""; // Will be set dynamically
+    changeTypeItem.children = []; // Will be populated in ContextMenu component
+
+    // Create a wrapper that dynamically generates submenu
+    const dynamicChangeTypeItem: ContextMenuItem = {
+      ...changeTypeItem,
+      children: [], // Placeholder, will be populated dynamically
+      // Override to populate children dynamically based on context
+      onClick: undefined, // No direct onClick, only submenu
+    };
+
+    menuItems.push(dynamicChangeTypeItem);
+    menuItems.push({
+      id: generateSeparatorId(),
+      label: "",
+      separator: true,
+    });
+  }
+
+  menuItems.push(
     {
       id: "properties",
       label: "Properties",
@@ -216,7 +330,10 @@ export function createDefaultNodeContextMenuItems(
     {
       id: "appearance",
       label: "Appearance",
-      icon: "",
+      icon: {
+        type: "lucide",
+        value: Highlighter,
+      },
       children: [
         createColorPickerMenuItem(onColorChange),
         {
@@ -246,8 +363,10 @@ export function createDefaultNodeContextMenuItems(
         }
       },
     },
-    createDeleteMenuItem(onDelete),
-  ];
+    createDeleteMenuItem(onDelete)
+  );
+
+  return menuItems;
 }
 
 /**
@@ -370,7 +489,10 @@ export function createDefaultEdgeContextMenuItems(
     {
       id: "appearance",
       label: "Appearance",
-      icon: "",
+      icon: {
+        type: "lucide",
+        value: Highlighter,
+      },
       children: [
         createColorPickerMenuItem(onColorChange),
         {
@@ -468,7 +590,10 @@ export function createNoteNodeContextMenuItems(
     {
       id: "appearance",
       label: "Appearance",
-      icon: "",
+      icon: {
+        type: "lucide",
+        value: Highlighter,
+      },
       children: [
         {
           id: "change-color",
@@ -539,7 +664,10 @@ export function createAnnotationNodeContextMenuItems(
     {
       id: "appearance",
       label: "Appearance",
-      icon: "",
+      icon: {
+        type: "lucide",
+        value: Highlighter,
+      },
       children: [
         {
           id: "change-color",

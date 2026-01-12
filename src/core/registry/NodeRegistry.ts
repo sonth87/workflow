@@ -3,7 +3,7 @@
  * Registry để quản lý các node types
  */
 
-import type { BaseNodeConfig } from "../types/base.types";
+import type { BaseNodeConfig, RegistryItem } from "../types/base.types";
 import { BaseRegistry } from "./BaseRegistry";
 
 export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
@@ -39,13 +39,13 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
       ...overrides,
       id: overrides?.id || `${nodeType}-${Date.now()}`,
       data: {
-        label: item.name || "New Node",
         ...defaultConfig.data,
         ...overrides?.data,
+        label: item.name || overrides?.data?.label || "New Node",
         // Pass metadata into data so it's accessible in React components
         metadata: {
           ...defaultConfig.metadata,
-          ...overrides?.metadata,
+          ...(overrides?.data?.metadata || {}),
         },
         // Pass icon into data for rendering
         icon: defaultConfig.icon,
@@ -57,9 +57,9 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
         ...overrides?.metadata,
       },
       properties: {
-        label: item.name || "New Node",
         ...defaultConfig.properties,
         ...overrides?.properties,
+        label: item.name || overrides?.properties?.label || "New Node",
       },
     } as BaseNodeConfig;
   }
@@ -95,6 +95,16 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
       valid: errors.length === 0,
       errors,
     };
+  }
+
+  /**
+   * Get nodes by category - override to check config.category
+   */
+  getByCategory(category: string): RegistryItem<BaseNodeConfig>[] {
+    return this.getAll().filter(item => {
+      // Check both item.category and item.config.category
+      return item.category === category || item.config?.category === category;
+    });
   }
 }
 

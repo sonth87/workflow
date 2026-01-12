@@ -26,6 +26,7 @@ import {
   type EventTriggerJSON,
 } from "./schemas/nodeConfigSchema";
 import type { PropertyGroupDefinition } from "../properties/types/propertyDefinition";
+import * as LucideIcons from "lucide-react";
 
 /**
  * Batch result interface
@@ -42,6 +43,41 @@ export interface BatchResult {
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
+}
+
+/**
+ * Convert icon config from JSON to IconConfig
+ * Handles lucide icon names by converting to React components
+ */
+function convertIconConfig(
+  iconJson: Record<string, unknown> | undefined
+): IconConfig | undefined {
+  if (!iconJson) return undefined;
+
+  const iconType = iconJson.type as string;
+  const iconValue = iconJson.value;
+
+  let convertedValue = iconValue;
+
+  // Convert lucide icon name to React component
+  if (iconType === "lucide" && typeof iconValue === "string") {
+    // Get the lucide icon component by name
+    const IconComponent = (LucideIcons as Record<string, unknown>)[iconValue];
+    if (IconComponent) {
+      convertedValue = IconComponent;
+    } else {
+      console.warn(`Lucide icon "${iconValue}" not found. Using fallback.`);
+      // Fallback to a default icon
+      convertedValue = LucideIcons.CircleDot;
+    }
+  }
+
+  return {
+    type: iconType as IconConfig["type"],
+    value: convertedValue,
+    color: iconJson.color as string | undefined,
+    backgroundColor: iconJson.backgroundColor as string | undefined,
+  } as IconConfig;
 }
 
 /**
@@ -325,7 +361,7 @@ export class CustomNodeFactory {
       propertyDefinitions: (config.properties?.map(convertPropertyDefinition) ||
         []) as unknown as PropertyDefinition[],
       connectionRules: config.connectionRules as unknown as ConnectionRule[],
-      icon: config.icon as IconConfig,
+      icon: convertIconConfig(config.icon as Record<string, unknown>),
       collapsible: config.collapsible,
       editable: config.editable,
       deletable: config.deletable,

@@ -33,8 +33,8 @@ const baseVisualConfigs: Record<BaseNodeType, NodeVisualConfig> = {
     // ringColor: "rgba(34, 197, 94, 0.25)",
     // textColor: "#14532d",
     // descriptionColor: "#16a34a",
-    // iconBackgroundColor: "#dcfce7",
-    // iconColor: "#16a34a",
+    iconBackgroundColor: "#39cc7e",
+    iconColor: "#FFFFFF",
   },
   [BaseNodeType.END]: {
     // backgroundColor: "#fef2f2",
@@ -44,8 +44,8 @@ const baseVisualConfigs: Record<BaseNodeType, NodeVisualConfig> = {
     // ringColor: "rgba(239, 68, 68, 0.25)",
     // textColor: "#7f1d1d",
     // descriptionColor: "#dc2626",
-    // iconBackgroundColor: "#fee2e2",
-    // iconColor: "#dc2626",
+    iconBackgroundColor: "#FF6262",
+    iconColor: "#FFFFFF",
   },
   [BaseNodeType.TASK]: {
     // backgroundColor: "#eff6ff",
@@ -55,8 +55,8 @@ const baseVisualConfigs: Record<BaseNodeType, NodeVisualConfig> = {
     // ringColor: "rgba(59, 130, 246, 0.25)",
     // textColor: "#1e3a8a",
     // descriptionColor: "#2563eb",
-    // iconBackgroundColor: "#dbeafe",
-    // iconColor: "#2563eb",
+    iconBackgroundColor: "#EFF6FF",
+    iconColor: "#FFFFFF",
   },
   [BaseNodeType.GATEWAY]: {
     // backgroundColor: "#fef3c7",
@@ -66,8 +66,8 @@ const baseVisualConfigs: Record<BaseNodeType, NodeVisualConfig> = {
     // ringColor: "rgba(245, 158, 11, 0.25)",
     // textColor: "#78350f",
     // descriptionColor: "#d97706",
-    // iconBackgroundColor: "#fef3c7",
-    // iconColor: "#d97706",
+    iconBackgroundColor: "#FCE7F3",
+    iconColor: "#FFFFFF",
   },
   [BaseNodeType.EVENT]: {
     // backgroundColor: "#faf5ff",
@@ -77,8 +77,8 @@ const baseVisualConfigs: Record<BaseNodeType, NodeVisualConfig> = {
     // ringColor: "rgba(168, 85, 247, 0.25)",
     // textColor: "#581c87",
     // descriptionColor: "#9333ea",
-    // iconBackgroundColor: "#f3e8ff",
-    // iconColor: "#9333ea",
+    iconBackgroundColor: "#CCFBF1",
+    iconColor: "#FFFFFF",
   },
   [BaseNodeType.ANNOTATION]: {
     // backgroundColor: "#ffffff",
@@ -88,8 +88,8 @@ const baseVisualConfigs: Record<BaseNodeType, NodeVisualConfig> = {
     // ringColor: "rgba(156, 163, 175, 0.15)",
     // textColor: "#374151",
     // descriptionColor: "#6b7280",
-    // iconBackgroundColor: "#f3f4f6",
-    // iconColor: "#6b7280",
+    iconBackgroundColor: "#FEF9C3",
+    iconColor: "#FFFFFF",
   },
   [BaseNodeType.POOL]: {
     // backgroundColor: "#f8fafc",
@@ -99,8 +99,8 @@ const baseVisualConfigs: Record<BaseNodeType, NodeVisualConfig> = {
     // ringColor: "rgba(100, 116, 139, 0.15)",
     // textColor: "#1e293b",
     // descriptionColor: "#475569",
-    // iconBackgroundColor: "#e2e8f0",
-    // iconColor: "#475569",
+    iconBackgroundColor: "#F1F5F9",
+    iconColor: "#FFFFFF",
   },
   [BaseNodeType.NOTE]: {
     // backgroundColor: "#fffbeb",
@@ -110,8 +110,8 @@ const baseVisualConfigs: Record<BaseNodeType, NodeVisualConfig> = {
     // ringColor: "rgba(251, 191, 36, 0.15)",
     // textColor: "#78350f",
     // descriptionColor: "#d97706",
-    // iconBackgroundColor: "#fef3c7",
-    // iconColor: "#d97706",
+    iconBackgroundColor: "#FEF9C3",
+    iconColor: "#FFFFFF",
   },
 };
 

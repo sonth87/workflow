@@ -9,6 +9,13 @@ import type {
   ContextMenuItem,
   ContextMenuContext,
 } from "@/core/types/base.types";
+import {
+  getCategoryTypeLabel,
+  createChangeTypeSubmenuItems,
+} from "@/core/utils/contextMenuHelpers";
+import { CategoryType } from "@/enum/workflow.enum";
+import { Settings2 } from "lucide-react";
+import { contextMenuActionsRegistry } from "@/core/registry";
 
 interface ContextMenuProps {
   x: number;
@@ -143,6 +150,48 @@ function ContextMenuItems({
   );
 }
 
+/**
+ * Ensure Properties menu item exists for certain node categories
+ */
+function ensurePropertiesMenuItem(
+  menuItems: ContextMenuItem[],
+  context: ContextMenuContext
+): ContextMenuItem[] {
+  if (!context.node) return menuItems;
+
+  const category = context.node.category as string;
+  const requiresProperties = [
+    CategoryType.START,
+    CategoryType.TASK,
+    CategoryType.GATEWAY,
+    CategoryType.END,
+  ].includes(category as CategoryType);
+
+  if (!requiresProperties) return menuItems;
+
+  // Check if Properties already exists
+  const hasProperties = menuItems.some(item => item.id === "properties");
+  if (hasProperties) return menuItems;
+
+  // Add Properties menu item at the beginning
+  const propertiesItem: ContextMenuItem = {
+    id: "properties",
+    label: "Properties",
+    icon: {
+      type: "lucide",
+      value: Settings2,
+    },
+    onClick: async (ctx: ContextMenuContext) => {
+      const action = contextMenuActionsRegistry.getAction("selectNode");
+      if (action && ctx.nodeId) {
+        action(ctx.nodeId);
+      }
+    },
+  };
+
+  return [propertiesItem, ...menuItems];
+}
+
 export function ContextMenu({ x, y, context, onClose }: ContextMenuProps) {
   const [items, setItems] = useState<ContextMenuItem[]>([]);
 
@@ -155,6 +204,28 @@ export function ContextMenu({ x, y, context, onClose }: ContextMenuProps) {
         context.node.nodeType,
         context
       );
+
+      // Populate Change Type menu dynamically
+      menuItems = menuItems.map(item => {
+        if (item.id === "change-type" && context.node) {
+          const category = context.node.category as string;
+          const onTypeChange = (item as any)._onTypeChange;
+          const children = createChangeTypeSubmenuItems(
+            context,
+            onTypeChange || (async () => {})
+          );
+
+          return {
+            ...item,
+            label: getCategoryTypeLabel(category),
+            children,
+          };
+        }
+        return item;
+      });
+
+      // Ensure Properties menu exists for certain categories
+      menuItems = ensurePropertiesMenuItem(menuItems, context);
     } else if (context.edgeId && context.edge) {
       menuItems = contextMenuRegistry.getEdgeContextMenu(
         context.edge.edgeType as string,

@@ -8,6 +8,7 @@ import { useWorkflowStore } from "@/core/store/workflowStore";
 import type { BaseNodeConfig } from "@/core/types/base.types";
 import { paletteToNodeVisualConfig } from "@/core/utils/contextMenuHelpers";
 import { createDuplicatedNode } from "@/utils/nodeDuplication";
+import { nodeRegistry } from "@/core/registry";
 
 export function useNodeActions() {
   const { nodes, updateNode, deleteNode } = useWorkflowStore();
@@ -143,6 +144,63 @@ export function useNodeActions() {
     [nodes, updateNode]
   );
 
+  /**
+   * Convert node to another type in the same category
+   */
+  const convertNodeType = useCallback(
+    (nodeId: string, targetNodeType: string) => {
+      const currentNode = nodes.find(n => n.id === nodeId);
+      if (!currentNode) return;
+
+      // Get target node config from registry
+      const targetNodeConfig = nodeRegistry.createNode(targetNodeType);
+      if (!targetNodeConfig) {
+        console.error(`Target node type "${targetNodeType}" not found`);
+        return;
+      }
+
+      // Merge properties: keep common keys, remove non-existent ones
+      const currentProperties = currentNode.properties || {};
+      const targetPropertyDefinitions =
+        targetNodeConfig.propertyDefinitions || [];
+      const targetPropertyKeys = new Set(
+        targetPropertyDefinitions.map(def => def.id)
+      );
+
+      const mergedProperties: Record<string, any> = {};
+      Object.keys(currentProperties).forEach(key => {
+        if (targetPropertyKeys.has(key)) {
+          mergedProperties[key] = currentProperties[key];
+        }
+      });
+
+      // Update node with new type while preserving position, id, connections, and common properties
+      updateNode(nodeId, {
+        type: targetNodeType,
+        nodeType: targetNodeType,
+        category: targetNodeConfig.category,
+        metadata: targetNodeConfig.metadata,
+        propertyDefinitions: targetNodeConfig.propertyDefinitions,
+        properties: {
+          ...targetNodeConfig.properties,
+          ...mergedProperties,
+        },
+        icon: targetNodeConfig.icon,
+        visualConfig: currentNode.visualConfig || targetNodeConfig.visualConfig,
+        data: {
+          ...(currentNode.data || {}),
+          label:
+            targetNodeConfig.metadata?.title || targetNodeConfig.data?.label,
+          metadata: targetNodeConfig.metadata,
+          icon: targetNodeConfig.icon,
+          visualConfig:
+            currentNode.data?.visualConfig || targetNodeConfig.visualConfig,
+        },
+      } as Partial<BaseNodeConfig>);
+    },
+    [nodes, updateNode]
+  );
+
   return {
     changeNodeColor,
     changeNodeBorderStyle,
@@ -150,5 +208,6 @@ export function useNodeActions() {
     toggleNodeCollapse,
     duplicateNode,
     updateNodeData,
+    convertNodeType,
   };
 }
