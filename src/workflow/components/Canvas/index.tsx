@@ -359,7 +359,7 @@ function CanvasInner({
 
   // Handle node click
   const onNodeClick = useCallback(
-    (_event: React.MouseEvent, node: any) => {
+    (event: React.MouseEvent, node: any) => {
       // Disable node selection in pan mode
       if (isPanMode) return;
 
@@ -368,13 +368,21 @@ function CanvasInner({
       if (panelStates.properties && (selectedNodeId || selectedEdgeId)) {
         selectNode(node.id);
       }
+
+      // Focus the canvas to enable keyboard shortcuts
+      const canvasElement = (event.target as HTMLElement).closest(
+        "[data-reactflow]"
+      );
+      if (canvasElement) {
+        (canvasElement as HTMLElement).focus();
+      }
     },
     [isPanMode, selectNode]
   );
 
   // Handle edge click
   const onEdgeClick = useCallback(
-    (_event: React.MouseEvent, edge: any) => {
+    (event: React.MouseEvent, edge: any) => {
       // Disable edge selection in pan mode
       if (isPanMode) return;
 
@@ -383,14 +391,32 @@ function CanvasInner({
       if (panelStates.properties && (selectedNodeId || selectedEdgeId)) {
         selectEdge(edge.id);
       }
+
+      // Focus the canvas to enable keyboard shortcuts
+      const canvasElement = (event.target as HTMLElement).closest(
+        "[data-reactflow]"
+      );
+      if (canvasElement) {
+        (canvasElement as HTMLElement).focus();
+      }
     },
     [isPanMode, selectEdge]
   );
 
   // Handle pane click
-  const onPaneClick = useCallback(() => {
-    clearSelection();
-  }, [clearSelection]);
+  const onPaneClick = useCallback(
+    (event: React.MouseEvent) => {
+      clearSelection();
+      // Focus the canvas to enable keyboard shortcuts
+      const canvasElement = (event.target as HTMLElement).closest(
+        "[data-reactflow]"
+      );
+      if (canvasElement) {
+        (canvasElement as HTMLElement).focus();
+      }
+    },
+    [clearSelection]
+  );
 
   // Handle node context menu
   const onNodeContextMenu = useCallback(
@@ -682,6 +708,9 @@ function CanvasInner({
       )}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      tabIndex={0}
+      style={{ outline: "none" }}
+      data-reactflow
     >
       <ReactFlow
         nodes={nodes}

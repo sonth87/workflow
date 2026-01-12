@@ -95,7 +95,7 @@ function convertPropertyDefinition(
     defaultValue: prop.defaultValue,
     placeholder: prop.placeholder,
     description: prop.description,
-    group: prop.group || "basic",
+    group: prop.group || "custom",
     order: prop.order || 0,
     options: prop.options
       ? prop.options.map(opt => ({
@@ -117,7 +117,7 @@ function convertToPropertyGroups(
   const groupMap = new Map<string, PropertyDefinitionJSON[]>();
 
   properties.forEach(prop => {
-    const groupId = prop.group || "basic";
+    const groupId = prop.group || "custom";
     if (!groupMap.has(groupId)) {
       groupMap.set(groupId, []);
     }
@@ -160,7 +160,7 @@ function convertToPropertyGroups(
         "order" in groupDef &&
         typeof groupDef.order === "number"
           ? groupDef.order
-          : null) || (groupId === "basic" ? 1 : 99),
+          : null) || (groupId === "basic" ? 1 : groupId === "custom" ? 90 : 99),
       fields: props.map(prop => ({
         id: prop.id,
         label: prop.label,
