@@ -1,0 +1,192 @@
+[
+  {
+    "id": "sendEmailTask",
+    "extends": "task",
+    "name": "Send Email",
+    "description": "Send email notification to specified recipients",
+    "icon": {
+      "type": "lucide",
+      "value": "Mail",
+      "color": "#ffffff",
+      "backgroundColor": "#e74c3c"
+    },
+    "visualConfig": {
+      "backgroundColor": "#fef2f2",
+      "borderColor": "#ef4444",
+      "borderStyle": "solid",
+      "borderWidth": 2,
+      "textColor": "#7f1d1d"
+    },
+    "properties": [
+      {
+        "id": "to",
+        "name": "to",
+        "label": "To",
+        "type": "text",
+        "required": true,
+        "placeholder": "email@example.com",
+        "description": "Recipient email address",
+        "group": "email",
+        "order": 1
+      },
+      {
+        "id": "cc",
+        "name": "cc",
+        "label": "CC",
+        "type": "text",
+        "required": false,
+        "placeholder": "cc@example.com",
+        "description": "Carbon copy recipients",
+        "group": "email",
+        "order": 2
+      },
+      {
+        "id": "subject",
+        "name": "subject",
+        "label": "Subject",
+        "type": "text",
+        "required": true,
+        "placeholder": "Email subject",
+        "group": "email",
+        "order": 3
+      },
+      {
+        "id": "body",
+        "name": "body",
+        "label": "Body",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "Email body content",
+        "group": "email",
+        "order": 4
+      },
+      {
+        "id": "priority",
+        "name": "priority",
+        "label": "Priority",
+        "type": "select",
+        "required": false,
+        "defaultValue": "normal",
+        "group": "settings",
+        "order": 5,
+        "options": [
+          { "label": "Low", "value": "low" },
+          { "label": "Normal", "value": "normal" },
+          { "label": "High", "value": "high" },
+          { "label": "Urgent", "value": "urgent" }
+        ]
+      },
+      {
+        "id": "attachments",
+        "name": "attachments",
+        "label": "Attachments",
+        "type": "text",
+        "required": false,
+        "placeholder": "file1.pdf, file2.doc",
+        "description": "Comma-separated list of file paths",
+        "group": "settings",
+        "order": 6
+      }
+    ],
+    "propertyGroups": [
+      {
+        "id": "email",
+        "label": "Email Configuration",
+        "description": "Configure email recipients and content",
+        "icon": "Mail",
+        "order": 1
+      },
+      {
+        "id": "settings",
+        "label": "Settings",
+        "description": "Additional email settings",
+        "icon": "Settings",
+        "order": 2
+      }
+    ],
+    "defaultProperties": {
+      "label": "Send Email",
+      "priority": "normal"
+    },
+    "connectionRules": {
+      "maxInputConnections": 5,
+      "maxOutputConnections": 2
+    },
+    "contextMenuItems": [
+      {
+        "id": "test-email",
+        "label": "Send Test Email",
+        "icon": "Send",
+        "action": {
+          "type": "event",
+          "event": "custom:send-test-email",
+          "payload": {
+            "test": true
+          }
+        }
+      },
+      {
+        "id": "validate-email",
+        "label": "Validate Email Config",
+        "icon": "CheckCircle",
+        "action": {
+          "type": "event",
+          "event": "custom:validate-email"
+        }
+      },
+      {
+        "separator": true
+      },
+      {
+        "id": "email-templates",
+        "label": "Email Templates",
+        "icon": "FileText",
+        "submenu": [
+          {
+            "id": "welcome-template",
+            "label": "Welcome Email",
+            "action": {
+              "type": "event",
+              "event": "custom:load-template",
+              "payload": { "template": "welcome" }
+            }
+          },
+          {
+            "id": "notification-template",
+            "label": "Notification Email",
+            "action": {
+              "type": "event",
+              "event": "custom:load-template",
+              "payload": { "template": "notification" }
+            }
+          }
+        ]
+      }
+    ],
+    "eventTriggers": [
+      {
+        "on": "node:added",
+        "action": "emit",
+        "event": "custom:email-node-created",
+        "payload": {
+          "message": "Email node created"
+        }
+      },
+      {
+        "on": "property:changed",
+        "condition": {
+          "property": "priority",
+          "operator": "equals",
+          "value": "urgent"
+        },
+        "action": "emit",
+        "event": "custom:urgent-email-configured"
+      }
+    ],
+    "hooks": {
+      "onCreated": "custom:sendEmailTask:created",
+      "onUpdated": "custom:sendEmailTask:updated",
+      "onPropertyChanged": "custom:sendEmailTask:propertyChanged"
+    }
+  }
+]

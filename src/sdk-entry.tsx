@@ -9,6 +9,8 @@ import type {
   WorkflowUIConfig,
   WorkflowBuilderProps,
 } from "./workflow";
+import { CustomNodeFactory, PluginJSONLoader, globalEventBus } from "./core";
+import type { CustomNodeJSON, PluginJSON } from "./core";
 
 const WorkflowBuilder = WorkflowModule.default;
 import "@xyflow/react/dist/style.css";
@@ -23,6 +25,11 @@ interface BPMConfig {
   container?: string | HTMLElement;
   pluginOptions?: PluginOptions;
   ui?: BPMUIConfig;
+  // JSON config support
+  customNodes?: CustomNodeJSON[];
+  customNodesUrl?: string;
+  pluginsFromJSON?: PluginJSON[];
+  pluginUrls?: string[];
   onReady?: () => void;
   onError?: (error: Error) => void;
 }
@@ -31,6 +38,7 @@ class BPMCore {
   private root: Root | null = null;
   private container: HTMLElement | null = null;
   private config: BPMConfig;
+  public eventBus: typeof globalEventBus;
 
   constructor(config: BPMConfig) {
     this.config = {
@@ -54,11 +62,15 @@ class BPMCore {
         ...config.ui,
       },
     };
+    this.eventBus = globalEventBus;
     this.init();
   }
 
-  private init() {
+  private async init() {
     try {
+      // Process JSON configurations first
+      await this.loadJSONConfigs();
+
       if (typeof this.config.container === "string") {
         this.container = document.querySelector(this.config.container);
       } else if (this.config.container instanceof HTMLElement) {
@@ -94,6 +106,58 @@ class BPMCore {
         this.config.onError(error as Error);
       }
     }
+  }
+
+  private async loadJSONConfigs() {
+    try {
+      // Load custom nodes from inline config
+      if (this.config.customNodes && Array.isArray(this.config.customNodes)) {
+        const result = CustomNodeFactory.registerMany(this.config.customNodes);
+        console.log(
+          `[BPM SDK] Loaded ${result.success} custom nodes from config`
+        );
+        if (result.failed > 0) {
+          console.warn(
+            `[BPM SDK] Failed to load ${result.failed} nodes:`,
+            result.errors
+          );
+        }
+      }
+
+      // Load plugins from inline JSON config
+      if (
+        this.config.pluginsFromJSON &&
+        Array.isArray(this.config.pluginsFromJSON)
+      ) {
+        const plugins = PluginJSONLoader.loadPlugins(
+          this.config.pluginsFromJSON
+        );
+
+        // Add plugins to pluginOptions
+        if (!this.config.pluginOptions) {
+          this.config.pluginOptions = {};
+        }
+        if (!this.config.pluginOptions.plugins) {
+          this.config.pluginOptions.plugins = [];
+        }
+        this.config.pluginOptions.plugins.push(...plugins);
+
+        console.log(
+          `[BPM SDK] Loaded ${plugins.length} plugins from JSON config`
+        );
+      }
+    } catch (error) {
+      console.error("[BPM SDK] Error loading JSON configs:", error);
+      throw error;
+    }
+  }
+
+  on(event: string, handler: (event: any) => void) {
+    return this.eventBus.on(event, handler);
+  }
+
+  emit(event: string, payload?: any) {
+    this.eventBus.emit(event, payload);
   }
 
   destroy() {

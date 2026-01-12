@@ -1,0 +1,257 @@
+{
+  "metadata": {
+    "id": "custom-integration-plugin",
+    "name": "Custom Integration Plugin",
+    "version": "1.0.0",
+    "description": "Plugin with custom integration nodes",
+    "author": "Your Company"
+  },
+  "categories": [
+    {
+      "id": "integrations",
+      "name": "Integrations",
+      "icon": "Plug",
+      "description": "External system integration nodes",
+      "order": 10
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications",
+      "icon": "Bell",
+      "description": "Notification and messaging nodes",
+      "order": 11
+    }
+  ],
+  "nodes": [
+    {
+      "id": "slackNotification",
+      "extends": "task",
+      "name": "Slack Notification",
+      "description": "Send notification to Slack channel",
+      "category": "notifications",
+      "icon": {
+        "type": "lucide",
+        "value": "MessageSquare",
+        "color": "#ffffff",
+        "backgroundColor": "#4A154B"
+      },
+      "properties": [
+        {
+          "id": "channel",
+          "name": "channel",
+          "label": "Channel",
+          "type": "text",
+          "required": true,
+          "placeholder": "#general",
+          "group": "basic",
+          "order": 1
+        },
+        {
+          "id": "message",
+          "name": "message",
+          "label": "Message",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Enter your message",
+          "group": "basic",
+          "order": 2
+        },
+        {
+          "id": "webhookUrl",
+          "name": "webhookUrl",
+          "label": "Webhook URL",
+          "type": "text",
+          "required": true,
+          "placeholder": "https://hooks.slack.com/services/...",
+          "group": "config",
+          "order": 3
+        },
+        {
+          "id": "username",
+          "name": "username",
+          "label": "Bot Username",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Workflow Bot",
+          "group": "config",
+          "order": 4
+        }
+      ],
+      "propertyGroups": [
+        {
+          "id": "basic",
+          "label": "Message",
+          "icon": "MessageSquare",
+          "order": 1
+        },
+        {
+          "id": "config",
+          "label": "Configuration",
+          "icon": "Settings",
+          "order": 2
+        }
+      ],
+      "defaultProperties": {
+        "label": "Slack Notification",
+        "username": "Workflow Bot"
+      },
+      "contextMenuItems": [
+        {
+          "id": "test-slack",
+          "label": "Send Test Message",
+          "icon": "Send",
+          "action": {
+            "type": "event",
+            "event": "custom:test-slack-message"
+          }
+        }
+      ]
+    },
+    {
+      "id": "databaseQuery",
+      "extends": "task",
+      "name": "Database Query",
+      "description": "Execute database query",
+      "category": "integrations",
+      "icon": {
+        "type": "lucide",
+        "value": "Database",
+        "color": "#ffffff",
+        "backgroundColor": "#10b981"
+      },
+      "properties": [
+        {
+          "id": "connectionString",
+          "name": "connectionString",
+          "label": "Connection String",
+          "type": "text",
+          "required": true,
+          "placeholder": "postgresql://user:pass@host:5432/db",
+          "group": "connection",
+          "order": 1
+        },
+        {
+          "id": "query",
+          "name": "query",
+          "label": "SQL Query",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "SELECT * FROM users WHERE id = $1",
+          "group": "query",
+          "order": 2
+        },
+        {
+          "id": "parameters",
+          "name": "parameters",
+          "label": "Query Parameters",
+          "type": "json",
+          "required": false,
+          "placeholder": "[1, \"john\"]",
+          "description": "Array of parameter values",
+          "group": "query",
+          "order": 3
+        },
+        {
+          "id": "timeout",
+          "name": "timeout",
+          "label": "Query Timeout (ms)",
+          "type": "number",
+          "required": false,
+          "defaultValue": 30000,
+          "group": "config",
+          "order": 4
+        }
+      ],
+      "propertyGroups": [
+        {
+          "id": "connection",
+          "label": "Connection",
+          "icon": "Link",
+          "order": 1
+        },
+        {
+          "id": "query",
+          "label": "Query",
+          "icon": "Code",
+          "order": 2
+        },
+        {
+          "id": "config",
+          "label": "Settings",
+          "icon": "Settings",
+          "order": 3
+        }
+      ],
+      "defaultProperties": {
+        "label": "Database Query",
+        "timeout": 30000
+      },
+      "contextMenuItems": [
+        {
+          "id": "test-query",
+          "label": "Test Query",
+          "icon": "Play",
+          "action": {
+            "type": "event",
+            "event": "custom:test-database-query"
+          }
+        },
+        {
+          "id": "format-sql",
+          "label": "Format SQL",
+          "icon": "Code",
+          "action": {
+            "type": "event",
+            "event": "custom:format-sql"
+          }
+        }
+      ]
+    },
+    {
+      "id": "conditionalStart",
+      "extends": "start",
+      "name": "Conditional Start",
+      "description": "Start event with condition checking",
+      "icon": {
+        "type": "lucide",
+        "value": "PlayCircle",
+        "color": "#ffffff",
+        "backgroundColor": "#22c55e"
+      },
+      "properties": [
+        {
+          "id": "condition",
+          "name": "condition",
+          "label": "Start Condition",
+          "type": "text",
+          "required": true,
+          "placeholder": "variable === 'value'",
+          "group": "basic",
+          "order": 1
+        },
+        {
+          "id": "checkInterval",
+          "name": "checkInterval",
+          "label": "Check Interval (ms)",
+          "type": "number",
+          "required": false,
+          "defaultValue": 5000,
+          "group": "config",
+          "order": 2
+        }
+      ],
+      "propertyGroups": [
+        {
+          "id": "config",
+          "label": "Configuration",
+          "icon": "Settings",
+          "order": 2
+        }
+      ],
+      "defaultProperties": {
+        "label": "Conditional Start",
+        "checkInterval": 5000
+      }
+    }
+  ]
+}

@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BPM Core SDK - JSON Configuration Example</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+      }
+      #bpm-container {
+        width: 100vw;
+        height: 100vh;
+      }
+      .info-panel {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        max-width: 300px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      .info-panel h3 {
+        margin: 0 0 10px 0;
+        font-size: 14px;
+      }
+      .info-panel p {
+        margin: 5px 0;
+        font-size: 12px;
+        color: #666;
+      }
+      .event-log {
+        margin-top: 10px;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 11px;
+        font-family: monospace;
+      }
+      .event-log div {
+        margin: 2px 0;
+        padding: 2px 0;
+        border-bottom: 1px solid #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="bpm-container"></div>
+
+    <div class="info-panel">
+      <h3>JSON Configuration Active</h3>
+      <p>Custom nodes loaded from JSON:</p>
+      <ul
+        id="loaded-nodes"
+        style="font-size: 11px; margin: 5px 0; padding-left: 20px"
+      ></ul>
+      <div class="event-log" id="event-log">
+        <strong>Event Log:</strong>
+      </div>
+    </div>
+
+    <!-- Load BPM SDK -->
+    <script src="../sdk-dist/bpm-sdk.js"></script>
+
+    <script>
+      // Define custom nodes as JSON
+      const customNodes = [
+        {
+          id: "sendEmailTask",
+          extends: "task",
+          name: "Send Email",
+          description: "Send email notification",
+          icon: {
+            type: "lucide",
+            value: "Mail",
+            color: "#ffffff",
+            backgroundColor: "#e74c3c",
+          },
+          visualConfig: {
+            backgroundColor: "#fef2f2",
+            borderColor: "#ef4444",
+            textColor: "#7f1d1d",
+          },
+          properties: [
+            {
+              id: "to",
+              name: "to",
+              label: "To",
+              type: "text",
+              required: true,
+              placeholder: "email@example.com",
+              group: "basic",
+              order: 1,
+            },
+            {
+              id: "subject",
+              name: "subject",
+              label: "Subject",
+              type: "text",
+              required: true,
+              group: "basic",
+              order: 2,
+            },
+            {
+              id: "body",
+              name: "body",
+              label: "Body",
+              type: "textarea",
+              required: true,
+              group: "basic",
+              order: 3,
+            },
+          ],
+          contextMenuItems: [
+            {
+              id: "test-email",
+              label: "Send Test Email",
+              icon: "Send",
+              action: {
+                type: "event",
+                event: "custom:send-test-email",
+              },
+            },
+          ],
+          eventTriggers: [
+            {
+              on: "node:added",
+              action: "emit",
+              event: "custom:email-node-created",
+              payload: { type: "email" },
+            },
+          ],
+          hooks: {
+            onCreated: "custom:sendEmailTask:created",
+          },
+        },
+        {
+          id: "httpRequestTask",
+          extends: "task",
+          name: "HTTP Request",
+          description: "Make HTTP/REST API calls",
+          icon: {
+            type: "lucide",
+            value: "Globe",
+            color: "#ffffff",
+            backgroundColor: "#3b82f6",
+          },
+          properties: [
+            {
+              id: "url",
+              name: "url",
+              label: "URL",
+              type: "text",
+              required: true,
+              placeholder: "https://api.example.com",
+              group: "basic",
+              order: 1,
+            },
+            {
+              id: "method",
+              name: "method",
+              label: "Method",
+              type: "select",
+              required: true,
+              defaultValue: "GET",
+              group: "basic",
+              order: 2,
+              options: [
+                { label: "GET", value: "GET" },
+                { label: "POST", value: "POST" },
+                { label: "PUT", value: "PUT" },
+                { label: "DELETE", value: "DELETE" },
+              ],
+            },
+          ],
+          contextMenuItems: [
+            {
+              id: "test-request",
+              label: "Test Request",
+              icon: "Play",
+              action: {
+                type: "event",
+                event: "custom:test-http-request",
+              },
+            },
+          ],
+        },
+        {
+          id: "conditionalStart",
+          extends: "start",
+          name: "Conditional Start",
+          description: "Start with condition",
+          icon: {
+            type: "lucide",
+            value: "PlayCircle",
+          },
+          properties: [
+            {
+              id: "condition",
+              name: "condition",
+              label: "Condition",
+              type: "text",
+              required: true,
+              placeholder: "variable === 'value'",
+              group: "basic",
+            },
+          ],
+        },
+      ];
+
+      // Initialize BPM with JSON config
+      var bpm = new BPM({
+        selector: "#bpm-container",
+        options: {
+          // Load custom nodes from JSON
+          customNodes: customNodes,
+
+          ui: {
+            mode: "edit",
+            showHeader: true,
+            showToolbox: true,
+            showPropertiesPanel: true,
+          },
+        },
+
+        onReady: function (instance) {
+          console.log("BPM Core initialized with JSON config");
+
+          // Update UI with loaded nodes
+          const nodesList = document.getElementById("loaded-nodes");
+          customNodes.forEach(function (node) {
+            const li = document.createElement("li");
+            li.textContent = node.name + " (" + node.id + ")";
+            nodesList.appendChild(li);
+          });
+
+          // Subscribe to custom events
+          bpm.on("custom:email-node-created", function (event) {
+            logEvent("Email node created", event.payload);
+          });
+
+          bpm.on("custom:sendEmailTask:created", function (event) {
+            logEvent("sendEmailTask hook triggered", event.payload);
+          });
+
+          bpm.on("custom:send-test-email", function (event) {
+            logEvent("Test email triggered", event.payload);
+            alert("Test email would be sent!");
+          });
+
+          bpm.on("custom:test-http-request", function (event) {
+            logEvent("Test HTTP request triggered", event.payload);
+            alert("Test HTTP request would be executed!");
+          });
+
+          bpm.on("node:added", function (event) {
+            logEvent("Node added to workflow", {
+              type: event.payload.node?.type,
+            });
+          });
+        },
+
+        onError: function (error) {
+          console.error("BPM initialization error:", error);
+          alert("Error: " + error.message);
+        },
+      });
+
+      // Helper function to log events
+      function logEvent(message, data) {
+        const logDiv = document.getElementById("event-log");
+        const entry = document.createElement("div");
+        const time = new Date().toLocaleTimeString();
+        entry.textContent = time + " - " + message;
+        if (data) {
+          entry.textContent += " | " + JSON.stringify(data);
+        }
+        logDiv.appendChild(entry);
+        logDiv.scrollTop = logDiv.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
