@@ -10,6 +10,7 @@ import { nodeStyle, type CustomNodeProps } from ".";
 import IconConfigComponent from "../../IconConfig";
 import { cn } from "@sth87/shadcn-design-system";
 import { useWorkflowStore } from "@/core/store/workflowStore";
+import { propertyRegistry } from "@/core/properties";
 
 // Deprecated: Use NodeVisualConfig from core types instead
 export interface NodeColorConfig {
@@ -41,6 +42,14 @@ export default function BaseNode(props: Props) {
   } = props;
   const [isExpanded, setIsExpanded] = useState(true);
   const { compactView, layoutDirection } = useWorkflowStore();
+  const { selectNode } = useWorkflowStore();
+
+  // Check if node has configurable properties
+  const hasProperties = type
+    ? propertyRegistry
+        .getNodePropertyGroups(type)
+        .some(group => group.fields.some(field => !field.readonly))
+    : false;
 
   // Access metadata
   const metadata = data?.metadata as BaseMetadata;
@@ -112,6 +121,7 @@ export default function BaseNode(props: Props) {
           !compactView &&
           props.selected && { borderColor: finalVisualConfig.borderColor }),
       }}
+      onDoubleClick={hasProperties ? () => selectNode(props.id) : undefined}
     >
       {compactView ? (
         // Compact view: icon only, text below or right, no border/background
