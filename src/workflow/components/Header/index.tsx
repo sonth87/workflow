@@ -4,49 +4,25 @@
  */
 
 import { useWorkflowStore } from "@/core/store/workflowStore";
-import { useTheme } from "@/hooks/useTheme";
-import { DEFAULT_LAYOUT_DIRECTION } from "@/workflow/constants/common";
+import { useWorkflowEvents } from "@/workflow/hooks/useWorkflow";
+import { Save } from "lucide-react";
 import {
-  useWorkflowEvents,
-  useWorkflowImportExport,
-} from "@/workflow/hooks/useWorkflow";
-import {
-  ArrowRightLeft,
-  ArrowUpDown,
-  Copy,
-  Download,
-  Eye,
-  Monitor,
-  Moon,
-  Save,
-  Shrink,
-  Sun,
-  Upload,
-  X,
-} from "lucide-react";
-import { useState } from "react";
+  ExportWorkflow,
+  ImportWorkflow,
+  LayoutSwitcher,
+  OutputViewer,
+  ThemeSwitcher,
+  ViewModeSwitcher,
+} from "../Behavior";
 
 export type LayoutDirection = "vertical" | "horizontal";
 
 interface HeaderProps {
   onSave?: () => void;
-  layoutDirection?: LayoutDirection;
-  onLayoutDirectionChange?: (direction: LayoutDirection) => void;
 }
 
-export function Header({
-  onSave,
-  layoutDirection = DEFAULT_LAYOUT_DIRECTION,
-  onLayoutDirectionChange,
-}: HeaderProps) {
-  const { workflowName, setWorkflowName, compactView, toggleCompactView } =
-    useWorkflowStore();
-  const { theme, setLightMode, setDarkMode, setSystemMode } = useTheme();
-  const { viewWorkflow, exportWorkflow, importWorkflow } =
-    useWorkflowImportExport();
-
-  const [showJsonDialog, setShowJsonDialog] = useState(false);
-  const [jsonData, setJsonData] = useState<string>("");
+export function Header({ onSave }: HeaderProps) {
+  const { workflowName, setWorkflowName } = useWorkflowStore();
 
   useWorkflowEvents("node:added", event => {
     console.log("Node được thêm:", event.payload);
@@ -55,16 +31,6 @@ export function Header({
   useWorkflowEvents("edge:added", event => {
     console.log("Edge connected:", event.payload);
   });
-
-  const handleViewWorkflow = () => {
-    const wfj = viewWorkflow();
-    setJsonData(JSON.stringify(wfj, null, 2));
-    setShowJsonDialog(true);
-  };
-
-  const handleCopyJson = () => {
-    navigator.clipboard.writeText(jsonData);
-  };
 
   return (
     <header className="w-full bg-primaryA-100 p-3">
@@ -95,116 +61,23 @@ export function Header({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Theme Switcher */}
-          <div className="flex items-center gap-1 rounded border border-border bg-muted p-1">
-            <button
-              title="Light Mode"
-              onClick={setLightMode}
-              className={`rounded p-2 transition-colors ${
-                theme === "light"
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-background"
-              }`}
-            >
-              <Sun size={16} />
-            </button>
-            <button
-              title="Dark Mode"
-              onClick={setDarkMode}
-              className={`rounded p-2 transition-colors ${
-                theme === "dark"
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-background"
-              }`}
-            >
-              <Moon size={16} />
-            </button>
-            <button
-              title="System Mode"
-              onClick={setSystemMode}
-              className={`rounded p-2 transition-colors ${
-                theme === "system"
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-background"
-              }`}
-            >
-              <Monitor size={16} />
-            </button>
-          </div>
+          <ThemeSwitcher />
 
           <div className="mx-1 h-6 w-px bg-border" />
 
-          {/* Layout Direction */}
-          {onLayoutDirectionChange && (
-            <>
-              <div className="flex items-center gap-1 rounded border border-border bg-muted p-1">
-                <button
-                  title="Vertical Layout (Top to Bottom)"
-                  onClick={() => onLayoutDirectionChange("vertical")}
-                  className={`rounded p-2 transition-colors ${
-                    layoutDirection === "vertical"
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-background"
-                  }`}
-                >
-                  <ArrowUpDown size={16} />
-                </button>
-                <button
-                  title="Horizontal Layout (Left to Right)"
-                  onClick={() => onLayoutDirectionChange("horizontal")}
-                  className={`rounded p-2 transition-colors ${
-                    layoutDirection === "horizontal"
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-background"
-                  }`}
-                >
-                  <ArrowRightLeft size={16} />
-                </button>
-              </div>
+          <LayoutSwitcher />
 
-              <div className="mx-1 h-6 w-px bg-border" />
-            </>
-          )}
+          <div className="mx-1 h-6 w-px bg-border" />
 
           {/* Compact View Toggle */}
-          <button
-            title={compactView ? "Expand View" : "Compact View"}
-            onClick={toggleCompactView}
-            className={`flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted ${
-              compactView ? "bg-primary text-primary-foreground" : ""
-            }`}
-          >
-            <Shrink size={16} />
-            {compactView ? "Expand" : "Compact"}
-          </button>
+          <ViewModeSwitcher />
 
           <div className="mx-1 h-6 w-px bg-border" />
 
-          <button
-            title="View Workflow"
-            onClick={handleViewWorkflow}
-            className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
-          >
-            <Eye size={16} />
-          </button>
+          <OutputViewer />
+          <ImportWorkflow />
 
-          <button
-            title="Import Workflow"
-            onClick={importWorkflow}
-            className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
-          >
-            <Upload size={16} />
-            Import
-          </button>
-
-          <button
-            title="Export Workflow"
-            onClick={exportWorkflow}
-            className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
-          >
-            <Download size={16} />
-            Export
-          </button>
+          <ExportWorkflow />
 
           <div className="mx-1 h-6 w-px bg-border" />
 
@@ -218,41 +91,6 @@ export function Header({
           </button>
         </div>
       </div>
-
-      {/* JSON Dialog */}
-      {showJsonDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-[90vw] max-w-4xl h-[80vh] bg-card rounded-lg shadow-xl flex flex-col">
-            {/* Dialog Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <h2 className="text-xl font-semibold">Workflow JSON</h2>
-              <div className="flex items-center gap-2">
-                <button
-                  title="Copy JSON"
-                  onClick={handleCopyJson}
-                  className="rounded p-2 hover:bg-muted"
-                >
-                  <Copy size={18} />
-                </button>
-                <button
-                  title="Close"
-                  onClick={() => setShowJsonDialog(false)}
-                  className="rounded p-2 hover:bg-muted"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-            </div>
-
-            {/* Dialog Content */}
-            <div className="flex-1 overflow-auto p-4">
-              <pre className="bg-muted rounded p-4 text-sm font-mono overflow-auto">
-                {jsonData}
-              </pre>
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 }

@@ -2,15 +2,13 @@ import { useCallback, useState } from "react";
 import { Canvas } from "./components/Canvas";
 import { Toolbox } from "./components/Toolbox";
 import { PropertiesPanel } from "./components/PropertiesPanel";
-import { Header, type LayoutDirection } from "./components/Header";
+import { Header } from "./components/Header";
 import { ValidationPanel } from "./components/ValidationPanel";
 import { Toolbar } from "./components/Toolbar";
 import { useNodeOperations, useWorkflowValidation } from "./hooks/useWorkflow";
 import { useWorkflowStore } from "@/core/store/workflowStore";
-import type { BaseNodeConfig } from "@/core/types/base.types";
 import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
-import { getLayoutedElements } from "./utils/layout";
-import { Behavior } from "./components/Behavior";
+import { UndoRedo } from "./components/Behavior";
 import {
   findTargetContainer,
   toRelativePosition,
@@ -52,84 +50,56 @@ export interface WorkflowUIConfig {
 function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
   const { createNode } = useNodeOperations();
   const { validate } = useWorkflowValidation();
-  const {
-    nodes,
-    edges,
-    setNodes,
-    selectedNodeId,
-    selectedEdgeId,
-    saveToHistory,
-    setLayoutDirection: storeSetLayoutDirection,
-    layoutDirection,
-  } = useWorkflowStore();
+  const { nodes, edges, selectedNodeId, selectedEdgeId } = useWorkflowStore();
   const { fitView } = useReactFlow();
-  const updateNodeInternals = useUpdateNodeInternals();
 
   const [isPanMode, setIsPanMode] = useState(false);
   const [showMinimap, setShowMinimap] = useState(false);
 
   const handleNodeDrop = useCallback(
     (nodeType: string, position: { x: number; y: number }) => {
-      createNode(nodeType, position);
+      const newNode = createNode(nodeType, position);
 
       // After creating node, check if it's inside a pool/lane and set parent
-      setTimeout(() => {
+      if (newNode && newNode.type !== "pool") {
         const { nodes: currentNodes } = useWorkflowStore.getState();
-        const newNode = currentNodes[currentNodes.length - 1]; // Get the newly created node
+        const targetContainer = findTargetContainer(
+          newNode,
+          currentNodes,
+          false
+        );
 
-        if (newNode && newNode.type !== "pool") {
-          const targetContainer = findTargetContainer(
-            newNode,
-            currentNodes,
-            false
-          );
-
-          if (targetContainer) {
-            // For lane, only allow Pool as parent
-            if (newNode.type === "lane" && targetContainer.type !== "pool") {
-              return;
-            }
-
-            const { updateNode } = useWorkflowStore.getState();
-            updateNode(newNode.id, {
-              parentId: targetContainer.id,
-              extent: targetContainer.data?.isLocked
-                ? ("parent" as const)
-                : undefined,
-              position: toRelativePosition(
-                newNode.position,
-                targetContainer.position
-              ),
-              // Lane inside pool should not be draggable
-              ...(newNode.type === "lane" && targetContainer.type === "pool"
-                ? { draggable: false }
-                : {}),
-            });
-
-            // Sort nodes to ensure parent appears before child
-            const updatedNodes = useWorkflowStore.getState().nodes;
-            const sortedNodes = sortNodesByParentChild(updatedNodes);
-            useWorkflowStore.getState().setNodes(sortedNodes);
+        if (targetContainer) {
+          // For lane, only allow Pool as parent
+          if (newNode.type === "lane" && targetContainer.type !== "pool") {
+            return;
           }
+
+          const { updateNode } = useWorkflowStore.getState();
+          updateNode(newNode.id, {
+            parentId: targetContainer.id,
+            extent: targetContainer.data?.isLocked
+              ? ("parent" as const)
+              : undefined,
+            position: toRelativePosition(
+              newNode.position,
+              targetContainer.position
+            ),
+            // Lane inside pool should not be draggable
+            ...(newNode.type === "lane" && targetContainer.type === "pool"
+              ? { draggable: false }
+              : {}),
+          });
+
+          // Sort nodes to ensure parent appears before child
+          const updatedNodes = useWorkflowStore.getState().nodes;
+          const sortedNodes = sortNodesByParentChild(updatedNodes);
+          useWorkflowStore.getState().setNodes(sortedNodes);
         }
-      }, 0);
+      }
     },
     [createNode]
   );
-
-  const handleRun = useCallback(async () => {
-    const result = await validate();
-
-    if (!result.valid) {
-      alert(
-        `Cannot run workflow. Please fix ${result.errors.length} error(s).`
-      );
-      return;
-    }
-
-    // Run workflow logic here
-    alert("Workflow execution started!");
-  }, [validate]);
 
   const handleSave = useCallback(async () => {
     await validate();
@@ -146,37 +116,6 @@ function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
       }
     },
     [nodes, fitView]
-  );
-
-  const handleChangeLayoutDirection = useCallback(
-    (direction: LayoutDirection) => {
-      // Save history before layout change
-      saveToHistory();
-
-      storeSetLayoutDirection(direction);
-
-      const { nodes: layoutedNodes } = getLayoutedElements(
-        nodes,
-        edges,
-        direction
-      );
-
-      setNodes(layoutedNodes as BaseNodeConfig[]);
-
-      setTimeout(() => {
-        layoutedNodes.forEach(n => updateNodeInternals(n.id));
-        fitView({ padding: 0.2, duration: 300, maxZoom: 1 });
-      }, 100);
-    },
-    [
-      nodes,
-      edges,
-      setNodes,
-      updateNodeInternals,
-      fitView,
-      saveToHistory,
-      storeSetLayoutDirection,
-    ]
   );
 
   const selectedNode = selectedNodeId
@@ -213,11 +152,7 @@ function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
     <div className="flex flex-col h-screen w-screen">
       {ui.showHeader && (
         <div className="">
-          <Header
-            onSave={handleSave}
-            layoutDirection={layoutDirection}
-            onLayoutDirectionChange={handleChangeLayoutDirection}
-          />
+          <Header onSave={handleSave} />
         </div>
       )}
       <div className="flex-1 bg-primaryA-100 overflow-hidden flex gap-2 px-2 pb-2">
@@ -227,8 +162,10 @@ function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
           </div>
         )}
 
-        <div className="flex-1 rounded-2xl overflow-hidden">
-          {ui.showBehavior && !isViewMode && <Behavior onRun={handleRun} />}
+        <div className="flex-1 rounded-2xl overflow-hidden relative">
+          {ui.showBehavior && !isViewMode && (
+            <UndoRedo className="absolute top-2 left-2 z-1" />
+          )}
           <Canvas
             onNodeDrop={isViewMode ? undefined : handleNodeDrop}
             isPanMode={isPanMode}

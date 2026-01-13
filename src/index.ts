@@ -30,7 +30,14 @@ export {
   ValidationPanel,
   Header,
   Toolbar,
-  Behavior,
+  UndoRedo,
+  ExportWorkflow,
+  ImportWorkflow,
+  LayoutSwitcher,
+  OutputViewer,
+  Run,
+  ThemeSwitcher,
+  ViewModeSwitcher,
 } from "./workflow/components";
 
 // ==================== Context ====================
