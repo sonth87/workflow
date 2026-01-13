@@ -23,13 +23,4 @@ export type { LayoutDirection } from "./Header";
 export { Toolbar } from "./Toolbar";
 
 // Behavior
-export {
-  UndoRedo,
-  ThemeSwitcher,
-  ViewModeSwitcher,
-  ImportWorkflow,
-  ExportWorkflow,
-  OutputViewer,
-  LayoutSwitcher,
-  Run,
-} from "./Behavior";
+export * from "./Behavior";

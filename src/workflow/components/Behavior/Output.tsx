@@ -1,6 +1,6 @@
 import { useWorkflowImportExport } from "@/workflow/hooks";
-import { Button } from "@sth87/shadcn-design-system";
-import { Copy, Eye, X } from "lucide-react";
+import { Button, Dialog } from "@sth87/shadcn-design-system";
+import { Copy, Eye } from "lucide-react";
 import React, { useState } from "react";
 
 type OutputViewerProps = {
@@ -33,39 +33,34 @@ const OutputViewer = ({ className }: OutputViewerProps) => {
         <Eye size={16} />
       </Button>
 
-      {showJsonDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-[90vw] max-w-4xl h-[80vh] bg-card rounded-lg shadow-xl flex flex-col">
-            {/* Dialog Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <h2 className="text-xl font-semibold">Workflow JSON</h2>
-              <div className="flex items-center gap-2">
-                <Button
-                  title="Copy JSON"
-                  onClick={handleCopyJson}
-                  className="rounded p-2 hover:bg-muted"
-                >
-                  <Copy size={18} />
-                </Button>
-                <Button
-                  title="Close"
-                  onClick={() => setShowJsonDialog(false)}
-                  className="rounded p-2 hover:bg-muted"
-                >
-                  <X size={18} />
-                </Button>
-              </div>
-            </div>
-
-            {/* Dialog Content */}
-            <div className="flex-1 overflow-auto p-4">
-              <pre className="bg-muted rounded p-4 text-sm font-mono overflow-auto">
-                {jsonData}
-              </pre>
-            </div>
+      <Dialog
+        open={showJsonDialog}
+        onOpenChange={setShowJsonDialog}
+        title="Workflow JSON"
+        description="View and copy the workflow configuration as JSON"
+        confirmButton={{
+          onClick: () => setShowJsonDialog(false),
+          text: "Close",
+        }}
+        size="4xl"
+        contentClassName="max-h-[80vh]!"
+      >
+        <div className="space-y-4">
+          <div className="flex justify-end">
+            <Button
+              title="Copy JSON"
+              onClick={handleCopyJson}
+              className="flex items-center gap-2"
+            >
+              <Copy size={16} />
+              Copy JSON
+            </Button>
           </div>
+          <pre className="bg-muted rounded p-4 text-sm font-mono overflow-auto">
+            {jsonData}
+          </pre>
         </div>
-      )}
+      </Dialog>
     </div>
   );
 };

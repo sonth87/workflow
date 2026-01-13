@@ -38,6 +38,7 @@ export {
   Run,
   ThemeSwitcher,
   ViewModeSwitcher,
+  Shortcuts,
 } from "./workflow/components";
 
 // ==================== Context ====================
