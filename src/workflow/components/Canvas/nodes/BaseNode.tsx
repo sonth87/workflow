@@ -5,12 +5,13 @@ import type {
 } from "@/core/types/base.types";
 import { NodeType } from "@/enum/workflow.enum";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 import { nodeStyle, type CustomNodeProps } from ".";
 import IconConfigComponent from "../../IconConfig";
 import { cn } from "@sth87/shadcn-design-system";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { propertyRegistry } from "@/core/properties";
+import { useNodeActions } from "@/workflow/hooks";
 
 // Deprecated: Use NodeVisualConfig from core types instead
 export interface NodeColorConfig {
@@ -40,9 +41,13 @@ export default function BaseNode(props: Props) {
     colorConfig,
     visualConfig,
   } = props;
-  const [isExpanded, setIsExpanded] = useState(true);
+  const { toggleNodeCollapse } = useNodeActions();
   const { compactView, layoutDirection } = useWorkflowStore();
   const { selectNode } = useWorkflowStore();
+
+  // Get collapsed state from node data (default to false = expanded)
+  const collapsed = data?.collapsed ?? false;
+  const isExpanded = !collapsed;
 
   // Check if node has configurable properties
   const hasProperties = type
@@ -103,7 +108,7 @@ export default function BaseNode(props: Props) {
     <div
       className={cn(
         compactView ? "group" : nodeStyle,
-        compactView ? "" : "w-52 min-w-52 max-w-xs",
+        compactView ? "" : "min-w-52 max-w-72",
         {
           "border-primary ring-4":
             props.selected &&
@@ -176,7 +181,7 @@ export default function BaseNode(props: Props) {
               <button
                 onClick={e => {
                   e.stopPropagation();
-                  setIsExpanded(!isExpanded);
+                  toggleNodeCollapse(props.id, !collapsed);
                 }}
                 className="p-1 hover:bg-muted rounded transition-colors shrink-0"
               >

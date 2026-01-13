@@ -26,15 +26,23 @@ import {
 } from "@/core/utils/contextMenuHelpers";
 import { contextMenuActionsRegistry } from "@/core/registry";
 import {
+  BaseNodeType,
+  getBaseNodeDefinition,
+} from "@/core/nodes/BaseNodeDefinitions";
+import {
+  AlarmClock,
   Circle,
   ClipboardList,
   DiamondPlus,
   FlipVertical,
   Highlighter,
+  ListCheck,
   LockOpen,
+  Mail,
   Palette,
   PanelTopBottomDashed,
   Plus,
+  Radio,
   Trash2,
 } from "lucide-react";
 
@@ -42,10 +50,19 @@ import {
 // Default Node Configurations
 // ============================================
 
+/**
+ * Helper to get visual config from base node type
+ */
+const getBaseVisualConfig = (baseType: BaseNodeType) => {
+  const baseDef = getBaseNodeDefinition(baseType);
+  return baseDef?.visualConfig;
+};
+
 const createDefaultNodeConfig = (
   nodeType: NodeType,
   category: CategoryType,
-  metadata: Partial<BaseNodeConfig["metadata"]>
+  metadata: Partial<BaseNodeConfig["metadata"]>,
+  baseType?: BaseNodeType
 ): BaseNodeConfig => ({
   id: "",
   type: nodeType,
@@ -59,6 +76,7 @@ const createDefaultNodeConfig = (
     description: metadata.description,
     version: "1.0.0",
   },
+  visualConfig: baseType ? getBaseVisualConfig(baseType) : undefined,
   collapsible: true,
   collapsed: false,
   editable: true,
@@ -247,6 +265,108 @@ const defaultNodes: PluginConfig["nodes"] = [
         description: "Wait for events",
       }
     ),
+  },
+
+  // Immediate Events
+  {
+    id: NodeType.IMMEDIATE_EMAIL,
+    type: NodeType.IMMEDIATE_EMAIL,
+    name: "Immediate Email",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_EMAIL,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Email",
+          description: "Trigger immediately based on email",
+        },
+        BaseNodeType.IMMEDIATE // Tự động lấy visual config từ base IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: Mail,
+      },
+    },
+  },
+  {
+    id: NodeType.IMMEDIATE_RECEIVE_MESSAGE,
+    type: NodeType.IMMEDIATE_RECEIVE_MESSAGE,
+    name: "Immediate Receive Message",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_RECEIVE_MESSAGE,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Receive Message",
+          description: "Trigger immediately based on received message",
+        },
+        BaseNodeType.IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: Mail,
+      },
+    },
+  },
+  {
+    id: NodeType.IMMEDIATE_TIMER,
+    type: NodeType.IMMEDIATE_TIMER,
+    name: "Immediate Timer",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_TIMER,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Timer",
+          description: "Trigger immediately based on timer",
+        },
+        BaseNodeType.IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: AlarmClock,
+      },
+    },
+  },
+  {
+    id: NodeType.IMMEDIATE_SIGNAL,
+    type: NodeType.IMMEDIATE_SIGNAL,
+    name: "Immediate Signal",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_SIGNAL,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Signal",
+          description: "Trigger immediately based on signal",
+        },
+        BaseNodeType.IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: Radio,
+      },
+    },
+  },
+  {
+    id: NodeType.IMMEDIATE_CONDITION,
+    type: NodeType.IMMEDIATE_CONDITION,
+    name: "Immediate Condition",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_CONDITION,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Condition",
+          description: "Trigger immediately based on condition",
+        },
+        BaseNodeType.IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: ListCheck,
+      },
+    },
   },
 
   // End Events

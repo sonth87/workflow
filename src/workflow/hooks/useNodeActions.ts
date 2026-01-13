@@ -101,11 +101,18 @@ export function useNodeActions() {
    */
   const toggleNodeCollapse = useCallback(
     (nodeId: string, collapsed: boolean) => {
+      const node = nodes.find(n => n.id === nodeId);
+      if (!node) return;
+
       updateNode(nodeId, {
         collapsed,
+        data: {
+          ...(node.data || {}),
+          collapsed,
+        },
       } as Partial<BaseNodeConfig>);
     },
-    [updateNode]
+    [nodes, updateNode]
   );
 
   /**
