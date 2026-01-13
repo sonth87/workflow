@@ -10,6 +10,7 @@ import { X } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../../data/toolboxData";
 import IconConfig from "../IconConfig";
+import { cn } from "@sth87/shadcn-design-system";
 
 // Default icon for custom category
 const CustomCategoryIcon = () => (
@@ -29,7 +30,9 @@ const CustomCategoryIcon = () => (
   </svg>
 );
 
-export function Toolbox() {
+type ToolboxProps = { className?: string };
+
+export function Toolbox({ className }: ToolboxProps) {
   const [selectedCategoryType, setSelectedCategoryType] =
     useState<CategoryType>();
 
@@ -132,7 +135,12 @@ export function Toolbox() {
   );
 
   return (
-    <aside className="h-full border border-border/50 bg-card rounded-2xl shadow-xl flex relative overflow-visible">
+    <aside
+      className={cn(
+        "h-auto border bg-card rounded-2xl shadow-xl flex relative overflow-visible",
+        className
+      )}
+    >
       <div className="px-2.5 py-4 space-y-1 flex-1 overflow-y-auto flex flex-col items-center">
         {builderCategories.map((category, index) => (
           <div
@@ -155,7 +163,7 @@ export function Toolbox() {
         <div className="h-px w-6 bg-border my-4" />
       </div>
       {selectedCategory && (
-        <div className="min-w-[320px] border-border absolute top-0 left-full border rounded-2xl z-10 bg-background">
+        <div className="min-w-[320px] border-border absolute top-0 left-[calc(100%+4px)] border rounded-2xl z-10 bg-background">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h2 className="text-base text-ink800 font-medium flex-1">
               {selectedCategory?.name}

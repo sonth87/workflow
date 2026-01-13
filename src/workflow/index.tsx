@@ -156,15 +156,13 @@ function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
         </div>
       )}
       <div className="flex-1 bg-primaryA-100 overflow-hidden flex gap-2 px-2 pb-2">
-        {ui.showToolbox && !isViewMode && (
-          <div>
-            <Toolbox />
-          </div>
-        )}
-
         <div className="flex-1 rounded-2xl overflow-hidden relative">
+          {ui.showToolbox && !isViewMode && (
+            <Toolbox className="absolute top-2 left-2 z-1" />
+          )}
+
           {ui.showBehavior && !isViewMode && (
-            <UndoRedo className="absolute top-2 left-2 z-1" />
+            <UndoRedo className="absolute bottom-2 left-2 z-1" />
           )}
           <Canvas
             onNodeDrop={isViewMode ? undefined : handleNodeDrop}

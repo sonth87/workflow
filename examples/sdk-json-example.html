@@ -216,6 +216,105 @@
             },
           ],
         },
+        {
+          id: "simpleTask",
+          extends: "task",
+          name: "Simple Task",
+          description: "Task with minimal context menu",
+          icon: {
+            type: "lucide",
+            value: "CheckSquare",
+            color: "#ffffff",
+            backgroundColor: "#10b981",
+          },
+          visualConfig: {
+            backgroundColor: "#ecfdf5",
+            borderColor: "#10b981",
+            textColor: "#064e3b",
+          },
+          // Disable some default context menu items
+          disableDefaultContextMenu: ["change-type", "appearance"],
+          contextMenuItems: [
+            {
+              id: "mark-complete",
+              label: "Mark Complete",
+              icon: "Check",
+              action: {
+                type: "event",
+                event: "custom:task-complete",
+              },
+            },
+          ],
+        },
+        {
+          id: "lockedTask",
+          extends: "task",
+          name: "Locked Task",
+          description: "Task with no duplicate/delete",
+          icon: {
+            type: "lucide",
+            value: "Lock",
+            color: "#ffffff",
+            backgroundColor: "#f59e0b",
+          },
+          visualConfig: {
+            backgroundColor: "#fef3c7",
+            borderColor: "#f59e0b",
+            textColor: "#78350f",
+          },
+          // Disable duplicate and delete options
+          disableDefaultContextMenu: ["duplicate", "delete"],
+          contextMenuItems: [
+            {
+              id: "unlock",
+              label: "Unlock Task",
+              icon: "Unlock",
+              action: {
+                type: "event",
+                event: "custom:unlock-task",
+              },
+            },
+          ],
+        },
+        {
+          id: "minimalTask",
+          extends: "task",
+          name: "Minimal Task",
+          description: "Task with only custom menu",
+          icon: {
+            type: "lucide",
+            value: "Minimize",
+            color: "#ffffff",
+            backgroundColor: "#6366f1",
+          },
+          visualConfig: {
+            backgroundColor: "#eef2ff",
+            borderColor: "#6366f1",
+            textColor: "#312e81",
+          },
+          // Disable all default context menu items
+          disableDefaultContextMenu: ["all"],
+          contextMenuItems: [
+            {
+              id: "execute",
+              label: "Execute Task",
+              icon: "Play",
+              action: {
+                type: "event",
+                event: "custom:execute-task",
+              },
+            },
+            {
+              id: "configure",
+              label: "Configure",
+              icon: "Settings",
+              action: {
+                type: "event",
+                event: "custom:configure-task",
+              },
+            },
+          ],
+        },
       ];
 
       // Initialize BPM with JSON config
@@ -267,6 +366,27 @@
             logEvent("Node added to workflow", {
               type: event.payload.node?.type,
             });
+          });
+
+          // Additional custom events for new nodes
+          bpm.on("custom:task-complete", function (event) {
+            logEvent("Task marked complete", event.payload);
+            alert("Task completed!");
+          });
+
+          bpm.on("custom:unlock-task", function (event) {
+            logEvent("Task unlocked", event.payload);
+            alert("Task unlocked!");
+          });
+
+          bpm.on("custom:execute-task", function (event) {
+            logEvent("Execute task", event.payload);
+            alert("Task executed!");
+          });
+
+          bpm.on("custom:configure-task", function (event) {
+            logEvent("Configure task", event.payload);
+            alert("Opening configuration...");
           });
         },
 

@@ -196,6 +196,18 @@ export const CustomNodeJSONSchema = z.object({
 
   // Context menu
   contextMenuItems: z.array(ContextMenuItemSchema).optional(),
+  disableDefaultContextMenu: z
+    .array(
+      z.enum([
+        "change-type",
+        "properties",
+        "appearance",
+        "duplicate",
+        "delete",
+        "all",
+      ])
+    )
+    .optional(),
 
   // Event triggers
   eventTriggers: z.array(EventTriggerSchema).optional(),

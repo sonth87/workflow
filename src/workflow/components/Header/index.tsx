@@ -44,9 +44,9 @@ export function Header({ onSave }: HeaderProps) {
 
           <div className="mx-1 h-6 w-px bg-border" />
 
-          <LayoutSwitcher />
+          {/* <LayoutSwitcher /> */}
 
-          <div className="mx-1 h-6 w-px bg-border" />
+          {/* <div className="mx-1 h-6 w-px bg-border" /> */}
 
           {/* Compact View Toggle */}
           <ViewModeSwitcher />

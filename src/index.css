@@ -172,6 +172,14 @@ body {
     hsl(from var(--color-primary) h s l) 0px 0px 29.7075px 0px;
 }
 
+.react-flow__panel.react-flow__attribution {
+  width: 0;
+  height: 0;
+  position: absolute;
+  overflow: hidden;
+  bottom: 0;
+}
+
 @keyframes pulse1 {
   0% {
     box-shadow:
