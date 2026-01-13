@@ -124,6 +124,28 @@ export class KeyboardShortcutsRegistry implements IKeyboardShortcutsRegistry {
   }
 
   /**
+   * Check if element is within ReactFlow canvas
+   */
+  private isInReactFlowCanvas(element: HTMLElement): boolean {
+    // Check if element itself or any parent has react-flow class
+    let current: HTMLElement | null = element;
+    while (current) {
+      // Check for React Flow classes
+      if (
+        current.classList.contains("react-flow") ||
+        current.classList.contains("react-flow__pane") ||
+        current.classList.contains("react-flow__renderer") ||
+        current.classList.contains("react-flow__viewport") ||
+        current.hasAttribute("data-reactflow")
+      ) {
+        return true;
+      }
+      current = current.parentElement;
+    }
+    return false;
+  }
+
+  /**
    * Find a shortcut that matches the keyboard event
    * Prioritizes shortcuts with modifiers over simple keys
    */
@@ -134,6 +156,12 @@ export class KeyboardShortcutsRegistry implements IKeyboardShortcutsRegistry {
       target.tagName === "INPUT" ||
       target.tagName === "TEXTAREA" ||
       target.isContentEditable;
+
+    // Only allow shortcuts when focused on ReactFlow canvas
+    // This prevents shortcuts from firing when typing in properties panel or modals
+    if (!this.isInReactFlowCanvas(target)) {
+      return undefined;
+    }
 
     let bestMatch: KeyboardShortcut | undefined;
     let bestMatchHasModifier = false;

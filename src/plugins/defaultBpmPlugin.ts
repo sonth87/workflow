@@ -30,6 +30,7 @@ import {
   ClipboardList,
   DiamondPlus,
   FlipVertical,
+  Highlighter,
   LockOpen,
   Palette,
   PanelTopBottomDashed,
@@ -672,6 +673,14 @@ const defaultContextMenus: Array<{
           if (action && context.nodeId) {
             action(context.nodeId);
           }
+        },
+        // On type change
+        async (targetNodeType: string, context: ContextMenuContext) => {
+          const action =
+            contextMenuActionsRegistry.getAction("convertNodeType");
+          if (action && context.nodeId) {
+            action(context.nodeId, targetNodeType);
+          }
         }
       ),
     },
@@ -903,7 +912,10 @@ const defaultContextMenus: Array<{
         {
           id: "appearance",
           label: "Appearance",
-          icon: "",
+          icon: {
+            type: "lucide",
+            value: Highlighter,
+          },
           children: [
             {
               id: "color-submenu",
@@ -1010,7 +1022,9 @@ const defaultContextMenus: Array<{
           label: "Delete Pool",
           icon: { type: "lucide", value: Trash2, color: "red" },
           onClick: async (context: ContextMenuContext) => {
-            const action = contextMenuActionsRegistry.getAction("deletePoolWithConfirmation");
+            const action = contextMenuActionsRegistry.getAction(
+              "deletePoolWithConfirmation"
+            );
             if (action && context.nodeId) {
               action(context.nodeId);
             }

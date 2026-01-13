@@ -75,6 +75,7 @@ export function WorkflowActionsProvider({
       duplicateNode: nodeActions.duplicateNode,
       toggleNodeCollapse: nodeActions.toggleNodeCollapse,
       updateNodeData: nodeActions.updateNodeData,
+      convertNodeType: nodeActions.convertNodeType,
       selectNode,
 
       // Pool-specific action

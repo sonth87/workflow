@@ -303,3 +303,6 @@ export default function WorkflowBuilder({
     </WorkflowCore>
   );
 }
+
+// Named export for consistency
+export { WorkflowBuilder };

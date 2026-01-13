@@ -1,0 +1,202 @@
+[
+  {
+    "id": "httpRequestTask",
+    "extends": "task",
+    "name": "HTTP Request",
+    "description": "Make HTTP/REST API calls",
+    "icon": {
+      "type": "lucide",
+      "value": "Globe",
+      "color": "#ffffff",
+      "backgroundColor": "#3b82f6"
+    },
+    "visualConfig": {
+      "backgroundColor": "#eff6ff",
+      "borderColor": "#3b82f6",
+      "borderStyle": "solid",
+      "borderWidth": 2,
+      "textColor": "#1e3a8a"
+    },
+    "properties": [
+      {
+        "id": "url",
+        "name": "url",
+        "label": "URL",
+        "type": "text",
+        "required": true,
+        "placeholder": "https://api.example.com/endpoint",
+        "description": "API endpoint URL",
+        "group": "request",
+        "order": 1,
+        "validation": {
+          "pattern": "^https?://",
+          "message": "Must be a valid URL"
+        }
+      },
+      {
+        "id": "method",
+        "name": "method",
+        "label": "HTTP Method",
+        "type": "select",
+        "required": true,
+        "defaultValue": "GET",
+        "group": "request",
+        "order": 2,
+        "options": [
+          { "label": "GET", "value": "GET" },
+          { "label": "POST", "value": "POST" },
+          { "label": "PUT", "value": "PUT" },
+          { "label": "PATCH", "value": "PATCH" },
+          { "label": "DELETE", "value": "DELETE" }
+        ]
+      },
+      {
+        "id": "headers",
+        "name": "headers",
+        "label": "Headers",
+        "type": "json",
+        "required": false,
+        "placeholder": "{ \"Content-Type\": \"application/json\" }",
+        "description": "Request headers in JSON format",
+        "group": "request",
+        "order": 3
+      },
+      {
+        "id": "body",
+        "name": "body",
+        "label": "Request Body",
+        "type": "json",
+        "required": false,
+        "placeholder": "{ \"key\": \"value\" }",
+        "description": "Request body in JSON format",
+        "group": "request",
+        "order": 4
+      },
+      {
+        "id": "timeout",
+        "name": "timeout",
+        "label": "Timeout (ms)",
+        "type": "number",
+        "required": false,
+        "defaultValue": 30000,
+        "group": "config",
+        "order": 5,
+        "validation": {
+          "min": 1000,
+          "max": 300000,
+          "message": "Timeout must be between 1000 and 300000 ms"
+        }
+      },
+      {
+        "id": "retry",
+        "name": "retry",
+        "label": "Retry Count",
+        "type": "number",
+        "required": false,
+        "defaultValue": 0,
+        "group": "config",
+        "order": 6,
+        "validation": {
+          "min": 0,
+          "max": 5,
+          "message": "Retry count must be between 0 and 5"
+        }
+      },
+      {
+        "id": "authentication",
+        "name": "authentication",
+        "label": "Authentication",
+        "type": "select",
+        "required": false,
+        "defaultValue": "none",
+        "group": "auth",
+        "order": 7,
+        "options": [
+          { "label": "None", "value": "none" },
+          { "label": "Bearer Token", "value": "bearer" },
+          { "label": "API Key", "value": "apikey" },
+          { "label": "Basic Auth", "value": "basic" }
+        ]
+      },
+      {
+        "id": "token",
+        "name": "token",
+        "label": "Token/API Key",
+        "type": "text",
+        "required": false,
+        "placeholder": "Enter your token",
+        "group": "auth",
+        "order": 8
+      }
+    ],
+    "propertyGroups": [
+      {
+        "id": "request",
+        "label": "Request Configuration",
+        "description": "Configure HTTP request details",
+        "icon": "Globe",
+        "order": 1
+      },
+      {
+        "id": "config",
+        "label": "Advanced Settings",
+        "description": "Timeout and retry configuration",
+        "icon": "Settings",
+        "order": 2
+      },
+      {
+        "id": "auth",
+        "label": "Authentication",
+        "description": "API authentication settings",
+        "icon": "Lock",
+        "order": 3
+      }
+    ],
+    "defaultProperties": {
+      "label": "HTTP Request",
+      "method": "GET",
+      "timeout": 30000,
+      "retry": 0,
+      "authentication": "none"
+    },
+    "contextMenuItems": [
+      {
+        "id": "test-request",
+        "label": "Test Request",
+        "icon": "Play",
+        "action": {
+          "type": "event",
+          "event": "custom:test-http-request"
+        }
+      },
+      {
+        "id": "view-response",
+        "label": "View Last Response",
+        "icon": "Eye",
+        "action": {
+          "type": "event",
+          "event": "custom:view-response"
+        }
+      },
+      {
+        "separator": true
+      },
+      {
+        "id": "copy-curl",
+        "label": "Copy as cURL",
+        "icon": "Copy",
+        "action": {
+          "type": "event",
+          "event": "custom:copy-curl"
+        }
+      }
+    ],
+    "eventTriggers": [
+      {
+        "on": "node:added",
+        "action": "emit",
+        "event": "custom:http-node-created"
+      }
+    ]
+  }
+]

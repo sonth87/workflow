@@ -51,7 +51,9 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
             )}
             <h2 className="text-sm font-semibold tracking-wide text-ink800">
               {selectedNode
-                ? selectedNode.metadata?.title || "Node Properties"
+                ? (selectedNode.data?.label as string) ||
+                  selectedNode.metadata?.title ||
+                  "Node Properties"
                 : "Edge Properties"}
             </h2>
           </div>

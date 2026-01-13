@@ -94,7 +94,7 @@ export default function BaseNode(props: Props) {
     <div
       className={cn(
         compactView ? "group" : nodeStyle,
-        compactView ? "" : "min-w-52",
+        compactView ? "" : "w-52 min-w-52 max-w-xs",
         {
           "border-primary ring-4":
             props.selected &&
@@ -154,7 +154,7 @@ export default function BaseNode(props: Props) {
                   icon={iconConfig}
                 />
                 <span
-                  className="text-sm font-semibold truncate"
+                  className="text-sm font-semibold line-clamp-2"
                   style={{
                     color: finalVisualConfig.textColor,
                   }}

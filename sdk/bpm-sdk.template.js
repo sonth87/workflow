@@ -266,6 +266,15 @@
       return promise;
     },
 
+    loadJSONConfig: function (url) {
+      return fetch(url).then(function (response) {
+        if (!response.ok) {
+          throw new Error("Failed to load JSON config: " + response.statusText);
+        }
+        return response.json();
+      });
+    },
+
     initBPMCore: function () {
       var self = this;
 
@@ -273,43 +282,109 @@
         if (window.__BPM_CORE__) {
           ensureGlobals();
 
-          var request = {
-            appType: "bpm",
-            selector: self.options.selector,
-            options: self.options.options || {},
-          };
+          // Process JSON configs if provided
+          var configPromises = [];
 
-          window.__SKYLINE_SDK_HUB_OPTIONS__[self.options.selector] =
-            self.options;
-
-          var q =
-            window.__SKYLINE_SDK_REQUESTS__["bpm"] ||
-            (window.__SKYLINE_SDK_REQUESTS__["bpm"] = []);
-          q.push(request);
-
-          if (typeof window.__BPM_CORE__ === "function") {
-            try {
-              var instance = new window.__BPM_CORE__({
-                container: self.options.selector,
-                ...self.options.options,
-              });
-
-              if (typeof self.options.onReady === "function") {
-                self.options.onReady(instance);
-              }
-            } catch (e) {
-              console.error("Error initializing BPM Core:", e);
-              if (typeof self.options.onError === "function") {
-                self.options.onError(e);
-              }
-            }
+          // Load custom nodes from JSON
+          if (self.options.options.customNodesUrl) {
+            configPromises.push(
+              self
+                .loadJSONConfig(self.options.options.customNodesUrl)
+                .then(function (nodesConfig) {
+                  self.options.options.customNodes = nodesConfig;
+                })
+            );
           }
+
+          // Load plugins from JSON URLs
+          if (
+            self.options.options.pluginUrls &&
+            Array.isArray(self.options.options.pluginUrls)
+          ) {
+            self.options.options.pluginUrls.forEach(function (url) {
+              configPromises.push(
+                self.loadJSONConfig(url).then(function (pluginConfig) {
+                  if (!self.options.options.pluginsFromJSON) {
+                    self.options.options.pluginsFromJSON = [];
+                  }
+                  self.options.options.pluginsFromJSON.push(pluginConfig);
+                })
+              );
+            });
+          }
+
+          Promise.all(configPromises)
+            .then(function () {
+              var request = {
+                appType: "bpm",
+                selector: self.options.selector,
+                options: self.options.options || {},
+              };
+
+              window.__SKYLINE_SDK_HUB_OPTIONS__[self.options.selector] =
+                self.options;
+
+              var q =
+                window.__SKYLINE_SDK_REQUESTS__["bpm"] ||
+                (window.__SKYLINE_SDK_REQUESTS__["bpm"] = []);
+              q.push(request);
+
+              if (typeof window.__BPM_CORE__ === "function") {
+                try {
+                  var instance = new window.__BPM_CORE__({
+                    container: self.options.selector,
+                    ...self.options.options,
+                  });
+
+                  // Expose event API
+                  self.eventBus = {
+                    on: function (event, handler) {
+                      if (instance && instance.eventBus) {
+                        return instance.eventBus.on(event, handler);
+                      }
+                    },
+                    emit: function (event, payload) {
+                      if (instance && instance.eventBus) {
+                        instance.eventBus.emit(event, payload);
+                      }
+                    },
+                  };
+
+                  if (typeof self.options.onReady === "function") {
+                    self.options.onReady(instance);
+                  }
+                } catch (e) {
+                  console.error("Error initializing BPM Core:", e);
+                  if (typeof self.options.onError === "function") {
+                    self.options.onError(e);
+                  }
+                }
+              }
+            })
+            .catch(function (error) {
+              console.error("Error loading JSON configs:", error);
+              if (typeof self.options.onError === "function") {
+                self.options.onError(error);
+              }
+            });
         } else {
           setTimeout(waitForBPMCore, 50);
         }
       };
 
       waitForBPMCore();
+    },
+
+    on: function (event, handler) {
+      if (this.eventBus) {
+        return this.eventBus.on(event, handler);
+      }
+    },
+
+    emit: function (event, payload) {
+      if (this.eventBus) {
+        this.eventBus.emit(event, payload);
+      }
     },
 
     destroy: function () {

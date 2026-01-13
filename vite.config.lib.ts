@@ -18,7 +18,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
       name: "BPMCore",
-      fileName: (format) => `bpm-core.${format}.js`,
+      fileName: format => `bpm-core.${format}.js`,
       formats: ["es", "cjs"],
     },
     rollupOptions: {
@@ -53,7 +53,7 @@ export default defineConfig({
           "@xyflow/react": "XYFlow",
         },
         // Preserve CSS imports
-        assetFileNames: (assetInfo) => {
+        assetFileNames: assetInfo => {
           if (assetInfo.name === "style.css") return "bpm-core.css";
           return assetInfo.name || "asset";
         },

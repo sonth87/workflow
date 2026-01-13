@@ -3,6 +3,7 @@ import type {
   ConnectionRule,
   NodeValidationRules,
 } from "@/types/workflow.type";
+import { nodeRegistry } from "@/core/registry/NodeRegistry";
 
 // Default validation rules for each node type
 export const DEFAULT_VALIDATION_RULES: NodeValidationRules = {
@@ -97,26 +98,44 @@ export const DEFAULT_VALIDATION_RULES: NodeValidationRules = {
 };
 
 // Get validation rules for a specific node type
-export function getNodeValidationRules(nodeType: NodeType): ConnectionRule {
-  return DEFAULT_VALIDATION_RULES[nodeType] || {};
+export function getNodeValidationRules(
+  nodeType: NodeType | string
+): ConnectionRule {
+  // Try to get from node registry first (for custom nodes)
+  const registeredNode = nodeRegistry.get(nodeType);
+  if (registeredNode?.config?.connectionRules) {
+    const rules = registeredNode.config.connectionRules;
+    // Convert array format to object format if needed
+    if (Array.isArray(rules) && rules.length > 0) {
+      return rules[0]; // Use first rule for basic validation
+    }
+    return rules as ConnectionRule;
+  }
+
+  // Fallback to default rules for built-in nodes
+  return DEFAULT_VALIDATION_RULES[nodeType as NodeType] || {};
 }
 
 // Validate if a connection is allowed
 export function validateConnection(
-  sourceType: NodeType,
-  targetType: NodeType,
+  sourceType: NodeType | string,
+  targetType: NodeType | string,
   existingSourceConnections: number,
   existingTargetConnections: number,
   customRules?: NodeValidationRules
 ): { valid: boolean; message?: string } {
+  // Get rules from registry or defaults
   const sourceRules =
-    customRules?.[sourceType] || DEFAULT_VALIDATION_RULES[sourceType];
+    (customRules && customRules[sourceType as NodeType]) ||
+    getNodeValidationRules(sourceType);
   const targetRules =
-    customRules?.[targetType] || DEFAULT_VALIDATION_RULES[targetType];
+    (customRules && customRules[targetType as NodeType]) ||
+    getNodeValidationRules(targetType);
 
   // Check source max output connections
   if (
     sourceRules?.maxOutputConnections !== undefined &&
+    sourceRules.maxOutputConnections >= 0 &&
     existingSourceConnections >= sourceRules.maxOutputConnections
   ) {
     return {
@@ -128,6 +147,7 @@ export function validateConnection(
   // Check target max input connections
   if (
     targetRules?.maxInputConnections !== undefined &&
+    targetRules.maxInputConnections >= 0 &&
     existingTargetConnections >= targetRules.maxInputConnections
   ) {
     return {
@@ -139,7 +159,7 @@ export function validateConnection(
   // Check allowed targets
   if (
     sourceRules?.allowedTargets &&
-    !sourceRules.allowedTargets.includes(targetType)
+    !sourceRules.allowedTargets.includes(targetType as NodeType)
   ) {
     return {
       valid: false,
@@ -150,7 +170,7 @@ export function validateConnection(
   // Check allowed sources
   if (
     targetRules?.allowedSources &&
-    !targetRules.allowedSources.includes(sourceType)
+    !targetRules.allowedSources.includes(sourceType as NodeType)
   ) {
     return {
       valid: false,
@@ -163,7 +183,7 @@ export function validateConnection(
 
 // Validate entire workflow
 export function validateWorkflow(
-  nodes: Array<{ id: string; type: NodeType }>,
+  nodes: Array<{ id: string; type: NodeType | string }>,
   edges: Array<{ source: string; target: string }>
 ): Array<{ nodeId: string; message: string; type: "error" | "warning" }> {
   const errors: Array<{
@@ -173,7 +193,7 @@ export function validateWorkflow(
   }> = [];
 
   nodes.forEach(node => {
-    const rules = DEFAULT_VALIDATION_RULES[node.type];
+    const rules = getNodeValidationRules(node.type);
     if (!rules) return;
 
     const outgoingConnections = edges.filter(e => e.source === node.id).length;
@@ -200,6 +220,7 @@ export function validateWorkflow(
     // Check max connections
     if (
       rules.maxOutputConnections !== undefined &&
+      rules.maxOutputConnections >= 0 &&
       outgoingConnections > rules.maxOutputConnections
     ) {
       errors.push({
@@ -211,6 +232,7 @@ export function validateWorkflow(
 
     if (
       rules.maxInputConnections !== undefined &&
+      rules.maxInputConnections >= 0 &&
       incomingConnections > rules.maxInputConnections
     ) {
       errors.push({

@@ -39,7 +39,7 @@ function convertPropertyDefinitionsToGroups(
   const groupsMap = new Map<string, PropertyFieldDefinition[]>();
 
   propertyDefinitions.forEach(propDef => {
-    const groupId = propDef.group || "basic";
+    const groupId = propDef.group || "custom";
     if (!groupsMap.has(groupId)) {
       groupsMap.set(groupId, []);
     }
@@ -74,10 +74,13 @@ function convertPropertyDefinitionsToGroups(
 
   groupsMap.forEach((fields, groupId) => {
     // Sort fields by order (not implemented yet, assume insertion order)
+    // Set order: basic=1, custom=90, others increment
+    const groupOrder =
+      groupId === "basic" ? 1 : groupId === "custom" ? 90 : order++;
     groups.push({
       id: groupId,
       label: groupId.charAt(0).toUpperCase() + groupId.slice(1), // Capitalize
-      order: order++,
+      order: groupOrder,
       fields,
     });
   });
