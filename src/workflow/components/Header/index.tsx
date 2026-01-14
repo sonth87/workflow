@@ -15,6 +15,7 @@ import {
   ThemeSwitcher,
   ViewModeSwitcher,
 } from "../Behavior";
+import { LanguageSwitcher } from "../LanguageSwitcher";
 
 export type LayoutDirection = "vertical" | "horizontal";
 
@@ -39,6 +40,7 @@ export function Header({ onSave }: HeaderProps) {
         <div className="flex items-center gap-3"></div>
 
         <div className="flex items-center gap-2">
+          <LanguageSwitcher />
           <ThemeSwitcher />
           <Shortcuts />
 

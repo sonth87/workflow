@@ -4,6 +4,7 @@
  */
 
 import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
+import type { MultilingualTextType } from "@/types/dynamic-bpm.type";
 import type { ZodType } from "zod";
 import type React from "react";
 
@@ -44,9 +45,9 @@ export type PropertyCondition =
  * Options cho select, multiselect, radio
  */
 export interface FieldOption {
-  label: string;
+  label: MultilingualTextType | string;
   value: string | number | boolean;
-  description?: string;
+  description?: MultilingualTextType | string;
   icon?: React.ComponentType;
   disabled?: boolean;
 }
@@ -114,13 +115,13 @@ export interface ValidationWarning {
  */
 export interface PropertyFieldDefinition {
   id: string; // Unique ID của field
-  label: string; // Label hiển thị
+  label: MultilingualTextType | string; // Label hiển thị
   type: PropertyFieldType; // Loại field
 
   // Value configuration
   defaultValue?: unknown;
-  placeholder?: string;
-  helpText?: string; // Tooltip hoặc help text
+  placeholder?: MultilingualTextType | string;
+  helpText?: MultilingualTextType | string; // Tooltip hoặc help text
 
   // Behavior
   required?: boolean;
@@ -147,8 +148,8 @@ export interface PropertyFieldDefinition {
  */
 export interface PropertyGroupDefinition {
   id: string; // Unique ID của group/tab
-  label: string; // Label hiển thị trên tab
-  description?: string; // Mô tả group
+  label: MultilingualTextType | string; // Label hiển thị trên tab
+  description?: MultilingualTextType | string; // Mô tả group
   icon?: React.ComponentType<{ className?: string }>; // Icon cho tab
 
   // Behavior

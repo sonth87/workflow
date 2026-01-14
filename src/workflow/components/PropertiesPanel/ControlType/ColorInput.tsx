@@ -4,6 +4,7 @@ import type {
 } from "@/core/properties";
 import type { PropertyDefinition } from "@/core/types/base.types";
 import { Input, cn } from "@sth87/shadcn-design-system";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface ColorControlProps {
   definition: PropertyDefinition | PropertyFieldDefinition;
@@ -20,19 +21,19 @@ export function ColorControl({
   disabled = false,
   errors = [],
 }: ColorControlProps) {
+  const { getText } = useLanguage();
   const hasError = errors.length > 0;
-  const desc = (
+  const desc =
     "description" in definition
-      ? definition.description
+      ? (definition.description as any)
       : "helpText" in definition
-        ? definition.helpText
-        : undefined
-  ) as string | undefined;
+        ? (definition.helpText as any)
+        : undefined;
 
   return (
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-foreground">
-        {definition.label}
+        {getText(definition.label as any) || ""}
         {definition.required && (
           <span className="text-destructive ml-1">*</span>
         )}
@@ -55,7 +56,7 @@ export function ColorControl({
         />
       </div>
       {desc && !hasError && (
-        <p className="text-xs text-muted-foreground">{desc}</p>
+        <p className="text-xs text-muted-foreground">{getText(desc) || ""}</p>
       )}
       {hasError && (
         <p className="text-xs text-destructive">{errors[0].message}</p>

@@ -8,6 +8,7 @@ import type {
   ValidationError,
 } from "@/core/properties";
 import { cn } from "@sth87/shadcn-design-system";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface MultiSelectControlProps {
   definition: PropertyFieldDefinition;
@@ -24,6 +25,7 @@ export function MultiSelectControl({
   disabled = false,
   errors = [],
 }: MultiSelectControlProps) {
+  const { getText } = useLanguage();
   const options = definition.options?.options || [];
   const selectedValues = Array.isArray(value) ? value : [];
 
@@ -39,7 +41,7 @@ export function MultiSelectControl({
   return (
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-foreground">
-        {definition.label}
+        {getText(definition.label as any)}
         {definition.required && (
           <span className="text-destructive ml-1">*</span>
         )}
@@ -48,7 +50,10 @@ export function MultiSelectControl({
       <textarea
         value={selectedValues.join("\n")}
         onChange={handleChange}
-        placeholder={definition.placeholder || "Enter values (one per line)..."}
+        placeholder={
+          (getText(definition.placeholder as any) ||
+            "Enter values (one per line)...") as string
+        }
         disabled={disabled || definition.readonly}
         className={cn(
           "w-full px-3 py-2 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary",
@@ -58,7 +63,9 @@ export function MultiSelectControl({
       />
 
       {definition.helpText && !hasError && (
-        <p className="text-xs text-muted-foreground">{definition.helpText}</p>
+        <p className="text-xs text-muted-foreground">
+          {getText(definition.helpText as any)}
+        </p>
       )}
 
       {hasError && (
@@ -67,7 +74,7 @@ export function MultiSelectControl({
 
       {options.length > 0 && (
         <div className="text-xs text-muted-foreground">
-          Available: {options.map(opt => opt.label).join(", ")}
+          Available: {options.map(opt => getText(opt.label as any)).join(", ")}
         </div>
       )}
     </div>

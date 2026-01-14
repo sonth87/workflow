@@ -8,6 +8,7 @@ import type {
   ValidationError,
 } from "@/core/properties";
 import { Slider, cn } from "@sth87/shadcn-design-system";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface SliderControlProps {
   definition: PropertyFieldDefinition;
@@ -24,6 +25,7 @@ export function SliderControl({
   disabled = false,
   errors = [],
 }: SliderControlProps) {
+  const { getText } = useLanguage();
   const numValue =
     typeof value === "number"
       ? value
@@ -42,7 +44,7 @@ export function SliderControl({
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-foreground">
-          {definition.label}
+          {getText(definition.label as any)}
           {definition.required && (
             <span className="text-destructive ml-1">*</span>
           )}
@@ -63,7 +65,9 @@ export function SliderControl({
       />
 
       {definition.helpText && !hasError && (
-        <p className="text-xs text-muted-foreground">{definition.helpText}</p>
+        <p className="text-xs text-muted-foreground">
+          {getText(definition.helpText as any)}
+        </p>
       )}
 
       {hasError && (

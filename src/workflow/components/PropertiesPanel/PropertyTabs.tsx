@@ -10,6 +10,7 @@ import type {
 import { PropertyGroup } from "./PropertyGroup";
 import { useState } from "react";
 import { cn } from "@sth87/shadcn-design-system";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface PropertyTabsProps {
   groups: PropertyGroupDefinition[];
@@ -22,6 +23,7 @@ interface PropertyTabsProps {
  */
 export function PropertyTabs({ groups, entity }: PropertyTabsProps) {
   const [activeTab, setActiveTab] = useState(groups[0]?.id || "");
+  const { getText } = useLanguage();
 
   if (groups.length === 0) {
     return (
@@ -67,7 +69,7 @@ export function PropertyTabs({ groups, entity }: PropertyTabsProps) {
                 )}
               >
                 {Icon && <Icon className="w-4 h-4" />}
-                <span>{group.label}</span>
+                <span>{getText(group.label)}</span>
               </button>
             );
           })}

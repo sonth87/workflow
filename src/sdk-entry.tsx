@@ -11,6 +11,7 @@ import type {
 } from "./workflow";
 import { CustomNodeFactory, PluginJSONLoader, globalEventBus } from "./core";
 import type { CustomNodeJSON, PluginJSON } from "./core";
+import type { UITranslations } from "./workflow/translations/ui.translations";
 
 const WorkflowBuilder = WorkflowModule.default;
 import "@xyflow/react/dist/style.css";
@@ -30,6 +31,9 @@ interface BPMConfig {
   customNodesUrl?: string;
   pluginsFromJSON?: PluginJSON[];
   pluginUrls?: string[];
+  // Language configuration
+  uiTranslations?: UITranslations;
+  defaultLanguage?: string;
   onReady?: () => void;
   onError?: (error: Error) => void;
 }
@@ -39,6 +43,7 @@ class BPMCore {
   private container: HTMLElement | null = null;
   private config: BPMConfig;
   public eventBus: typeof globalEventBus;
+  private languageSetter: ((language: string) => void) | null = null;
 
   constructor(config: BPMConfig) {
     this.config = {
@@ -83,7 +88,13 @@ class BPMCore {
 
       this.root = createRoot(this.container);
       const props: WorkflowBuilderProps = {
-        pluginOptions: this.config.pluginOptions || {},
+        pluginOptions: {
+          ...(this.config.pluginOptions || {}),
+          languageConfig: {
+            defaultLanguage: this.config.defaultLanguage || "en",
+            uiTranslations: this.config.uiTranslations,
+          },
+        },
         uiConfig: this.config.ui,
       };
       this.root.render(
@@ -94,6 +105,12 @@ class BPMCore {
       );
 
       if (typeof this.config.onReady === "function") {
+        // Register this instance globally for language setter callback
+        if (typeof window !== "undefined") {
+          const win = window as any;
+          win.__BPM_CORE_INSTANCE__ = this;
+        }
+
         setTimeout(() => {
           if (this.config.onReady) {
             this.config.onReady();
@@ -168,6 +185,21 @@ class BPMCore {
     this.container = null;
   }
 
+  setLanguage(language: string) {
+    if (this.languageSetter) {
+      this.languageSetter(language);
+    } else {
+      // Fallback: save to localStorage for next init
+      if (typeof window !== "undefined") {
+        localStorage.setItem("bpm-language", language);
+      }
+    }
+  }
+
+  _registerLanguageSetter(setter: (language: string) => void) {
+    this.languageSetter = setter;
+  }
+
   update(config: Partial<BPMConfig>) {
     this.config = {
       ...this.config,
@@ -176,7 +208,13 @@ class BPMCore {
     };
     if (this.root && this.container) {
       const props: WorkflowBuilderProps = {
-        pluginOptions: this.config.pluginOptions || {},
+        pluginOptions: {
+          ...(this.config.pluginOptions || {}),
+          languageConfig: {
+            defaultLanguage: this.config.defaultLanguage || "en",
+            uiTranslations: this.config.uiTranslations,
+          },
+        },
         uiConfig: this.config.ui,
       };
       this.root.render(

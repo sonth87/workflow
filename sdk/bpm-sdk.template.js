@@ -336,6 +336,9 @@
                     ...self.options.options,
                   });
 
+                  // Store instance for later access
+                  self.instance = instance;
+
                   // Expose event API
                   self.eventBus = {
                     on: function (event, handler) {
@@ -387,7 +390,22 @@
       }
     },
 
+    setLanguage: function (language) {
+      if (this.instance && typeof this.instance.setLanguage === "function") {
+        return this.instance.setLanguage(language);
+      }
+    },
+
+    update: function (config) {
+      if (this.instance && typeof this.instance.update === "function") {
+        return this.instance.update(config);
+      }
+    },
+
     destroy: function () {
+      if (this.instance && typeof this.instance.destroy === "function") {
+        this.instance.destroy();
+      }
       if (this.selectors && this.options.class) {
         for (var i = 0; i < this.selectors.length; i++) {
           var node = this.selectors[i];

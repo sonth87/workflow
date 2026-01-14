@@ -9,3 +9,4 @@ export * from "./useWorkflowTheme";
 export * from "./useEdgeActions";
 export * from "./useNodeActions";
 export * from "./useLanguage";
+export * from "./useAvailableLanguages";

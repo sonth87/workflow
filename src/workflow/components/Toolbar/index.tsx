@@ -15,7 +15,8 @@ import {
   Check,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Popover, Command } from "@sth87/shadcn-design-system";
+import { Popover, Command, Tooltip } from "@sth87/shadcn-design-system";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface ToolbarProps {
   isPanMode?: boolean;
@@ -31,6 +32,7 @@ export function Toolbar({
   onMinimapToggle,
 }: ToolbarProps) {
   const { zoomIn, zoomOut, fitView, getZoom } = useReactFlow();
+  const { getUIText } = useLanguage();
   const [displayZoom, setDisplayZoom] = useState(100);
 
   useEffect(() => {
@@ -65,7 +67,7 @@ export function Toolbar({
   return (
     <footer className="flex items-center justify-center gap-1 rounded-lg bg-card p-2 shadow-md border border-border">
       <button
-        title="Select tool (V)"
+        title={getUIText("toolbar.selectTool")}
         onClick={() => onPanModeChange?.(false)}
         className={`rounded p-2 transition-colors ${
           !isPanMode
@@ -77,7 +79,7 @@ export function Toolbar({
       </button>
 
       <button
-        title="Hand tool (H) - Pan canvas only"
+        title={getUIText("toolbar.handTool")}
         onClick={() => onPanModeChange?.(true)}
         className={`rounded p-2 transition-colors ${
           isPanMode
@@ -92,7 +94,7 @@ export function Toolbar({
 
       <button
         onClick={handleZoomOut}
-        title="Zoom out"
+        title={getUIText("toolbar.zoomOut")}
         className="rounded p-2 hover:bg-muted transition-colors"
       >
         <Minus size={18} className="text-foreground" />
@@ -104,34 +106,38 @@ export function Toolbar({
 
       <button
         onClick={handleZoomIn}
-        title="Zoom in"
+        title={getUIText("toolbar.zoomIn")}
         className="rounded p-2 hover:bg-muted transition-colors"
       >
         <Plus size={18} className="text-foreground" />
       </button>
 
-      <button
-        onClick={handleFitView}
-        title="Zoom in"
-        className="rounded p-2 hover:bg-muted transition-colors"
-      >
-        <RefreshCcw size={18} className="text-foreground" />
-      </button>
+      <Tooltip content={getUIText("toolbar.resetView")} delayDuration={0} sideOffset={4}>
+        <button
+          onClick={handleFitView}
+          title={getUIText("toolbar.resetView")}
+          className="rounded p-2 hover:bg-muted transition-colors"
+        >
+          <RefreshCcw size={18} className="text-foreground" />
+        </button>
+      </Tooltip>
 
       <div className="h-6 w-px bg-border" />
 
-      <button
-        onClick={toggleFullscreen}
-        title="Fullscreen"
-        className="rounded p-2 hover:bg-muted transition-colors"
-      >
-        <Maximize size={18} className="text-foreground" />
-      </button>
+      <Tooltip content={getUIText("toolbar.fullscreen")} delayDuration={0} sideOffset={4}>
+        <button
+          onClick={toggleFullscreen}
+          title={getUIText("toolbar.fullscreen")}
+          className="rounded p-2 hover:bg-muted transition-colors"
+        >
+          <Maximize size={18} className="text-foreground" />
+        </button>
+      </Tooltip>
 
       <Popover
         trigger={
           <button
-            title="More options"
+            title={getUIText("toolbar.moreOptions")}
             className="rounded p-2 hover:bg-muted transition-colors"
           >
             <Menu size={18} />
@@ -141,12 +147,12 @@ export function Toolbar({
         content={
           <Command className="rounded-lg border shadow-md min-w-40">
             <Command.List>
-              <Command.Group heading="Options">
+              <Command.Group heading={getUIText("toolbar.options")}>
                 <Command.Item
                   onSelect={() => onMinimapToggle?.(!showMinimap)}
                   className="flex justify-between"
                 >
-                  <span>Minimap</span>
+                  <span>{getUIText("toolbar.minimap")}</span>
                   {showMinimap && (
                     <span>
                       <Check />

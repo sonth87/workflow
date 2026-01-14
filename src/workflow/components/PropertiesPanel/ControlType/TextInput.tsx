@@ -4,6 +4,7 @@ import type {
 } from "@/core/properties";
 import type { PropertyDefinition } from "@/core/types/base.types";
 import { Input, cn } from "@sth87/shadcn-design-system";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface TextControlProps {
   definition: PropertyDefinition | PropertyFieldDefinition;
@@ -21,6 +22,7 @@ export function TextControl({
   errors = [],
 }: TextControlProps) {
   const hasError = errors.length > 0;
+  const { getText } = useLanguage();
 
   return (
     <div className="space-y-1.5">
@@ -28,12 +30,18 @@ export function TextControl({
         type="text"
         value={(value as string) || ""}
         onChange={e => onChange(e.target.value)}
-        placeholder={definition.placeholder}
-        label={definition.label}
+        placeholder={
+          (getText(definition.placeholder) || undefined) as string | undefined
+        }
+        label={getText(definition.label)}
         required={definition.required}
         disabled={disabled || !!definition.readonly}
         className={cn(hasError && "border-destructive")}
-        infoTooltip={definition?.helpText as string}
+        infoTooltip={
+          (getText(definition?.helpText as any) || undefined) as
+            | string
+            | undefined
+        }
       />
       {hasError && (
         <p className="text-xs text-destructive">{errors[0].message}</p>

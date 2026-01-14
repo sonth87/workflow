@@ -2,14 +2,14 @@
  * Toolbox data configuration
  */
 
-import type { IconConfig, NodeVisualConfig } from "@/core";
+import type { IconConfig, NodeVisualConfig, MultilingualText } from "@/core";
 import { CategoryType, NodeType } from "@/enum/workflow.enum";
 import { GalleryVerticalEnd } from "lucide-react";
 
 export interface NodeItem {
   type: NodeType;
-  label: string;
-  description?: string;
+  label: MultilingualText | string;
+  description?: MultilingualText | string;
   visualConfig?: NodeVisualConfig;
   icon?: IconConfig;
 }
@@ -21,7 +21,7 @@ export interface SeparatorConfig {
 }
 
 export interface NodeCategory {
-  name: string;
+  name: MultilingualText | string;
   isOpen: boolean;
   nodes: NodeItem[];
   icon?: React.ReactNode;

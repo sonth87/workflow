@@ -6,7 +6,7 @@ import type {
   MultilingualTextType,
 } from "@/types/dynamic-bpm.type";
 import { getNestedValue, type DefaultValues } from "@/utils/nested-value";
-import useLanguage from "./useLanguage";
+import { useLanguage } from "./useLanguage";
 
 interface UseBuildDefaultValueProps {
   fields: InputComponent[];

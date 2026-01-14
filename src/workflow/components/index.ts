@@ -22,5 +22,8 @@ export type { LayoutDirection } from "./Header";
 // Toolbar
 export { Toolbar } from "./Toolbar";
 
+// Language Switcher
+export { LanguageSwitcher } from "./LanguageSwitcher";
+
 // Behavior
 export * from "./Behavior";

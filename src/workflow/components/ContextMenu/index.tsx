@@ -16,6 +16,7 @@ import {
 import { CategoryType } from "@/enum/workflow.enum";
 import { Settings2 } from "lucide-react";
 import { contextMenuActionsRegistry } from "@/core/registry";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface ContextMenuProps {
   x: number;
@@ -76,6 +77,7 @@ function ContextMenuItems({
   context: ContextMenuContext;
   onClose: () => void;
 }) {
+  const { getText } = useLanguage();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
   return (
@@ -108,7 +110,7 @@ function ContextMenuItems({
               >
                 <div className="flex items-center flex-1">
                   <MenuItemIcon icon={item.icon} color={item.color} />
-                  <span>{item.label}</span>
+                  <span>{getText(item.label as any)}</span>
                 </div>
                 <span className="ml-2">›</span>
               </button>
@@ -142,7 +144,7 @@ function ContextMenuItems({
             }}
           >
             <MenuItemIcon icon={item.icon} color={item.color} />
-            <span>{item.label}</span>
+            <span>{getText(item.label as any)}</span>
           </button>
         );
       })}
@@ -217,7 +219,7 @@ export function ContextMenu({ x, y, context, onClose }: ContextMenuProps) {
 
           return {
             ...item,
-            label: getCategoryTypeLabel(category),
+            label: getCategoryTypeLabel(category) as any,
             children,
           };
         }

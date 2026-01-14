@@ -8,6 +8,7 @@ import type {
   ValidationError,
 } from "@/core/properties";
 import { DatePicker, cn } from "@sth87/shadcn-design-system";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface DateControlProps {
   definition: PropertyFieldDefinition;
@@ -24,6 +25,7 @@ export function DateControl({
   disabled = false,
   errors = [],
 }: DateControlProps) {
+  const { getText } = useLanguage();
   const dateValue =
     value instanceof Date
       ? value.toISOString().split("T")[0]
@@ -40,7 +42,7 @@ export function DateControl({
   return (
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-foreground">
-        {definition.label}
+        {getText(definition.label as any)}
         {definition.required && (
           <span className="text-destructive ml-1">*</span>
         )}
@@ -62,8 +64,16 @@ export function DateControl({
             ? new Date(definition.options.maxDate).toISOString().split("T")[0]
             : undefined
         }
-        placeholder={definition.placeholder}
-        infoTooltip={definition?.helpText as string}
+        placeholder={
+          (getText(definition.placeholder as any) || undefined) as
+            | string
+            | undefined
+        }
+        infoTooltip={
+          (getText(definition?.helpText as any) || undefined) as
+            | string
+            | undefined
+        }
       />
 
       {hasError && (

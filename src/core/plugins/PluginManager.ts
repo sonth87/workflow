@@ -108,37 +108,37 @@ export interface PluginConfig {
   nodes?: Array<{
     id: string;
     type: string;
-    name: string;
+    name: string | { [key: string]: string };
     config: BaseNodeConfig;
   }>;
   edges?: Array<{
     id: string;
     type: string;
-    name: string;
+    name: string | { [key: string]: string };
     config: BaseEdgeConfig;
   }>;
   rules?: Array<{
     id: string;
     type: string;
-    name: string;
+    name: string | { [key: string]: string };
     config: BaseRuleConfig;
   }>;
   themes?: Array<{
     id: string;
     type: string;
-    name: string;
+    name: string | { [key: string]: string };
     config: ThemeConfig;
   }>;
   contextMenus?: Array<{
     id: string;
     type: string;
-    name: string;
+    name: string | { [key: string]: string };
     config: ContextMenuConfig;
   }>;
   categories?: Array<{
     id: string;
     type: string;
-    name: string;
+    name: string | { [key: string]: string };
     config: CategoryConfig;
   }>;
   [key: string]: unknown;
@@ -296,12 +296,12 @@ export class PluginManager {
 
     // Register categories first (before nodes)
     if (config.categories) {
-      categoryRegistry.registerMany(config.categories);
+      categoryRegistry.registerMany(config.categories as any);
     }
 
     // Register nodes
     if (config.nodes) {
-      nodeRegistry.registerMany(config.nodes);
+      nodeRegistry.registerMany(config.nodes as any);
 
       // Register property configurations for nodes that have propertyDefinitions
       config.nodes.forEach(node => {
@@ -319,22 +319,22 @@ export class PluginManager {
 
     // Register edges
     if (config.edges) {
-      edgeRegistry.registerMany(config.edges);
+      edgeRegistry.registerMany(config.edges as any);
     }
 
     // Register rules
     if (config.rules) {
-      ruleRegistry.registerMany(config.rules);
+      ruleRegistry.registerMany(config.rules as any);
     }
 
     // Register themes
     if (config.themes) {
-      themeRegistry.registerMany(config.themes);
+      themeRegistry.registerMany(config.themes as any);
     }
 
     // Register context menus
     if (config.contextMenus) {
-      contextMenuRegistry.registerMany(config.contextMenus);
+      contextMenuRegistry.registerMany(config.contextMenus as any);
     }
   }
 

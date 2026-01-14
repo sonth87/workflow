@@ -1,6 +1,9 @@
 /**
  * Context Menu Helpers
  * Utility functions for creating common context menu items
+ * 
+ * NOTE: Labels use multilingual objects from contextMenuLabels
+ * These are resolved to current language in React components via getText()
  */
 
 import type {
@@ -21,6 +24,7 @@ import {
   Trash2,
   ArrowLeftRight,
 } from "lucide-react";
+import { getContextMenuLabel } from "./contextMenuLabels";
 
 /**
  * Generate unique separator ID
@@ -50,7 +54,7 @@ export function createColorMenuItems(
   return [
     {
       id: "color-reset",
-      label: "Reset Color",
+      label: getContextMenuLabel("resetColor") as any,
       icon: "↺",
       onClick: async (context: any) => {
         await onColorChange("", context); // Pass empty string to reset
@@ -73,7 +77,7 @@ export function createColorPickerMenuItem(
 ): ContextMenuItem {
   return {
     id: "change-color",
-    label: "Change Color",
+    label: getContextMenuLabel("changeColor") as any,
     icon: "",
     children: createColorMenuItems(onColorChange),
   };
@@ -87,7 +91,7 @@ export function createDeleteMenuItem(
 ): ContextMenuItem {
   return {
     id: "delete",
-    label: "Delete",
+    label: getContextMenuLabel("delete") as any,
     icon: {
       type: "lucide",
       value: Trash2,
@@ -108,7 +112,7 @@ export function createChangeTypeMenuItem(
 ): ContextMenuItem {
   return {
     id: "change-type",
-    label: "Change Type",
+    label: getContextMenuLabel("changeType") as any,
     icon: {
       type: "lucide",
       value: ArrowLeftRight,
@@ -134,15 +138,15 @@ export function createChangeTypeMenuItem(
 /**
  * Get category label for Change Type menu
  */
-export function getCategoryTypeLabel(category: string): string {
-  const labels: Record<string, string> = {
-    [CategoryType.START]: "Start Type",
-    [CategoryType.TASK]: "Task Type",
-    [CategoryType.GATEWAY]: "Gateway Type",
-    [CategoryType.IMMEDIATE]: "Immediate Type",
-    [CategoryType.END]: "End Type",
+export function getCategoryTypeLabel(category: string): { [key: string]: string } {
+  const labels: Record<string, { [key: string]: string }> = {
+    [CategoryType.START]: getContextMenuLabel("startType"),
+    [CategoryType.TASK]: getContextMenuLabel("taskType"),
+    [CategoryType.GATEWAY]: getContextMenuLabel("gatewayType"),
+    [CategoryType.IMMEDIATE]: getContextMenuLabel("immediateType"),
+    [CategoryType.END]: getContextMenuLabel("endType"),
   };
-  return labels[category] || "Change Type";
+  return labels[category] || (getContextMenuLabel("changeType") as any);
 }
 
 /**

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { globalEventBus } from "@/core/events/EventBus";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 import NodeResizer from "../../resizer";
 import NodeToolbar, { type ToolbarItemProps } from "../shared/NodeToolbar";
 
@@ -95,6 +96,7 @@ export interface PoolNodeProps extends NodeProps {
 
 function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
   const { updateNode, nodes } = useWorkflowStore();
+  const { getUIText } = useLanguage();
 
   const isHorizontal = data.orientation === "horizontal" || !data.orientation;
   const isLocked = data.isLocked ?? false;
@@ -551,15 +553,15 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
       {
         id: "add-lane",
         icon: <Plus size={16} />,
-        tooltip: "Thêm lane mới",
+        tooltip: getUIText("poolNode.addLaneNew"),
         onClick: handleAddLane,
       },
       {
         id: "toggle-lock",
         icon: isLocked ? <Lock size={16} /> : <Unlock size={16} />,
         tooltip: isLocked
-          ? "Unlock (cho phép kéo ra)"
-          : "Lock (giữ nodes bên trong)",
+          ? getUIText("poolNode.unlockLane")
+          : getUIText("poolNode.lockLane"),
         onClick: handleToggleLock,
       },
       {
@@ -569,13 +571,15 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
         ) : (
           <FlipHorizontal size={16} />
         ),
-        tooltip: isHorizontal ? "Chuyển sang dọc" : "Chuyển sang ngang",
+        tooltip: isHorizontal
+          ? getUIText("poolNode.switchVertical")
+          : getUIText("poolNode.switchHorizontal"),
         onClick: handleToggleOrientation,
       },
       {
         id: "color-picker",
         icon: <></>,
-        tooltip: "Đổi màu",
+        tooltip: getUIText("poolNode.changeColor"),
         onClick: () => {},
         customContent: (
           <Popover
@@ -629,6 +633,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
     handleToggleLock,
     handleToggleOrientation,
     handleColorChange,
+    getUIText,
   ]);
 
   return (
@@ -776,7 +781,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
                         "right-2 top-2": true,
                       }
                     )}
-                    title="Xóa lane"
+                    title={getUIText("poolNode.deleteLane")}
                   >
                     <Trash2 size={14} className="text-red-600" />
                   </button>
@@ -796,7 +801,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
                       }
                     )}
                     onMouseDown={e => handleDividerMouseDown(index, e)}
-                    title="Kéo để thay đổi kích thước"
+                    title={getUIText("poolNode.dragResize")}
                   />
                 )}
               </div>

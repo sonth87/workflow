@@ -8,10 +8,14 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
   type ReactNode,
 } from "react";
 import { pluginManager, type Plugin } from "@/core/plugins/PluginManager";
 import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
+import { LanguageProvider } from "./LanguageContext";
+import { useLanguage } from "../hooks/useLanguage";
+import type { UITranslations } from "../translations/ui.translations";
 
 interface WorkflowContextValue {
   isInitialized: boolean;
@@ -51,6 +55,14 @@ export interface PluginOptions {
    * Additional plugins to install
    */
   plugins?: Plugin[];
+
+  /**
+   * Language configuration for i18n
+   */
+  languageConfig?: {
+    defaultLanguage?: string;
+    uiTranslations?: UITranslations;
+  };
 }
 
 interface WorkflowProviderProps {
@@ -61,18 +73,30 @@ interface WorkflowProviderProps {
   pluginOptions?: PluginOptions;
 }
 
-export function WorkflowProvider({
+function WorkflowProviderInner({
   children,
   pluginOptions = {},
 }: WorkflowProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const { setLanguage } = useLanguage();
 
   const {
     enableDefaultPlugin = true,
     autoActivate = true,
     plugins = [],
+    languageConfig = {},
   } = pluginOptions;
+
+  // Register language setter for SDK access as soon as possible
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const win = window as any;
+      if (win.__BPM_CORE_INSTANCE__) {
+        win.__BPM_CORE_INSTANCE__._registerLanguageSetter(setLanguage);
+      }
+    }
+  }, [setLanguage]);
 
   useEffect(() => {
     async function initializeWorkflow() {
@@ -143,5 +167,21 @@ export function WorkflowProvider({
     <WorkflowContext.Provider value={{ isInitialized, error }}>
       {children}
     </WorkflowContext.Provider>
+  );
+}
+
+export function WorkflowProvider({
+  children,
+  pluginOptions = {},
+}: WorkflowProviderProps) {
+  return (
+    <LanguageProvider 
+      defaultLanguage={pluginOptions.languageConfig?.defaultLanguage || "vi"}
+      uiTranslations={pluginOptions.languageConfig?.uiTranslations}
+    >
+      <WorkflowProviderInner pluginOptions={pluginOptions}>
+        {children}
+      </WorkflowProviderInner>
+    </LanguageProvider>
   );
 }
