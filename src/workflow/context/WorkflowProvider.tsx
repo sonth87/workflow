@@ -95,13 +95,17 @@ function WorkflowProviderInner({
     if (typeof window !== "undefined") {
       const win = window as any;
       if (win.__BPM_CORE_INSTANCE__) {
-        console.log(
-          `[WorkflowProvider] Registering language setter with language: ${language}`
-        );
         win.__BPM_CORE_INSTANCE__._registerLanguageSetter(
           setLanguage,
           language
         );
+
+        // Call onReady callback after language setter is registered
+        if (typeof win.__BPM_CORE_ON_READY__ === "function") {
+          const onReadyCallback = win.__BPM_CORE_ON_READY__;
+          win.__BPM_CORE_ON_READY__ = null; // Clear to prevent multiple calls
+          onReadyCallback();
+        }
       }
     }
   }, [setLanguage, language]);

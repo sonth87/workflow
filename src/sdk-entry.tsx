@@ -117,14 +117,15 @@ class BPMCore {
         if (typeof window !== "undefined") {
           const win = window as any;
           win.__BPM_CORE_INSTANCE__ = this;
+          // Store onReady callback to be called from WorkflowProvider after language setter is registered
+          win.__BPM_CORE_ON_READY__ = this.config.onReady;
         }
-
-        // Wait for language to be synced before calling onReady
-        setTimeout(() => {
-          if (this.config.onReady) {
-            this.config.onReady();
-          }
-        }, 100);
+      } else {
+        // If no onReady callback, still register instance
+        if (typeof window !== "undefined") {
+          const win = window as any;
+          win.__BPM_CORE_INSTANCE__ = this;
+        }
       }
     } catch (error) {
       console.error("BPM initialization error:", error);
