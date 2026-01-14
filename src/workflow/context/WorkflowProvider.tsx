@@ -7,13 +7,14 @@ import {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useState,
   useRef,
   type ReactNode,
 } from "react";
 import { pluginManager, type Plugin } from "@/core/plugins/PluginManager";
 import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
-import { LanguageProvider } from "./LanguageContext";
+import { LanguageProvider, useLanguageContext } from "./LanguageContext";
 import { useLanguage } from "../hooks/useLanguage";
 import type { UITranslations } from "../translations/ui.translations";
 
@@ -80,6 +81,7 @@ function WorkflowProviderInner({
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const { setLanguage } = useLanguage();
+  const { language } = useLanguageContext();
 
   const {
     enableDefaultPlugin = true,
@@ -88,15 +90,31 @@ function WorkflowProviderInner({
     languageConfig = {},
   } = pluginOptions;
 
-  // Register language setter for SDK access as soon as possible
-  useEffect(() => {
+  // Register language setter for SDK access immediately (before paint)
+  useLayoutEffect(() => {
     if (typeof window !== "undefined") {
       const win = window as any;
       if (win.__BPM_CORE_INSTANCE__) {
-        win.__BPM_CORE_INSTANCE__._registerLanguageSetter(setLanguage);
+        console.log(
+          `[WorkflowProvider] Registering language setter with language: ${language}`
+        );
+        win.__BPM_CORE_INSTANCE__._registerLanguageSetter(
+          setLanguage,
+          language
+        );
       }
     }
-  }, [setLanguage]);
+  }, [setLanguage, language]);
+
+  // Sync current language to BPMCore instance whenever language changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const win = window as any;
+      if (win.__BPM_CORE_INSTANCE__ && language) {
+        win.__BPM_CORE_INSTANCE__._setCurrentLanguage(language);
+      }
+    }
+  }, [language]);
 
   useEffect(() => {
     async function initializeWorkflow() {
@@ -175,7 +193,7 @@ export function WorkflowProvider({
   pluginOptions = {},
 }: WorkflowProviderProps) {
   return (
-    <LanguageProvider 
+    <LanguageProvider
       defaultLanguage={pluginOptions.languageConfig?.defaultLanguage || "vi"}
       uiTranslations={pluginOptions.languageConfig?.uiTranslations}
     >

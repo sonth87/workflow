@@ -44,6 +44,7 @@ class BPMCore {
   private config: BPMConfig;
   public eventBus: typeof globalEventBus;
   private languageSetter: ((language: string) => void) | null = null;
+  private currentLanguage: string = "en";
 
   constructor(config: BPMConfig) {
     this.config = {
@@ -67,6 +68,13 @@ class BPMCore {
         ...config.ui,
       },
     };
+    // Initialize from localStorage first (to match LanguageProvider behavior)
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("bpm-language");
+      this.currentLanguage = stored || config.defaultLanguage || "en";
+    } else {
+      this.currentLanguage = config.defaultLanguage || "en";
+    }
     this.eventBus = globalEventBus;
     this.init();
   }
@@ -111,11 +119,12 @@ class BPMCore {
           win.__BPM_CORE_INSTANCE__ = this;
         }
 
+        // Wait for language to be synced before calling onReady
         setTimeout(() => {
           if (this.config.onReady) {
             this.config.onReady();
           }
-        }, 0);
+        }, 100);
       }
     } catch (error) {
       console.error("BPM initialization error:", error);
@@ -185,19 +194,43 @@ class BPMCore {
     this.container = null;
   }
 
+  getLanguage(): string {
+    console.log(`[BPM SDK] getLanguage() = ${this.currentLanguage}`);
+    return this.currentLanguage;
+  }
+
   setLanguage(language: string) {
+    console.log(`[BPM SDK] setLanguage(${language})`);
+    this.currentLanguage = language;
     if (this.languageSetter) {
       this.languageSetter(language);
+      console.log(`[BPM SDK] Language setter called successfully`);
     } else {
-      // Fallback: save to localStorage for next init
+      console.warn(
+        `[BPM SDK] Language setter not registered yet, saving to localStorage`
+      );
       if (typeof window !== "undefined") {
         localStorage.setItem("bpm-language", language);
       }
     }
   }
 
-  _registerLanguageSetter(setter: (language: string) => void) {
+  _registerLanguageSetter(
+    setter: (language: string) => void,
+    currentLanguage?: string
+  ) {
     this.languageSetter = setter;
+    // Always sync current language from context (LanguageProvider loads from localStorage)
+    if (currentLanguage && currentLanguage !== this.currentLanguage) {
+      console.log(
+        `[BPM SDK] Language synced: ${this.currentLanguage} → ${currentLanguage}`
+      );
+      this.currentLanguage = currentLanguage;
+    }
+  }
+
+  _setCurrentLanguage(language: string) {
+    this.currentLanguage = language;
   }
 
   update(config: Partial<BPMConfig>) {

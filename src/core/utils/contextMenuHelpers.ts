@@ -1,7 +1,7 @@
 /**
  * Context Menu Helpers
  * Utility functions for creating common context menu items
- * 
+ *
  * NOTE: Labels use multilingual objects from contextMenuLabels
  * These are resolved to current language in React components via getText()
  */
@@ -138,7 +138,9 @@ export function createChangeTypeMenuItem(
 /**
  * Get category label for Change Type menu
  */
-export function getCategoryTypeLabel(category: string): { [key: string]: string } {
+export function getCategoryTypeLabel(category: string): {
+  [key: string]: string;
+} {
   const labels: Record<string, { [key: string]: string }> = {
     [CategoryType.START]: getContextMenuLabel("startType"),
     [CategoryType.TASK]: getContextMenuLabel("taskType"),

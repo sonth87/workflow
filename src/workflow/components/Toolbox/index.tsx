@@ -316,7 +316,9 @@ export function Toolbox({ className }: ToolboxProps) {
       {toolboxState === "expanded" && (
         <>
           <div className="flex items-center justify-between px-4 py-4">
-            <h1 className="text-lg font-semibold text-ink800">{getUIText("toolbox.toolbox")}</h1>
+            <h1 className="text-lg font-semibold text-ink800">
+              {getUIText("toolbox.toolbox")}
+            </h1>
             <button
               onClick={() => setToolboxState("collapsed")}
               className="p-2 rounded-lg hover:bg-foreground/10 transition-colors"

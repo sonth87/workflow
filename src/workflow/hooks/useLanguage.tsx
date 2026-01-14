@@ -49,7 +49,7 @@ export const useLanguage = () => {
    * Get UI text from translations dictionary
    * Supports nested keys like "toolbar.zoomIn"
    * and template variables like "error: {count}"
-   * 
+   *
    * @example
    * const title = getUIText("toolbar.zoomIn");
    * const msg = getUIText("run.cannotRunWorkflow", { count: 5 });
@@ -68,14 +68,14 @@ export const useLanguage = () => {
         // If value is multilingual object, use getText
         if (value && typeof value === "object" && !Array.isArray(value)) {
           let text = getText(value);
-          
+
           // Replace template variables if provided
           if (params) {
             Object.entries(params).forEach(([key, val]) => {
               text = text.replace(new RegExp(`\\{${key}\\}`, "g"), String(val));
             });
           }
-          
+
           return text;
         }
 

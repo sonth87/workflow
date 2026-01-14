@@ -2,12 +2,12 @@
  * Context Menu Labels/Text Helper
  * Centralized translations for context menu items
  * This allows contextMenuHelpers to work without React/hooks while still supporting i18n
- * 
+ *
  * Usage in React components:
  * ```tsx
  * import { useLanguage } from '@/workflow/hooks/useLanguage'
  * import { getContextMenuLabel } from '@/core/utils/contextMenuLabels'
- * 
+ *
  * const { getText } = useLanguage()
  * const label = getText(getContextMenuLabel('resetColor'))
  * ```
@@ -57,8 +57,8 @@ export const contextMenuLabels = {
  * @param key - The key of the label
  * @returns Object with language codes as keys
  */
-export function getContextMenuLabel(
-  key: keyof typeof contextMenuLabels
-): { [key: string]: string } {
+export function getContextMenuLabel(key: keyof typeof contextMenuLabels): {
+  [key: string]: string;
+} {
   return contextMenuLabels[key] || { en: key, vi: key };
 }

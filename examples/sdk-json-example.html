@@ -74,6 +74,18 @@
         color: #666;
         font-weight: bold;
       }
+      #language-select {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1001;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        background: white;
+        cursor: pointer;
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
@@ -93,6 +105,12 @@
       </div>
     </div>
 
+    <select id="language-select">
+      <option value="en">English</option>
+      <option value="vi">Tiếng Việt</option>
+      <option value="ko">한국어 (Korean)</option>
+    </select>
+
     <!-- Load BPM SDK -->
     <script src="../sdk-dist/bpm-sdk.js"></script>
 
@@ -100,28 +118,72 @@
       // UI Translations with Korean support
       const uiTranslations = {
         toolbar: {
-          selectTool: { en: "Select tool (V)", vi: "Công cụ chọn (V)", ko: "선택 도구 (V)" },
-          handTool: { en: "Hand tool (H) - Pan canvas only", vi: "Công cụ cầm nắm (H)", ko: "손 도구 (H) - 캔버스만 이동" },
+          selectTool: {
+            en: "Select tool (V)",
+            vi: "Công cụ chọn (V)",
+            ko: "선택 도구 (V)",
+          },
+          handTool: {
+            en: "Hand tool (H) - Pan canvas only",
+            vi: "Công cụ cầm nắm (H)",
+            ko: "손 도구 (H) - 캔버스만 이동",
+          },
           zoomOut: { en: "Zoom out", vi: "Thu nhỏ", ko: "축소" },
           zoomIn: { en: "Zoom in", vi: "Phóng to", ko: "확대" },
-          resetView: { en: "Reset view", vi: "Đặt lại chế độ xem", ko: "보기 재설정" },
-          fullscreen: { en: "Fullscreen", vi: "Toàn màn hình", ko: "전체 화면" },
-          moreOptions: { en: "More options", vi: "Thêm tùy chọn", ko: "더 많은 옵션" },
+          resetView: {
+            en: "Reset view",
+            vi: "Đặt lại chế độ xem",
+            ko: "보기 재설정",
+          },
+          fullscreen: {
+            en: "Fullscreen",
+            vi: "Toàn màn hình",
+            ko: "전체 화면",
+          },
+          moreOptions: {
+            en: "More options",
+            vi: "Thêm tùy chọn",
+            ko: "더 많은 옵션",
+          },
           options: { en: "Options", vi: "Tùy chọn", ko: "옵션" },
           minimap: { en: "Minimap", vi: "Bản đồ thu nhỏ", ko: "미니맵" },
         },
         toolbox: {
           toolbox: { en: "Toolbox", vi: "Hộp công cụ", ko: "도구 상자" },
-          expandToolbox: { en: "Expand toolbox", vi: "Mở rộng hộp công cụ", ko: "도구 상자 확장" },
-          minimizeToolbox: { en: "Minimize toolbox", vi: "Thu nhỏ hộp công cụ", ko: "도구 상자 최소화" },
-          collapseToolbox: { en: "Collapse toolbox", vi: "Đóng hộp công cụ", ko: "도구 상자 축소" },
+          expandToolbox: {
+            en: "Expand toolbox",
+            vi: "Mở rộng hộp công cụ",
+            ko: "도구 상자 확장",
+          },
+          minimizeToolbox: {
+            en: "Minimize toolbox",
+            vi: "Thu nhỏ hộp công cụ",
+            ko: "도구 상자 최소화",
+          },
+          collapseToolbox: {
+            en: "Collapse toolbox",
+            vi: "Đóng hộp công cụ",
+            ko: "도구 상자 축소",
+          },
         },
         properties: {
-          nodeProperties: { en: "Node Properties", vi: "Thuộc tính nút", ko: "노드 속성" },
-          edgeProperties: { en: "Edge Properties", vi: "Thuộc tính cạnh", ko: "엣지 속성" },
+          nodeProperties: {
+            en: "Node Properties",
+            vi: "Thuộc tính nút",
+            ko: "노드 속성",
+          },
+          edgeProperties: {
+            en: "Edge Properties",
+            vi: "Thuộc tính cạnh",
+            ko: "엣지 속성",
+          },
         },
         contextMenu: {
-          resetColor: { en: "Reset Color", vi: "Đặt lại màu", ko: "색상 재설정" },
+          resetColor: {
+            en: "Reset Color",
+            vi: "Đặt lại màu",
+            ko: "색상 재설정",
+          },
           changeColor: { en: "Change Color", vi: "Đổi màu", ko: "색상 변경" },
           delete: { en: "Delete", vi: "Xóa", ko: "삭제" },
           properties: { en: "Properties", vi: "Thuộc tính", ko: "속성" },
@@ -134,7 +196,11 @@
           id: "sendEmailTask",
           extends: "task",
           name: { en: "Send Email", vi: "Gửi Email", ko: "이메일 전송" },
-          description: { en: "Send email notification", vi: "Gửi thông báo email", ko: "이메일 알림 발송" },
+          description: {
+            en: "Send email notification",
+            vi: "Gửi thông báo email",
+            ko: "이메일 알림 발송",
+          },
           icon: {
             type: "lucide",
             value: "Mail",
@@ -179,7 +245,11 @@
           contextMenuItems: [
             {
               id: "test-email",
-              label: { en: "Send Test Email", vi: "Gửi Email Test", ko: "테스트 이메일 전송" },
+              label: {
+                en: "Send Test Email",
+                vi: "Gửi Email Test",
+                ko: "테스트 이메일 전송",
+              },
               icon: "Send",
               action: {
                 type: "event",
@@ -203,7 +273,11 @@
           id: "httpRequestTask",
           extends: "task",
           name: { en: "HTTP Request", vi: "Yêu cầu HTTP", ko: "HTTP 요청" },
-          description: { en: "Make HTTP/REST API calls", vi: "Thực hiện gọi HTTP/REST API", ko: "HTTP/REST API 호출 수행" },
+          description: {
+            en: "Make HTTP/REST API calls",
+            vi: "Thực hiện gọi HTTP/REST API",
+            ko: "HTTP/REST API 호출 수행",
+          },
           icon: {
             type: "lucide",
             value: "Globe",
@@ -241,7 +315,11 @@
           contextMenuItems: [
             {
               id: "test-request",
-              label: { en: "Test Request", vi: "Kiểm tra Yêu cầu", ko: "요청 테스트" },
+              label: {
+                en: "Test Request",
+                vi: "Kiểm tra Yêu cầu",
+                ko: "요청 테스트",
+              },
               icon: "Play",
               action: {
                 type: "event",
@@ -253,8 +331,16 @@
         {
           id: "conditionalStart",
           extends: "start",
-          name: { en: "Conditional Start", vi: "Bắt đầu Điều kiện", ko: "조건부 시작" },
-          description: { en: "Start with condition", vi: "Bắt đầu với điều kiện", ko: "조건으로 시작" },
+          name: {
+            en: "Conditional Start",
+            vi: "Bắt đầu Điều kiện",
+            ko: "조건부 시작",
+          },
+          description: {
+            en: "Start with condition",
+            vi: "Bắt đầu với điều kiện",
+            ko: "조건으로 시작",
+          },
           icon: {
             type: "lucide",
             value: "AlarmClock",
@@ -275,7 +361,11 @@
           id: "simpleTask",
           extends: "task",
           name: { en: "Simple Task", vi: "Nhiệm vụ Đơn giản", ko: "단순 작업" },
-          description: { en: "Task with minimal context menu", vi: "Nhiệm vụ với menu ngữ cảnh tối thiểu", ko: "최소 컨텍스트 메뉴가 있는 작업" },
+          description: {
+            en: "Task with minimal context menu",
+            vi: "Nhiệm vụ với menu ngữ cảnh tối thiểu",
+            ko: "최소 컨텍스트 메뉴가 있는 작업",
+          },
           icon: {
             type: "lucide",
             value: "CheckSquare",
@@ -292,7 +382,11 @@
           contextMenuItems: [
             {
               id: "mark-complete",
-              label: { en: "Mark Complete", vi: "Đánh dấu Hoàn thành", ko: "완료로 표시" },
+              label: {
+                en: "Mark Complete",
+                vi: "Đánh dấu Hoàn thành",
+                ko: "완료로 표시",
+              },
               icon: "Check",
               action: {
                 type: "event",
@@ -305,7 +399,11 @@
           id: "lockedTask",
           extends: "task",
           name: { en: "Locked Task", vi: "Nhiệm vụ Khóa", ko: "잠긴 작업" },
-          description: { en: "Task with no duplicate/delete", vi: "Nhiệm vụ không sao chép/xóa", ko: "복제/삭제 없는 작업" },
+          description: {
+            en: "Task with no duplicate/delete",
+            vi: "Nhiệm vụ không sao chép/xóa",
+            ko: "복제/삭제 없는 작업",
+          },
           icon: {
             type: "lucide",
             value: "Lock",
@@ -322,7 +420,11 @@
           contextMenuItems: [
             {
               id: "unlock",
-              label: { en: "Unlock Task", vi: "Mở Khóa Nhiệm vụ", ko: "작업 잠금 해제" },
+              label: {
+                en: "Unlock Task",
+                vi: "Mở Khóa Nhiệm vụ",
+                ko: "작업 잠금 해제",
+              },
               icon: "Unlock",
               action: {
                 type: "event",
@@ -334,8 +436,16 @@
         {
           id: "minimalTask",
           extends: "task",
-          name: { en: "Minimal Task", vi: "Nhiệm vụ Tối thiểu", ko: "최소 작업" },
-          description: { en: "Task with only custom menu", vi: "Nhiệm vụ chỉ với menu tùy chỉnh", ko: "맞춤 메뉴만 있는 작업" },
+          name: {
+            en: "Minimal Task",
+            vi: "Nhiệm vụ Tối thiểu",
+            ko: "최소 작업",
+          },
+          description: {
+            en: "Task with only custom menu",
+            vi: "Nhiệm vụ chỉ với menu tùy chỉnh",
+            ko: "맞춤 메뉴만 있는 작업",
+          },
           icon: {
             type: "lucide",
             value: "Minimize",
@@ -352,7 +462,11 @@
           contextMenuItems: [
             {
               id: "execute",
-              label: { en: "Execute Task", vi: "Thực thi Nhiệm vụ", ko: "작업 실행" },
+              label: {
+                en: "Execute Task",
+                vi: "Thực thi Nhiệm vụ",
+                ko: "작업 실행",
+              },
               icon: "Play",
               action: {
                 type: "event",
@@ -392,26 +506,22 @@
         },
 
         onReady: function (instance) {
-          console.log("BPM Core initialized with JSON config and Korean language support");
+          console.log(
+            "BPM Core initialized with JSON config and Korean language support"
+          );
 
-          // Create language switcher
-          const languageSwitcher = document.createElement("select");
-          languageSwitcher.id = "language-select";
-          languageSwitcher.style.cssText = "position: fixed; top: 10px; right: 10px; z-index: 1001; padding: 8px 12px; border-radius: 4px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 14px;";
-          languageSwitcher.innerHTML = `
-            <option value="en">English</option>
-            <option value="vi">Tiếng Việt</option>
-            <option value="ko">한국어 (Korean)</option>
-          `;
-          
-          languageSwitcher.addEventListener("change", function(e) {
+          // Get current language and set it in the select
+          const currentLanguage = bpm.getLanguage();
+          console.log("Current language:", currentLanguage);
+          const languageSwitcher = document.getElementById("language-select");
+          languageSwitcher.value = currentLanguage;
+
+          // Handle language change
+          languageSwitcher.addEventListener("change", function (e) {
             console.log("Language changed to:", e.target.value);
-            // Now setLanguage method is available on bpm instance
             bpm.setLanguage(e.target.value);
             console.log("Language updated successfully!");
           });
-          
-          document.body.insertBefore(languageSwitcher, document.body.firstChild);
 
           // Update UI with loaded nodes
           const nodesList = document.getElementById("loaded-nodes");

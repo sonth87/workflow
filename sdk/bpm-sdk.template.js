@@ -390,6 +390,13 @@
       }
     },
 
+    getLanguage: function () {
+      if (this.instance && typeof this.instance.getLanguage === "function") {
+        return this.instance.getLanguage();
+      }
+      return "en"; // Default fallback
+    },
+
     setLanguage: function (language) {
       if (this.instance && typeof this.instance.setLanguage === "function") {
         return this.instance.setLanguage(language);

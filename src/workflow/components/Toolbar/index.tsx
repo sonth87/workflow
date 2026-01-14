@@ -112,7 +112,11 @@ export function Toolbar({
         <Plus size={18} className="text-foreground" />
       </button>
 
-      <Tooltip content={getUIText("toolbar.resetView")} delayDuration={0} sideOffset={4}>
+      <Tooltip
+        content={getUIText("toolbar.resetView")}
+        delayDuration={0}
+        sideOffset={4}
+      >
         <button
           onClick={handleFitView}
           title={getUIText("toolbar.resetView")}
@@ -124,7 +128,11 @@ export function Toolbar({
 
       <div className="h-6 w-px bg-border" />
 
-      <Tooltip content={getUIText("toolbar.fullscreen")} delayDuration={0} sideOffset={4}>
+      <Tooltip
+        content={getUIText("toolbar.fullscreen")}
+        delayDuration={0}
+        sideOffset={4}
+      >
         <button
           onClick={toggleFullscreen}
           title={getUIText("toolbar.fullscreen")}

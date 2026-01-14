@@ -1,13 +1,13 @@
 /**
  * UI Translations Dictionary
- * 
+ *
  * This file contains all user-facing UI text for multilingual support.
  * Structure allows for flexible language configuration by external projects.
- * 
+ *
  * Usage in external projects:
  * ```
  * import { DEFAULT_UI_TRANSLATIONS, UITranslations } from 'bpm-core/translations'
- * 
+ *
  * const customTranslations: UITranslations = {
  *   ...DEFAULT_UI_TRANSLATIONS,
  *   toolbar: {
@@ -15,7 +15,7 @@
  *     selectTool: { en: "Custom Select", vi: "Chọn tùy chỉnh" }
  *   }
  * }
- * 
+ *
  * // Pass to LanguageProvider
  * ```
  */
@@ -181,7 +181,10 @@ export interface UITranslations {
 export const DEFAULT_UI_TRANSLATIONS: UITranslations = {
   toolbar: {
     selectTool: { en: "Select tool (V)", vi: "Công cụ chọn (V)" },
-    handTool: { en: "Hand tool (H) - Pan canvas only", vi: "Công cụ cầm nắm (H) - Chỉ di chuyển canvas" },
+    handTool: {
+      en: "Hand tool (H) - Pan canvas only",
+      vi: "Công cụ cầm nắm (H) - Chỉ di chuyển canvas",
+    },
     zoomOut: { en: "Zoom out", vi: "Thu nhỏ" },
     zoomIn: { en: "Zoom in", vi: "Phóng to" },
     resetView: { en: "Reset view", vi: "Đặt lại chế độ xem" },
@@ -199,20 +202,44 @@ export const DEFAULT_UI_TRANSLATIONS: UITranslations = {
   properties: {
     nodeProperties: { en: "Node Properties", vi: "Thuộc tính nút" },
     edgeProperties: { en: "Edge Properties", vi: "Thuộc tính cạnh" },
-    noPropertiesAvailable: { en: "No properties available in this group", vi: "Không có thuộc tính nào trong nhóm này" },
-    noPropertyGroupsAvailable: { en: "No property groups available", vi: "Không có nhóm thuộc tính nào" },
-    selectNodeToConfigure: { en: "Select a node to configure", vi: "Chọn một nút để cấu hình" },
-    noConfigurationAvailable: { en: "No configuration available for this node type", vi: "Không có cấu hình nào cho loại nút này" },
-    selectEdgeToConfigure: { en: "Select an edge to configure", vi: "Chọn một cạnh để cấu hình" },
+    noPropertiesAvailable: {
+      en: "No properties available in this group",
+      vi: "Không có thuộc tính nào trong nhóm này",
+    },
+    noPropertyGroupsAvailable: {
+      en: "No property groups available",
+      vi: "Không có nhóm thuộc tính nào",
+    },
+    selectNodeToConfigure: {
+      en: "Select a node to configure",
+      vi: "Chọn một nút để cấu hình",
+    },
+    noConfigurationAvailable: {
+      en: "No configuration available for this node type",
+      vi: "Không có cấu hình nào cho loại nút này",
+    },
+    selectEdgeToConfigure: {
+      en: "Select an edge to configure",
+      vi: "Chọn một cạnh để cấu hình",
+    },
   },
   multiSelect: {
-    enterValuesPlaceholder: { en: "Enter values (one per line)...", vi: "Nhập giá trị (một dòng một giá trị)..." },
+    enterValuesPlaceholder: {
+      en: "Enter values (one per line)...",
+      vi: "Nhập giá trị (một dòng một giá trị)...",
+    },
   },
   noteNode: {
     changeColor: { en: "Change color", vi: "Đổi màu" },
     changeFontSize: { en: "Change font size", vi: "Đổi kích thước font" },
-    typePlaceholder: { en: "Type your note here...", vi: "Nhập ghi chú của bạn ở đây..." },
-    styledWithMarkdown: { en: "Styled with markdown", vi: "Được tạo kiểu bằng markdown" },
+    typePlaceholder: {
+      en: "Type your note here...",
+      vi: "Nhập ghi chú của bạn ở đây...",
+    },
+    styledWithMarkdown: {
+      en: "Styled with markdown",
+      vi: "Được tạo kiểu bằng markdown",
+    },
     small: { en: "Small", vi: "Nhỏ" },
     normal: { en: "Normal", vi: "Bình thường" },
     extraSmall: { en: "Extra Small", vi: "Rất nhỏ" },
@@ -222,7 +249,10 @@ export const DEFAULT_UI_TRANSLATIONS: UITranslations = {
     changeTextColor: { en: "Change text color", vi: "Đổi màu chữ" },
     changeFontSize: { en: "Change font size", vi: "Đổi kích thước font" },
     flipArrow: { en: "Flip arrow", vi: "Lật mũi tên" },
-    typePlaceholder: { en: "Type your annotation here...", vi: "Nhập chú thích của bạn ở đây..." },
+    typePlaceholder: {
+      en: "Type your annotation here...",
+      vi: "Nhập chú thích của bạn ở đây...",
+    },
     small: { en: "Small", vi: "Nhỏ" },
     normal: { en: "Normal", vi: "Bình thường" },
     extraSmall: { en: "Extra Small", vi: "Rất nhỏ" },
@@ -230,8 +260,14 @@ export const DEFAULT_UI_TRANSLATIONS: UITranslations = {
   },
   poolNode: {
     addLaneNew: { en: "Add Lane", vi: "Thêm làn đường" },
-    unlockLane: { en: "Unlock (allow dragging out)", vi: "Mở khóa (cho phép kéo ra)" },
-    lockLane: { en: "Lock (keep nodes inside)", vi: "Khóa (giữ các nút bên trong)" },
+    unlockLane: {
+      en: "Unlock (allow dragging out)",
+      vi: "Mở khóa (cho phép kéo ra)",
+    },
+    lockLane: {
+      en: "Lock (keep nodes inside)",
+      vi: "Khóa (giữ các nút bên trong)",
+    },
     switchVertical: { en: "Switch to vertical", vi: "Chuyển sang dọc" },
     switchHorizontal: { en: "Switch to horizontal", vi: "Chuyển sang ngang" },
     changeColor: { en: "Change Color", vi: "Đổi màu" },
@@ -285,13 +321,31 @@ export const DEFAULT_UI_TRANSLATIONS: UITranslations = {
     node: { en: "Node:", vi: "Nút:" },
     labelRequired: { en: "Label is required", vi: "Nhãn là bắt buộc" },
     nodeMustHaveId: { en: "Node must have an id", vi: "Nút phải có một id" },
-    nodeMustHaveType: { en: "Node must have a type", vi: "Nút phải có một loại" },
+    nodeMustHaveType: {
+      en: "Node must have a type",
+      vi: "Nút phải có một loại",
+    },
     isRequired: { en: "is required", vi: "là bắt buộc" },
-    validationFailed: { en: "Validation failed", vi: "Xác thực không thành công" },
-    edgeMustHaveSource: { en: "Edge must have a source", vi: "Cạnh phải có một nguồn" },
-    edgeMustHaveTarget: { en: "Edge must have a target", vi: "Cạnh phải có một mục tiêu" },
-    connectionNotAllowed: { en: "Connection not allowed", vi: "Không được phép kết nối" },
-    workflowValidationFailed: { en: "Workflow validation failed", vi: "Xác thực quy trình không thành công" },
+    validationFailed: {
+      en: "Validation failed",
+      vi: "Xác thực không thành công",
+    },
+    edgeMustHaveSource: {
+      en: "Edge must have a source",
+      vi: "Cạnh phải có một nguồn",
+    },
+    edgeMustHaveTarget: {
+      en: "Edge must have a target",
+      vi: "Cạnh phải có một mục tiêu",
+    },
+    connectionNotAllowed: {
+      en: "Connection not allowed",
+      vi: "Không được phép kết nối",
+    },
+    workflowValidationFailed: {
+      en: "Workflow validation failed",
+      vi: "Xác thực quy trình không thành công",
+    },
   },
   header: {
     save: { en: "Save", vi: "Lưu" },
@@ -305,13 +359,22 @@ export const DEFAULT_UI_TRANSLATIONS: UITranslations = {
     close: { en: "Close", vi: "Đóng" },
   },
   layout: {
-    verticalLayout: { en: "Vertical Layout (Top to Bottom)", vi: "Bố cục dọc (Trên xuống dưới)" },
-    horizontalLayout: { en: "Horizontal Layout (Left to Right)", vi: "Bố cục ngang (Trái qua phải)" },
+    verticalLayout: {
+      en: "Vertical Layout (Top to Bottom)",
+      vi: "Bố cục dọc (Trên xuống dưới)",
+    },
+    horizontalLayout: {
+      en: "Horizontal Layout (Left to Right)",
+      vi: "Bố cục ngang (Trái qua phải)",
+    },
   },
   output: {
     viewWorkflow: { en: "View Workflow", vi: "Xem quy trình" },
     workflowJson: { en: "Workflow JSON", vi: "JSON quy trình" },
-    viewCopyWorkflow: { en: "View and copy the workflow configuration as JSON", vi: "Xem và sao chép cấu hình quy trình dưới dạng JSON" },
+    viewCopyWorkflow: {
+      en: "View and copy the workflow configuration as JSON",
+      vi: "Xem và sao chép cấu hình quy trình dưới dạng JSON",
+    },
     copyJson: { en: "Copy JSON", vi: "Sao chép JSON" },
   },
   theme: {
@@ -320,8 +383,14 @@ export const DEFAULT_UI_TRANSLATIONS: UITranslations = {
     systemMode: { en: "System Mode", vi: "Chế độ hệ thống" },
   },
   run: {
-    cannotRunWorkflow: { en: "Cannot run workflow. Please fix {count} error(s).", vi: "Không thể chạy quy trình. Vui lòng sửa {count} lỗi." },
-    workflowExecutionStarted: { en: "Workflow execution started!", vi: "Bắt đầu thực thi quy trình!" },
+    cannotRunWorkflow: {
+      en: "Cannot run workflow. Please fix {count} error(s).",
+      vi: "Không thể chạy quy trình. Vui lòng sửa {count} lỗi.",
+    },
+    workflowExecutionStarted: {
+      en: "Workflow execution started!",
+      vi: "Bắt đầu thực thi quy trình!",
+    },
     run: { en: "Run", vi: "Chạy" },
   },
   import: {
@@ -331,7 +400,13 @@ export const DEFAULT_UI_TRANSLATIONS: UITranslations = {
     exportWorkflow: { en: "Export Workflow", vi: "Xuất quy trình" },
   },
   canvas: {
-    cannotCreateConnection: { en: "Cannot create connection: {message}", vi: "Không thể tạo kết nối: {message}" },
-    circularLoopError: { en: "❌ Cannot create connection: This would create a circular loop in the workflow!", vi: "❌ Không thể tạo kết nối: Điều này sẽ tạo một vòng lặp trong quy trình!" },
+    cannotCreateConnection: {
+      en: "Cannot create connection: {message}",
+      vi: "Không thể tạo kết nối: {message}",
+    },
+    circularLoopError: {
+      en: "❌ Cannot create connection: This would create a circular loop in the workflow!",
+      vi: "❌ Không thể tạo kết nối: Điều này sẽ tạo một vòng lặp trong quy trình!",
+    },
   },
 };

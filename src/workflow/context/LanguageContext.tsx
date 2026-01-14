@@ -1,18 +1,18 @@
 /**
  * Language Context
  * Manages global language state for dynamic i18n support
- * 
+ *
  * Supports custom translations for external project integration:
  * ```
  * import { DEFAULT_UI_TRANSLATIONS, UITranslations } from 'bpm-core/translations'
- * 
+ *
  * const customTranslations: UITranslations = {
  *   ...DEFAULT_UI_TRANSLATIONS,
  *   toolbar: { ...DEFAULT_UI_TRANSLATIONS.toolbar, ... }
  * }
- * 
- * <LanguageProvider 
- *   defaultLanguage="en" 
+ *
+ * <LanguageProvider
+ *   defaultLanguage="en"
  *   uiTranslations={customTranslations}
  * >
  * ```
@@ -26,7 +26,10 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { DEFAULT_UI_TRANSLATIONS, type UITranslations } from "../translations/ui.translations";
+import {
+  DEFAULT_UI_TRANSLATIONS,
+  type UITranslations,
+} from "../translations/ui.translations";
 
 // Support any language dynamically - not limited to en/vi
 export type LanguageType = string;
