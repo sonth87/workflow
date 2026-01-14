@@ -12,14 +12,22 @@
       "name": "Integrations",
       "icon": "Plug",
       "description": "External system integration nodes",
-      "order": 10
+      "order": 10,
+      "separator": {
+        "show": true,
+        "style": "line",
+        "color": "#e5e7eb"
+      }
     },
     {
       "id": "notifications",
       "name": "Notifications",
       "icon": "Bell",
       "description": "Notification and messaging nodes",
-      "order": 11
+      "order": 11,
+      "separator": {
+        "show": false
+      }
     }
   ],
   "nodes": [

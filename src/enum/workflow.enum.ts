@@ -15,6 +15,12 @@ export enum NodeType {
   TASK_BUSINESS_RULE = "taskBusinessRule",
   TASK_AI = "taskAi",
 
+  IMMEDIATE_EMAIL = "immediateEmail",
+  IMMEDIATE_RECEIVE_MESSAGE = "immediateReceiveMessage",
+  IMMEDIATE_TIMER = "immediateTimer",
+  IMMEDIATE_SIGNAL = "immediateSignal",
+  IMMEDIATE_CONDITION = "immediateCondition",
+
   SERVICE_TASK = "serviceTask",
   NOTIFICATION = "notification",
   TIME_DELAY = "timeDelay",
@@ -77,6 +83,7 @@ export enum CategoryType {
   END = "end",
   TASK = "task",
   GATEWAY = "gateway",
+  IMMEDIATE = "immediate",
   SUBFLOW = "subflow",
   CUSTOM = "custom",
   OTHER = "other",

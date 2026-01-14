@@ -18,6 +18,7 @@ import {
   TimeDelayNode,
 } from "./TaskNodes";
 import { AnnotationNode } from "./NoteNode/AnnotationNode";
+import { ImmediateNode } from "./ImmediateNodes";
 
 // Export shared styles
 export { handleStyle, nodeStyle } from "./styles";
@@ -111,6 +112,28 @@ export const nodeTypes = {
     ServiceTaskNode,
     NodeType.SERVICE_TASK
   ),
+  // immediate nodes
+  [NodeType.IMMEDIATE_EMAIL]: wrapWithBaseNode(
+    ImmediateNode,
+    NodeType.IMMEDIATE_EMAIL
+  ),
+  [NodeType.IMMEDIATE_RECEIVE_MESSAGE]: wrapWithBaseNode(
+    ImmediateNode,
+    NodeType.IMMEDIATE_RECEIVE_MESSAGE
+  ),
+  [NodeType.IMMEDIATE_TIMER]: wrapWithBaseNode(
+    ImmediateNode,
+    NodeType.IMMEDIATE_TIMER
+  ),
+  [NodeType.IMMEDIATE_SIGNAL]: wrapWithBaseNode(
+    ImmediateNode,
+    NodeType.IMMEDIATE_SIGNAL
+  ),
+  [NodeType.IMMEDIATE_CONDITION]: wrapWithBaseNode(
+    ImmediateNode,
+    NodeType.IMMEDIATE_CONDITION
+  ),
+  // notifications and delays
   [NodeType.NOTIFICATION]: wrapWithBaseNode(
     NotificationNode,
     NodeType.NOTIFICATION

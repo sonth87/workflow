@@ -406,6 +406,25 @@ export class CustomNodeFactory {
           targetType: "node",
           targetNodeTypes: [config.id],
           items: menuItems as ContextMenuItem[],
+          disableDefaultItems: config.disableDefaultContextMenu as any,
+        },
+      });
+    } else if (
+      config.disableDefaultContextMenu &&
+      config.disableDefaultContextMenu.length > 0
+    ) {
+      // Even if no custom items, register to apply disable settings
+      contextMenuRegistry.register({
+        id: `${config.id}-context-menu`,
+        type: config.id,
+        name: `${config.name} Context Menu`,
+        config: {
+          id: `${config.id}-context-menu`,
+          name: `${config.name} Context Menu`,
+          targetType: "node",
+          targetNodeTypes: [config.id],
+          items: [],
+          disableDefaultItems: config.disableDefaultContextMenu as any,
         },
       });
     }

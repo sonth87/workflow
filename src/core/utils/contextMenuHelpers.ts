@@ -121,6 +121,7 @@ export function createChangeTypeMenuItem(
         CategoryType.START,
         CategoryType.TASK,
         CategoryType.GATEWAY,
+        CategoryType.IMMEDIATE,
         CategoryType.END,
       ].includes(category as CategoryType);
     },
@@ -138,6 +139,7 @@ export function getCategoryTypeLabel(category: string): string {
     [CategoryType.START]: "Start Type",
     [CategoryType.TASK]: "Task Type",
     [CategoryType.GATEWAY]: "Gateway Type",
+    [CategoryType.IMMEDIATE]: "Immediate Type",
     [CategoryType.END]: "End Type",
   };
   return labels[category] || "Change Type";

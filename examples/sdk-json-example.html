@@ -52,20 +52,44 @@
         padding: 2px 0;
         border-bottom: 1px solid #ddd;
       }
+      .info-panel.minimized #panel-content {
+        display: none;
+      }
+      .info-panel.minimized h3 {
+        margin-bottom: 0;
+        font-size: 14px;
+      }
+      .info-panel.minimized {
+        bottom: 0px;
+        left: 0px;
+        padding: 2px 8px;
+      }
+      #minimize-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        line-height: 24px;
+        float: right;
+        color: #666;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <div id="bpm-container"></div>
 
     <div class="info-panel">
-      <h3>JSON Configuration Active</h3>
-      <p>Custom nodes loaded from JSON:</p>
-      <ul
-        id="loaded-nodes"
-        style="font-size: 11px; margin: 5px 0; padding-left: 20px"
-      ></ul>
-      <div class="event-log" id="event-log">
-        <strong>Event Log:</strong>
+      <h3>JSON Configuration Active <button id="minimize-btn">-</button></h3>
+      <div id="panel-content">
+        <p>Custom nodes loaded from JSON:</p>
+        <ul
+          id="loaded-nodes"
+          style="font-size: 11px; margin: 5px 0; padding-left: 20px"
+        ></ul>
+        <div class="event-log" id="event-log">
+          <strong>Event Log:</strong>
+        </div>
       </div>
     </div>
 
@@ -216,6 +240,105 @@
             },
           ],
         },
+        {
+          id: "simpleTask",
+          extends: "task",
+          name: "Simple Task",
+          description: "Task with minimal context menu",
+          icon: {
+            type: "lucide",
+            value: "CheckSquare",
+            color: "#ffffff",
+            backgroundColor: "#10b981",
+          },
+          visualConfig: {
+            backgroundColor: "#ecfdf5",
+            borderColor: "#10b981",
+            textColor: "#064e3b",
+          },
+          // Disable some default context menu items
+          disableDefaultContextMenu: ["change-type", "appearance"],
+          contextMenuItems: [
+            {
+              id: "mark-complete",
+              label: "Mark Complete",
+              icon: "Check",
+              action: {
+                type: "event",
+                event: "custom:task-complete",
+              },
+            },
+          ],
+        },
+        {
+          id: "lockedTask",
+          extends: "task",
+          name: "Locked Task",
+          description: "Task with no duplicate/delete",
+          icon: {
+            type: "lucide",
+            value: "Lock",
+            color: "#ffffff",
+            backgroundColor: "#f59e0b",
+          },
+          visualConfig: {
+            backgroundColor: "#fef3c7",
+            borderColor: "#f59e0b",
+            textColor: "#78350f",
+          },
+          // Disable duplicate and delete options
+          disableDefaultContextMenu: ["duplicate", "delete"],
+          contextMenuItems: [
+            {
+              id: "unlock",
+              label: "Unlock Task",
+              icon: "Unlock",
+              action: {
+                type: "event",
+                event: "custom:unlock-task",
+              },
+            },
+          ],
+        },
+        {
+          id: "minimalTask",
+          extends: "task",
+          name: "Minimal Task",
+          description: "Task with only custom menu",
+          icon: {
+            type: "lucide",
+            value: "Minimize",
+            color: "#ffffff",
+            backgroundColor: "#6366f1",
+          },
+          visualConfig: {
+            backgroundColor: "#eef2ff",
+            borderColor: "#6366f1",
+            textColor: "#312e81",
+          },
+          // Disable all default context menu items
+          disableDefaultContextMenu: ["all"],
+          contextMenuItems: [
+            {
+              id: "execute",
+              label: "Execute Task",
+              icon: "Play",
+              action: {
+                type: "event",
+                event: "custom:execute-task",
+              },
+            },
+            {
+              id: "configure",
+              label: "Configure",
+              icon: "Settings",
+              action: {
+                type: "event",
+                event: "custom:configure-task",
+              },
+            },
+          ],
+        },
       ];
 
       // Initialize BPM with JSON config
@@ -268,6 +391,27 @@
               type: event.payload.node?.type,
             });
           });
+
+          // Additional custom events for new nodes
+          bpm.on("custom:task-complete", function (event) {
+            logEvent("Task marked complete", event.payload);
+            alert("Task completed!");
+          });
+
+          bpm.on("custom:unlock-task", function (event) {
+            logEvent("Task unlocked", event.payload);
+            alert("Task unlocked!");
+          });
+
+          bpm.on("custom:execute-task", function (event) {
+            logEvent("Execute task", event.payload);
+            alert("Task executed!");
+          });
+
+          bpm.on("custom:configure-task", function (event) {
+            logEvent("Configure task", event.payload);
+            alert("Opening configuration...");
+          });
         },
 
         onError: function (error) {
@@ -275,6 +419,28 @@
           alert("Error: " + error.message);
         },
       });
+
+      // Minimize button functionality
+      document
+        .getElementById("minimize-btn")
+        .addEventListener("click", function () {
+          const panel = document.querySelector(".info-panel");
+          panel.classList.toggle("minimized");
+          this.textContent = panel.classList.contains("minimized") ? "" : "-";
+        });
+
+      // Expand panel when clicking on minimized panel (excluding button)
+      document
+        .querySelector(".info-panel")
+        .addEventListener("click", function (event) {
+          if (
+            event.target.id !== "minimize-btn" &&
+            this.classList.contains("minimized")
+          ) {
+            this.classList.remove("minimized");
+            document.getElementById("minimize-btn").textContent = "-";
+          }
+        });
 
       // Helper function to log events
       function logEvent(message, data) {

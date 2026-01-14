@@ -11,6 +11,7 @@ import type {
   ThemeConfig,
 } from "@/core/types/base.types";
 import type { ContextMenuConfig } from "@/core/registry/ContextMenuRegistry";
+import type { CategoryConfig } from "@/core/registry/CategoryRegistry";
 import type { ContextMenuContext } from "@/core/types/base.types";
 import {
   NodeType,
@@ -26,15 +27,23 @@ import {
 } from "@/core/utils/contextMenuHelpers";
 import { contextMenuActionsRegistry } from "@/core/registry";
 import {
+  BaseNodeType,
+  getBaseNodeDefinition,
+} from "@/core/nodes/BaseNodeDefinitions";
+import {
+  AlarmClock,
   Circle,
   ClipboardList,
   DiamondPlus,
   FlipVertical,
   Highlighter,
+  ListCheck,
   LockOpen,
+  Mail,
   Palette,
   PanelTopBottomDashed,
   Plus,
+  Radio,
   Trash2,
 } from "lucide-react";
 
@@ -42,10 +51,19 @@ import {
 // Default Node Configurations
 // ============================================
 
+/**
+ * Helper to get visual config from base node type
+ */
+const getBaseVisualConfig = (baseType: BaseNodeType) => {
+  const baseDef = getBaseNodeDefinition(baseType);
+  return baseDef?.visualConfig;
+};
+
 const createDefaultNodeConfig = (
   nodeType: NodeType,
   category: CategoryType,
-  metadata: Partial<BaseNodeConfig["metadata"]>
+  metadata: Partial<BaseNodeConfig["metadata"]>,
+  baseType?: BaseNodeType
 ): BaseNodeConfig => ({
   id: "",
   type: nodeType,
@@ -59,6 +77,7 @@ const createDefaultNodeConfig = (
     description: metadata.description,
     version: "1.0.0",
   },
+  visualConfig: baseType ? getBaseVisualConfig(baseType) : undefined,
   collapsible: true,
   collapsed: false,
   editable: true,
@@ -68,6 +87,58 @@ const createDefaultNodeConfig = (
   propertyDefinitions: [],
   properties: {},
 });
+
+// ============================================
+// Helper: Create Category Configuration
+// ============================================
+
+const createCategory = (
+  categoryType: CategoryType | string,
+  name: string,
+  overrides: Partial<CategoryConfig> = {}
+) => {
+  const id = `category-${categoryType}`;
+  const config: CategoryConfig = {
+    id,
+    name,
+    categoryType: categoryType as CategoryType,
+    isOpen: true,
+    ...overrides,
+  };
+  return { id, type: categoryType, name, config };
+};
+
+// ============================================
+// Default Categories Configurations
+// ============================================
+
+const defaultCategories: PluginConfig["categories"] = [
+  createCategory(CategoryType.START, "Start Events", {
+    description: "Các sự kiện bắt đầu workflow",
+    order: 1,
+  }),
+  createCategory(CategoryType.TASK, "Tasks", {
+    description: "Các loại task trong workflow",
+    order: 2,
+  }),
+  createCategory(CategoryType.GATEWAY, "Gateways", {
+    description: "Các điểm quyết định trong workflow",
+    order: 3,
+  }),
+  createCategory(CategoryType.END, "End Events", {
+    description: "Các sự kiện kết thúc workflow",
+    order: 4,
+  }),
+  createCategory(CategoryType.IMMEDIATE, "Immediate", {
+    description: "Các sự kiện tức thì",
+    order: 5,
+    separator: { show: true, style: "line", color: "#e5e7eb" },
+  }),
+  createCategory(CategoryType.OTHER, "Other", {
+    description: "Các nodes khác",
+    order: 6,
+  }),
+];
 
 const defaultNodes: PluginConfig["nodes"] = [
   // Start Events
@@ -247,6 +318,108 @@ const defaultNodes: PluginConfig["nodes"] = [
         description: "Wait for events",
       }
     ),
+  },
+
+  // Immediate Events
+  {
+    id: NodeType.IMMEDIATE_EMAIL,
+    type: NodeType.IMMEDIATE_EMAIL,
+    name: "Immediate Email",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_EMAIL,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Email",
+          description: "Trigger immediately based on email",
+        },
+        BaseNodeType.IMMEDIATE // Tự động lấy visual config từ base IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: Mail,
+      },
+    },
+  },
+  {
+    id: NodeType.IMMEDIATE_RECEIVE_MESSAGE,
+    type: NodeType.IMMEDIATE_RECEIVE_MESSAGE,
+    name: "Immediate Receive Message",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_RECEIVE_MESSAGE,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Receive Message",
+          description: "Trigger immediately based on received message",
+        },
+        BaseNodeType.IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: Mail,
+      },
+    },
+  },
+  {
+    id: NodeType.IMMEDIATE_TIMER,
+    type: NodeType.IMMEDIATE_TIMER,
+    name: "Immediate Timer",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_TIMER,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Timer",
+          description: "Trigger immediately based on timer",
+        },
+        BaseNodeType.IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: AlarmClock,
+      },
+    },
+  },
+  {
+    id: NodeType.IMMEDIATE_SIGNAL,
+    type: NodeType.IMMEDIATE_SIGNAL,
+    name: "Immediate Signal",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_SIGNAL,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Signal",
+          description: "Trigger immediately based on signal",
+        },
+        BaseNodeType.IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: Radio,
+      },
+    },
+  },
+  {
+    id: NodeType.IMMEDIATE_CONDITION,
+    type: NodeType.IMMEDIATE_CONDITION,
+    name: "Immediate Condition",
+    config: {
+      ...createDefaultNodeConfig(
+        NodeType.IMMEDIATE_CONDITION,
+        CategoryType.IMMEDIATE,
+        {
+          title: "Immediate Condition",
+          description: "Trigger immediately based on condition",
+        },
+        BaseNodeType.IMMEDIATE
+      ),
+      icon: {
+        type: "lucide",
+        value: ListCheck,
+      },
+    },
   },
 
   // End Events
@@ -598,7 +771,6 @@ const defaultRules: Array<{
     },
   },
 ];
-
 // ============================================
 // Default Theme
 // ============================================
@@ -1052,6 +1224,7 @@ export const defaultBpmPlugin: Plugin = {
     edges: defaultEdges,
     rules: defaultRules,
     themes: defaultThemes,
+    categories: defaultCategories,
     contextMenus: defaultContextMenus,
   },
   async initialize() {

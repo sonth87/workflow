@@ -196,6 +196,18 @@ export const CustomNodeJSONSchema = z.object({
 
   // Context menu
   contextMenuItems: z.array(ContextMenuItemSchema).optional(),
+  disableDefaultContextMenu: z
+    .array(
+      z.enum([
+        "change-type",
+        "properties",
+        "appearance",
+        "duplicate",
+        "delete",
+        "all",
+      ])
+    )
+    .optional(),
 
   // Event triggers
   eventTriggers: z.array(EventTriggerSchema).optional(),
@@ -239,6 +251,13 @@ export const PluginJSONSchema = z.object({
         icon: z.string().optional(),
         description: z.string().optional(),
         order: z.number().optional(),
+        separator: z
+          .object({
+            show: z.boolean().optional(),
+            color: z.string().optional(),
+            style: z.enum(["line", "spacer"]).optional(),
+          })
+          .optional(),
       })
     )
     .optional(),

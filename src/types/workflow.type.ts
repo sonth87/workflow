@@ -70,6 +70,11 @@ export interface GateWayNode extends BaseConfig {
   data: DynamicConfig;
 }
 
+export interface ImmediateNode extends BaseConfig {
+  category_type: CategoryType.IMMEDIATE;
+  data: DynamicConfig;
+}
+
 export interface EndNode extends BaseConfig {
   category_type: CategoryType.END;
   data: DynamicConfig;
@@ -100,7 +105,12 @@ export type NodeValidationRules = {
   [K in NodeType]?: ConnectionRule;
 };
 
-export type WorkflowNode = StartNode | EndNode | TaskNode | GateWayNode;
+export type WorkflowNode =
+  | StartNode
+  | EndNode
+  | TaskNode
+  | GateWayNode
+  | ImmediateNode;
 
 export interface WorkflowDefinition {
   id: string;

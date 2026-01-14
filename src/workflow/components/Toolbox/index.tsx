@@ -6,10 +6,17 @@
 import { categoryRegistry } from "@/core/registry/CategoryRegistry";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { CategoryType, NodeType } from "@/enum/workflow.enum";
-import { X } from "lucide-react";
+import {
+  X,
+  ChevronDown,
+  ChevronRight,
+  PanelLeft,
+  PanelRight,
+} from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../../data/toolboxData";
 import IconConfig from "../IconConfig";
+import { cn } from "@sth87/shadcn-design-system";
 
 // Default icon for custom category
 const CustomCategoryIcon = () => (
@@ -29,9 +36,14 @@ const CustomCategoryIcon = () => (
   </svg>
 );
 
-export function Toolbox() {
+type ToolboxProps = { className?: string };
+
+type ToolboxState = "minimize" | "collapsed" | "expanded";
+
+export function Toolbox({ className }: ToolboxProps) {
   const [selectedCategoryType, setSelectedCategoryType] =
     useState<CategoryType>();
+  const [toolboxState, setToolboxState] = useState<ToolboxState>("collapsed");
 
   const handleDragStart = (e: React.DragEvent, nodeType: NodeType) => {
     e.dataTransfer.effectAllowed = "move";
@@ -55,13 +67,20 @@ export function Toolbox() {
         cat => cat.categoryType === categoryType
       );
       if (!existing) {
-        categories.push({
+        const newCategory: NodeCategory = {
           name: registryItem.config.name,
           isOpen: registryItem.config.isOpen ?? true,
           categoryType: categoryType as CategoryType,
           nodes: [],
           icon: registryItem.config.icon || <CustomCategoryIcon />,
-        });
+          order: registryItem.config.order,
+          separator: registryItem.config.separator || undefined,
+        };
+        categories.push(newCategory);
+      } else if (existing) {
+        // Update existing category with registry config
+        existing.order = registryItem.config.order;
+        existing.separator = registryItem.config.separator || undefined;
       }
     });
 
@@ -80,6 +99,8 @@ export function Toolbox() {
             categoryType === CategoryType.CUSTOM ? (
               <CustomCategoryIcon />
             ) : undefined,
+          order: undefined,
+          separator: undefined,
         };
         categories.push(existing);
       }
@@ -119,8 +140,14 @@ export function Toolbox() {
       }
     });
 
-    // Filter out empty categories
-    return categories.filter(cat => cat.nodes.length > 0);
+    // Filter out empty categories and sort by order
+    return categories
+      .filter(cat => cat.nodes.length > 0)
+      .sort((a, b) => {
+        const orderA = a.order ?? 999;
+        const orderB = b.order ?? 999;
+        return orderA - orderB;
+      });
   }, []);
 
   const selectedCategory = useMemo(
@@ -132,72 +159,204 @@ export function Toolbox() {
   );
 
   return (
-    <aside className="h-full border border-border/50 bg-card rounded-2xl shadow-xl flex relative overflow-visible">
-      <div className="px-2.5 py-4 space-y-1 flex-1 overflow-y-auto flex flex-col items-center">
-        {builderCategories.map((category, index) => (
-          <div
-            key={`${category.name}-${index}`}
-            className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"
-            onClick={() => setSelectedCategoryType(category.categoryType)}
+    <aside
+      className={cn(
+        "border rounded-2xl shadow-xl flex flex-col relative overflow-visible bg-background/90 backdrop-blur-xs",
+        { "h-[calc(100%-1rem)] w-xs": toolboxState === "expanded" },
+        className
+      )}
+    >
+      {/* {toolboxState === "minimize" && (
+        <div className="px-2.5 py-4 flex flex-col items-center gap-2">
+          <button
+            onClick={() => setToolboxState("collapsed")}
+            className="p-2 rounded-lg hover:bg-foreground/10 transition-colors"
+            title="Expand toolbox"
           >
-            {typeof category.icon === "string" &&
-            category.icon.startsWith("data:image/svg") ? (
-              <img
-                src={category.icon}
-                alt={category.name}
-                className="w-4.5 h-4.5"
-              />
-            ) : (
-              category.icon
-            )}
-          </div>
-        ))}
-        <div className="h-px w-6 bg-border my-4" />
-      </div>
-      {selectedCategory && (
-        <div className="min-w-[320px] border-border absolute top-0 left-full border rounded-2xl z-10 bg-background">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <h2 className="text-base text-ink800 font-medium flex-1">
-              {selectedCategory?.name}
-            </h2>
-            <button
-              onClick={() => setSelectedCategoryType(undefined)}
-              className="p-2 rounded-lg hover:bg-foreground/10"
+            <ChevronDown size={16} />
+          </button>
+        </div>
+      )} */}
+
+      {toolboxState === "collapsed" && (
+        <>
+          <div className="px-2.5 py-4 flex-1 overflow-y-auto flex flex-col items-center gap-1">
+            <div
+              className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"
+              onClick={() => {
+                setToolboxState("expanded");
+                setSelectedCategoryType(undefined);
+              }}
             >
-              <X size={16} />
-            </button>
-          </div>
-          <div className="p-4 space-y-1">
-            {selectedCategory.nodes
-              .filter(node => node && node.type)
-              .map(node => {
-                return (
-                  <div
-                    key={node.type}
-                    draggable
-                    onDragStart={e => handleDragStart(e, node.type)}
-                    className="flex items-start gap-2 rounded-lg bg-card/80 backdrop-blur-sm p-3 font-medium cursor-move hover:bg-foreground/10 hover:border-primary hover:scale-[1.02] active:scale-95 transition-all duration-150"
-                  >
-                    <IconConfig
-                      type={node.type}
-                      visualConfig={node?.visualConfig}
-                      icon={node?.icon}
+              <PanelLeft size={16} />
+            </div>
+            <div className="h-px w-[calc(100%-0.5rem)] bg-border my-2" />
+
+            {builderCategories.map((category, index) => (
+              <div key={`${category.name}-${index}`}>
+                <div
+                  className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"
+                  onClick={() => setSelectedCategoryType(category.categoryType)}
+                  title={category.name}
+                >
+                  {typeof category.icon === "string" &&
+                  category.icon.startsWith("data:image/svg") ? (
+                    <img
+                      src={category.icon}
+                      alt={category.name}
+                      className="w-4.5 h-4.5"
                     />
-                    <div className="flex flex-col justify-start">
-                      <span className="text-sm font-medium text-ink800">
-                        {node.label}
-                      </span>
-                      {node.description && (
-                        <div className="text-xs mt-1 text-ink600 font-normal">
-                          {node.description}
-                        </div>
+                  ) : (
+                    category.icon
+                  )}
+                </div>
+                {/* Render separator if configured */}
+                {category.separator &&
+                  category.separator.show &&
+                  index < builderCategories.length - 1 && (
+                    <div className="flex items-center justify-center py-2">
+                      {category.separator.style === "line" ? (
+                        <div
+                          className="h-px w-6"
+                          style={{
+                            backgroundColor:
+                              category.separator.color || "#e5e7eb",
+                          }}
+                        />
+                      ) : (
+                        <div className="h-2" />
                       )}
                     </div>
-                  </div>
-                );
-              })}
+                  )}
+              </div>
+            ))}
+            <div className="h-px w-[calc(100%-0.5rem)] bg-border my-2" />
+            {/* <button
+              onClick={() => setToolboxState("minimize")}
+              className="p-2 rounded-lg hover:bg-foreground/10 transition-colors"
+              title="Minimize toolbox"
+            >
+              <ChevronRight size={16} />
+            </button> */}
           </div>
-        </div>
+          {selectedCategory && (
+            <div className="min-w-[320px] border-border absolute top-0 left-[calc(100%+4px)] border rounded-2xl z-10 bg-background">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <h2 className="text-base text-ink800 font-medium flex-1">
+                  {selectedCategory?.name}
+                </h2>
+                <button
+                  onClick={() => setSelectedCategoryType(undefined)}
+                  className="p-2 rounded-lg hover:bg-foreground/10"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="p-4 space-y-1">
+                {selectedCategory.nodes
+                  .filter(node => node && node.type)
+                  .map(node => {
+                    return (
+                      <div
+                        key={node.type}
+                        draggable
+                        onDragStart={e => handleDragStart(e, node.type)}
+                        className="flex items-start gap-2 rounded-lg bg-card/80 backdrop-blur-sm p-3 font-medium cursor-move hover:bg-foreground/10 hover:border-primary hover:scale-[1.02] active:scale-95 transition-all duration-150"
+                      >
+                        <IconConfig
+                          type={node.type}
+                          visualConfig={node?.visualConfig}
+                          icon={node?.icon}
+                        />
+                        <div className="flex flex-col justify-start">
+                          <span className="text-sm font-medium text-ink800">
+                            {node.label}
+                          </span>
+                          {node.description && (
+                            <div className="text-xs mt-1 text-ink600 font-normal">
+                              {node.description}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {toolboxState === "expanded" && (
+        <>
+          <div className="flex items-center justify-between px-4 py-4">
+            <h1 className="text-lg font-semibold text-ink800">Toolbox</h1>
+            <button
+              onClick={() => setToolboxState("collapsed")}
+              className="p-2 rounded-lg hover:bg-foreground/10 transition-colors"
+              title="Collapse toolbox"
+            >
+              <PanelRight size={16} />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-4 pb-4 flex flex-col gap-4">
+            {builderCategories.map((category, index) => (
+              <div
+                key={`${category.name}-${index}`}
+                className="flex flex-col gap-2"
+              >
+                <div className="flex items-center gap-2 px-2">
+                  {typeof category.icon === "string" &&
+                  category.icon.startsWith("data:image/svg") ? (
+                    <img
+                      src={category.icon}
+                      alt={category.name}
+                      className="w-5 h-5"
+                    />
+                  ) : (
+                    <div className="w-5 h-5">{category.icon}</div>
+                  )}
+                  <h3 className="text-sm font-semibold text-ink800">
+                    {category.name}
+                  </h3>
+                </div>
+                <div className="pl-5">
+                  {category.nodes
+                    .filter(node => node && node.type)
+                    .map(node => {
+                      return (
+                        <div
+                          key={node.type}
+                          draggable
+                          onDragStart={e => handleDragStart(e, node.type)}
+                          className="flex items-start gap-2 rounded-lg bg-card/80 backdrop-blur-sm p-3 font-medium cursor-move hover:bg-foreground/10 hover:border-primary hover:scale-[1.02] active:scale-95 transition-all duration-150"
+                        >
+                          <IconConfig
+                            type={node.type}
+                            visualConfig={node?.visualConfig}
+                            icon={node?.icon}
+                          />
+                          <div className="flex flex-col justify-start">
+                            <span className="text-sm font-medium text-ink800">
+                              {node.label}
+                            </span>
+                            {node.description && (
+                              <div className="text-xs mt-1 text-ink600 font-normal">
+                                {node.description}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+                {index < builderCategories.length - 1 && (
+                  <div className="h-px bg-border my-2" />
+                )}
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </aside>
   );

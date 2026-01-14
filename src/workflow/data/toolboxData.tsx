@@ -14,12 +14,20 @@ export interface NodeItem {
   icon?: IconConfig;
 }
 
+export interface SeparatorConfig {
+  show?: boolean;
+  color?: string;
+  style?: "line" | "spacer";
+}
+
 export interface NodeCategory {
   name: string;
   isOpen: boolean;
   nodes: NodeItem[];
   icon?: React.ReactNode;
   categoryType?: CategoryType;
+  order?: number;
+  separator?: SeparatorConfig;
 }
 
 export const NODES_BY_CATEGORIES: NodeCategory[] = [
@@ -79,6 +87,30 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
     name: "Gateway",
     isOpen: false,
     categoryType: CategoryType.GATEWAY,
+    nodes: [],
+    icon: (
+      <svg
+        width="17"
+        height="17"
+        viewBox="0 0 17 17"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M7.11484 0.549081C7.84704 -0.183026 9.03399 -0.183028 9.7662 0.549081L16.332 7.11484C17.0641 7.84704 17.0641 9.03399 16.332 9.7662L9.7662 16.332C9.03399 17.0641 7.84705 17.0641 7.11484 16.332L0.549081 9.7662C-0.183026 9.03399 -0.183028 7.84705 0.549081 7.11484L7.11484 0.549081ZM8.88241 1.43287C8.63836 1.18892 8.24268 1.18892 7.99862 1.43287L1.43287 7.99862C1.18892 8.24268 1.18892 8.63836 1.43287 8.88241L7.99862 15.4482C8.24268 15.6921 8.63836 15.6921 8.88241 15.4482L15.4482 8.88241C15.6921 8.63836 15.6921 8.24268 15.4482 7.99862L8.88241 1.43287Z"
+          fill="#FF9D57"
+        />
+        <path
+          d="M10.082 5.91529C10.326 5.67121 10.7217 5.67121 10.9657 5.91529C11.2098 6.15937 11.2098 6.555 10.9657 6.79908L9.32431 8.44052L10.9657 10.082C11.2098 10.326 11.2098 10.7217 10.9657 10.9657C10.7217 11.2098 10.326 11.2098 10.082 10.9657L8.44052 9.32431L6.79908 10.9657C6.555 11.2098 6.15937 11.2098 5.91529 10.9657C5.67121 10.7217 5.67121 10.326 5.91529 10.082L7.55673 8.44052L5.91529 6.79908C5.67121 6.555 5.67121 6.15937 5.91529 5.91529C6.15937 5.67121 6.555 5.67121 6.79908 5.91529L8.44052 7.55673L10.082 5.91529Z"
+          fill="#FF9D57"
+        />
+      </svg>
+    ),
+  },
+  {
+    name: "Immediate",
+    isOpen: false,
+    categoryType: CategoryType.IMMEDIATE,
     nodes: [],
     icon: (
       <svg
