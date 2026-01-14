@@ -18,6 +18,11 @@ export interface CategoryConfig {
   icon?: ReactNode;
   description?: string;
   order?: number; // Display order in toolbox
+  separator?: {
+    show?: boolean; // Hiển thị separator sau category này
+    color?: string; // Màu của separator
+    style?: "line" | "spacer"; // Kiểu separator
+  };
   [key: string]: unknown;
 }
 

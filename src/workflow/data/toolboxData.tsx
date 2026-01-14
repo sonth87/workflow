@@ -14,12 +14,20 @@ export interface NodeItem {
   icon?: IconConfig;
 }
 
+export interface SeparatorConfig {
+  show?: boolean;
+  color?: string;
+  style?: "line" | "spacer";
+}
+
 export interface NodeCategory {
   name: string;
   isOpen: boolean;
   nodes: NodeItem[];
   icon?: React.ReactNode;
   categoryType?: CategoryType;
+  order?: number;
+  separator?: SeparatorConfig;
 }
 
 export const NODES_BY_CATEGORIES: NodeCategory[] = [

@@ -11,6 +11,7 @@ import type {
   ThemeConfig,
 } from "@/core/types/base.types";
 import type { ContextMenuConfig } from "@/core/registry/ContextMenuRegistry";
+import type { CategoryConfig } from "@/core/registry/CategoryRegistry";
 import type { ContextMenuContext } from "@/core/types/base.types";
 import {
   NodeType,
@@ -86,6 +87,58 @@ const createDefaultNodeConfig = (
   propertyDefinitions: [],
   properties: {},
 });
+
+// ============================================
+// Helper: Create Category Configuration
+// ============================================
+
+const createCategory = (
+  categoryType: CategoryType | string,
+  name: string,
+  overrides: Partial<CategoryConfig> = {}
+) => {
+  const id = `category-${categoryType}`;
+  const config: CategoryConfig = {
+    id,
+    name,
+    categoryType: categoryType as CategoryType,
+    isOpen: true,
+    ...overrides,
+  };
+  return { id, type: categoryType, name, config };
+};
+
+// ============================================
+// Default Categories Configurations
+// ============================================
+
+const defaultCategories: PluginConfig["categories"] = [
+  createCategory(CategoryType.START, "Start Events", {
+    description: "Các sự kiện bắt đầu workflow",
+    order: 1,
+  }),
+  createCategory(CategoryType.TASK, "Tasks", {
+    description: "Các loại task trong workflow",
+    order: 2,
+  }),
+  createCategory(CategoryType.GATEWAY, "Gateways", {
+    description: "Các điểm quyết định trong workflow",
+    order: 3,
+  }),
+  createCategory(CategoryType.END, "End Events", {
+    description: "Các sự kiện kết thúc workflow",
+    order: 4,
+  }),
+  createCategory(CategoryType.IMMEDIATE, "Immediate", {
+    description: "Các sự kiện tức thì",
+    order: 5,
+    separator: { show: true, style: "line", color: "#e5e7eb" },
+  }),
+  createCategory(CategoryType.OTHER, "Other", {
+    description: "Các nodes khác",
+    order: 6,
+  }),
+];
 
 const defaultNodes: PluginConfig["nodes"] = [
   // Start Events
@@ -718,7 +771,6 @@ const defaultRules: Array<{
     },
   },
 ];
-
 // ============================================
 // Default Theme
 // ============================================
@@ -1172,6 +1224,7 @@ export const defaultBpmPlugin: Plugin = {
     edges: defaultEdges,
     rules: defaultRules,
     themes: defaultThemes,
+    categories: defaultCategories,
     contextMenus: defaultContextMenus,
   },
   async initialize() {
