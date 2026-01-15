@@ -6,13 +6,19 @@ import React from "react";
 type ImportWorkflowProps = { className?: string };
 
 const ImportWorkflow = ({ className }: ImportWorkflowProps) => {
-  const { importWorkflow } = useWorkflowImportExport();
+  const { uploadWorkflow } = useWorkflowImportExport();
+
+  const handleImport = () => {
+    uploadWorkflow().catch(error => {
+      console.error("Failed to import workflow:", error);
+    });
+  };
 
   return (
     <div className={className}>
       <Button
         title="Import Workflow"
-        onClick={importWorkflow}
+        onClick={handleImport}
         className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
       >
         <Upload size={16} />
