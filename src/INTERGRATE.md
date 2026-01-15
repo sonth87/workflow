@@ -178,14 +178,22 @@ var edges = bpm.getEdges();    // Lấy danh sách edges
 bpm.clearWorkflow();           // Xóa toàn bộ workflow (nodes + edges)
 
 // Import/Export
-bpm.importWorkflow({ nodes: [...], edges: [...] });  // Import workflow từ object
-var data = bpm.exportWorkflow();                     // Export workflow kèm metadata
-var data = bpm.exportWorkflow(false);                // Export workflow không có metadata
-bpm.downloadWorkflow('my-workflow.json');           // Tải workflow dưới dạng file JSON
-bpm.uploadWorkflow().then(function(data) {          // Upload workflow từ file (mở file picker)
+// Import từ data có sẵn (API, restore, programmatic)
+bpm.importWorkflow({ nodes: [...], edges: [...] });  // Import workflow từ object có sẵn
+bpm.importWorkflow(data, false);                     // Import không clear workflow hiện tại
+
+// Upload từ file (user chọn file)
+bpm.uploadWorkflow().then(function(data) {          // Mở file picker, user chọn file JSON
   console.log('Uploaded:', data);
 });
-var view = bpm.viewWorkflow();                      // Xem workflow hiện tại (alias của getWorkflow)
+
+// Export
+var data = bpm.exportWorkflow();                     // Export workflow kèm metadata
+var data = bpm.exportWorkflow(false);                // Export workflow không có metadata
+bpm.downloadWorkflow('my-workflow.json');            // Tải workflow dưới dạng file JSON (auto download)
+
+// View
+var view = bpm.viewWorkflow();                       // Xem workflow hiện tại (alias của getWorkflow)
 
 // Validation
 var errors = bpm.getValidationErrors();    // Lấy danh sách lỗi validation
