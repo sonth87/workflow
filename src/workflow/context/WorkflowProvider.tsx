@@ -9,14 +9,16 @@ import {
   useEffect,
   useLayoutEffect,
   useState,
-  useRef,
   type ReactNode,
 } from "react";
 import { pluginManager, type Plugin } from "@/core/plugins/PluginManager";
 import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
 import { LanguageProvider, useLanguageContext } from "./LanguageContext";
 import { useLanguage } from "../hooks/useLanguage";
+import { useAvailableLanguages } from "../hooks/useAvailableLanguages";
 import type { UITranslations } from "../translations/ui.translations";
+import { useWorkflowStore } from "@/core/store/workflowStore";
+import { useTheme } from "@/hooks/useTheme";
 
 interface WorkflowContextValue {
   isInitialized: boolean;
@@ -82,6 +84,9 @@ function WorkflowProviderInner({
   const [error, setError] = useState<Error | null>(null);
   const { setLanguage } = useLanguage();
   const { language } = useLanguageContext();
+  const availableLanguages = useAvailableLanguages();
+  const store = useWorkflowStore();
+  const theme = useTheme();
 
   const {
     enableDefaultPlugin = true,
@@ -93,27 +98,46 @@ function WorkflowProviderInner({
   // Register language setter for SDK access immediately (before paint)
   useLayoutEffect(() => {
     if (typeof window !== "undefined") {
-      const win = window as any;
+      const win = window as Window & {
+        __BPM_CORE_INSTANCE__?: unknown;
+        __BPM_CORE_ON_READY__?: (() => void) | null;
+      };
       if (win.__BPM_CORE_INSTANCE__) {
-        win.__BPM_CORE_INSTANCE__._registerLanguageSetter(
-          setLanguage,
-          language
+        const instance = win.__BPM_CORE_INSTANCE__ as {
+          _registerLanguageSetter: (
+            setter: (lang: string) => void,
+            currentLang: string
+          ) => void;
+          _registerLanguagesGetter: (getter: () => string[]) => void;
+          _registerStoreGetter: (getter: () => unknown) => void;
+          _registerThemeGetter: (getter: () => unknown) => void;
+          _registerThemeSetter: (setter: (theme: string) => void) => void;
+        };
+
+        instance._registerLanguageSetter(setLanguage, language);
+        instance._registerLanguagesGetter(() => availableLanguages);
+        instance._registerStoreGetter(() => store);
+        instance._registerThemeGetter(() => theme);
+        instance._registerThemeSetter((newTheme: string) =>
+          theme.setTheme(newTheme as "light" | "dark" | "system")
         );
 
-        // Call onReady callback after language setter is registered
+        // Call onReady callback after all registrations
         if (typeof win.__BPM_CORE_ON_READY__ === "function") {
           const onReadyCallback = win.__BPM_CORE_ON_READY__;
-          win.__BPM_CORE_ON_READY__ = null; // Clear to prevent multiple calls
+          win.__BPM_CORE_ON_READY__ = null;
           onReadyCallback();
         }
       }
     }
-  }, [setLanguage, language]);
+  }, [setLanguage, language, availableLanguages, store, theme]);
 
   // Sync current language to BPMCore instance whenever language changes
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const win = window as any;
+      const win = window as Window & {
+        __BPM_CORE_INSTANCE__?: { _setCurrentLanguage: (lang: string) => void };
+      };
       if (win.__BPM_CORE_INSTANCE__ && language) {
         win.__BPM_CORE_INSTANCE__._setCurrentLanguage(language);
       }
@@ -198,7 +222,7 @@ export function WorkflowProvider({
 }: WorkflowProviderProps) {
   return (
     <LanguageProvider
-      defaultLanguage={pluginOptions.languageConfig?.defaultLanguage || "vi"}
+      defaultLanguage={pluginOptions.languageConfig?.defaultLanguage || "en"}
       uiTranslations={pluginOptions.languageConfig?.uiTranslations}
     >
       <WorkflowProviderInner pluginOptions={pluginOptions}>

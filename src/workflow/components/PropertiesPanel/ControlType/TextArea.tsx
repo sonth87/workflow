@@ -24,10 +24,12 @@ export function TextAreaControl({
   const hasError = errors.length > 0;
   const { getText } = useLanguage();
 
+  // Convert multilingual value to string
+  const displayValue = getText(value as any) || "";
   return (
     <div className="space-y-1.5">
       <Textarea
-        value={(value as string) || ""}
+        value={displayValue}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
           onChange(e.target.value)
         }

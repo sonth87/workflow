@@ -18,8 +18,27 @@ export interface WorkflowData {
 }
 
 export function useWorkflowImportExport() {
-  const { nodes, edges, setNodes, setEdges, clearWorkflow } =
-    useWorkflowStore();
+  const {
+    nodes,
+    edges,
+    setNodes,
+    setEdges,
+    clearWorkflow,
+    workflowName,
+    workflowDescription,
+  } = useWorkflowStore();
+
+  /**
+   * View current workflow data
+   */
+  const viewWorkflow = useCallback(() => {
+    return {
+      nodes,
+      edges,
+      workflowName,
+      workflowDescription,
+    };
+  }, [nodes, edges, workflowName, workflowDescription]);
 
   /**
    * Export workflow data as JSON
@@ -117,6 +136,7 @@ export function useWorkflowImportExport() {
   }, [importWorkflow]);
 
   return {
+    viewWorkflow,
     exportWorkflow,
     downloadWorkflow,
     importWorkflow,

@@ -60,7 +60,7 @@ interface LanguageProviderProps {
 
 export function LanguageProvider({
   children,
-  defaultLanguage = "vi",
+  defaultLanguage = "en",
   uiTranslations = DEFAULT_UI_TRANSLATIONS,
 }: LanguageProviderProps) {
   const [language, setLanguageState] = useState<LanguageType>(() => {

@@ -105,19 +105,19 @@ CustomNodeFactory.registerFromConfig(nodeConfig);
 {
   "id": "string (required)",
   "name": "string (required)",
-  "label": "string (required)",
+  "label": "string OR MultilingualText (required)",
   "type": "text|number|textarea|boolean|select|multiselect|color|json|date|slider (required)",
   "required": boolean,
   "defaultValue": any,
-  "placeholder": "string",
-  "description": "string",
+  "placeholder": "string OR MultilingualText",
+  "description": "string OR MultilingualText",
   "group": "string",
   "order": number,
   "options": [
     {
-      "label": "string",
+      "label": "string OR MultilingualText",
       "value": "string|number|boolean",
-      "description": "string",
+      "description": "string OR MultilingualText",
       "disabled": boolean
     }
   ],
@@ -127,17 +127,40 @@ CustomNodeFactory.registerFromConfig(nodeConfig);
     "max": number,
     "minLength": number,
     "maxLength": number,
-    "message": "string"
+    "message": "string OR MultilingualText"
   }
 }
 ```
+
+### MultilingualText Format
+
+All text fields (`label`, `placeholder`, `description`, `name`) support multilingual format:
+
+```json
+// Simple string (works, but not translatable)
+"label": "Email Address"
+
+// Multilingual object (recommended)
+"label": {
+  "en": "Email Address",
+  "vi": "Địa chỉ Email",
+  "fr": "Adresse e-mail"
+}
+```
+
+**Requirements:**
+
+- Must include at least the `"en"` (English) key
+- Can include any language codes you need
+- The system automatically detects and displays available languages
+- Falls back to English if the current language is not available
 
 ### Context Menu Item
 
 ```json
 {
   "id": "string (required)",
-  "label": "string (required)",
+  "label": "string OR MultilingualText (required)",
   "icon": "string (lucide icon name)",
   "action": {
     "type": "event|function|navigate|modal|api",
@@ -304,6 +327,230 @@ You can subscribe to these events in your custom nodes:
 
 - Use `custom:*` namespace for your custom events
 - Example: `custom:email-sent`, `custom:api-called`
+
+## 🌍 Multilingual Support
+
+### Overview
+
+All text fields in JSON configurations support multilingual format. This allows your nodes to automatically adapt to the user's selected language.
+
+### Supported Fields
+
+The following fields support multilingual text:
+
+- Node `name` and `description`
+- Plugin metadata `name` and `description`
+- Category `name` and `description`
+- Property `label`, `placeholder`, `description`
+- Property option `label` and `description`
+- Validation `message`
+- Context menu `label`
+- Property group `label` and `description`
+
+### Basic Usage
+
+Instead of a simple string, provide an object with language codes as keys:
+
+```json
+{
+  "name": {
+    "en": "Send Email",
+    "vi": "Gửi Email",
+    "fr": "Envoyer un e-mail",
+    "de": "E-Mail senden"
+  }
+}
+```
+
+### Complete Multilingual Example
+
+```json
+{
+  "id": "customNotification",
+  "extends": "task",
+  "name": {
+    "en": "Custom Notification",
+    "vi": "Thông báo tùy chỉnh",
+    "fr": "Notification personnalisée"
+  },
+  "description": {
+    "en": "Send customized notifications to users",
+    "vi": "Gửi thông báo tùy chỉnh cho người dùng",
+    "fr": "Envoyer des notifications personnalisées aux utilisateurs"
+  },
+  "properties": [
+    {
+      "id": "recipient",
+      "name": "recipient",
+      "label": {
+        "en": "Recipient",
+        "vi": "Người nhận",
+        "fr": "Destinataire"
+      },
+      "type": "text",
+      "required": true,
+      "placeholder": {
+        "en": "Enter recipient email",
+        "vi": "Nhập email người nhận",
+        "fr": "Entrez l'e-mail du destinataire"
+      },
+      "description": {
+        "en": "Email address of the recipient",
+        "vi": "Địa chỉ email của người nhận",
+        "fr": "Adresse e-mail du destinataire"
+      }
+    },
+    {
+      "id": "type",
+      "name": "type",
+      "label": {
+        "en": "Notification Type",
+        "vi": "Loại thông báo",
+        "fr": "Type de notification"
+      },
+      "type": "select",
+      "options": [
+        {
+          "label": {
+            "en": "Email",
+            "vi": "Email",
+            "fr": "E-mail"
+          },
+          "value": "email"
+        },
+        {
+          "label": {
+            "en": "SMS",
+            "vi": "Tin nhắn",
+            "fr": "SMS"
+          },
+          "value": "sms"
+        }
+      ]
+    }
+  ],
+  "propertyGroups": [
+    {
+      "id": "recipient-info",
+      "label": {
+        "en": "Recipient Information",
+        "vi": "Thông tin người nhận",
+        "fr": "Informations sur le destinataire"
+      }
+    }
+  ],
+  "contextMenuItems": [
+    {
+      "id": "test-notification",
+      "label": {
+        "en": "Send Test Notification",
+        "vi": "Gửi thông báo thử",
+        "fr": "Envoyer une notification de test"
+      },
+      "icon": "Send"
+    }
+  ]
+}
+```
+
+### Migration Helper
+
+If you have existing JSON configs with English-only strings, here's a helper function to convert them:
+
+```javascript
+function convertToMultilingual(config, targetLanguages = ["en"]) {
+  // Helper to wrap string in multilingual object
+  function wrapText(text) {
+    if (typeof text !== "string") return text;
+    const result = {};
+    targetLanguages.forEach(lang => {
+      result[lang] = text; // You can translate these manually later
+    });
+    return result;
+  }
+
+  // Convert node name and description
+  if (config.name) config.name = wrapText(config.name);
+  if (config.description) config.description = wrapText(config.description);
+
+  // Convert properties
+  if (config.properties) {
+    config.properties.forEach(prop => {
+      if (prop.label) prop.label = wrapText(prop.label);
+      if (prop.placeholder) prop.placeholder = wrapText(prop.placeholder);
+      if (prop.description) prop.description = wrapText(prop.description);
+
+      // Convert options
+      if (prop.options) {
+        prop.options.forEach(opt => {
+          if (opt.label) opt.label = wrapText(opt.label);
+          if (opt.description) opt.description = wrapText(opt.description);
+        });
+      }
+    });
+  }
+
+  // Convert property groups
+  if (config.propertyGroups) {
+    config.propertyGroups.forEach(group => {
+      if (group.label) group.label = wrapText(group.label);
+      if (group.description) group.description = wrapText(group.description);
+    });
+  }
+
+  // Convert context menu items
+  if (config.contextMenuItems) {
+    config.contextMenuItems.forEach(item => {
+      if (item.label) item.label = wrapText(item.label);
+    });
+  }
+
+  return config;
+}
+
+// Usage
+const oldConfig = {
+  name: "Send Email",
+  description: "Send email notification",
+  properties: [{ id: "to", label: "To", type: "text" }],
+};
+
+const newConfig = convertToMultilingual(oldConfig, ["en", "vi", "fr"]);
+console.log(JSON.stringify(newConfig, null, 2));
+```
+
+### Best Practices
+
+1. **Always include English**: The `en` key is required as a fallback
+2. **Be consistent**: Use the same language codes across all your configs
+3. **Keep it concise**: Translations should fit in the UI comfortably
+4. **Use native speakers**: Get proper translations from native speakers
+5. **Test thoroughly**: Switch between languages to ensure all text displays correctly
+
+### Fallback Behavior
+
+The system uses this fallback chain:
+
+1. Current selected language (e.g., `fr`)
+2. English (`en`)
+3. First available language in the object
+4. The multilingual object itself (as last resort)
+
+Example:
+
+```json
+{
+  "label": {
+    "en": "Submit",
+    "vi": "Gửi",
+    "fr": "Soumettre"
+  }
+}
+```
+
+- User selects `fr` → displays "Soumettre"
+- User selects `de` (not available) → displays "Submit" (fallback to `en`)
+- User selects language before any node loads → displays "Submit"
 
 ## Best Practices
 

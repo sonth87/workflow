@@ -11,6 +11,11 @@ import type {
 } from "./workflow";
 import { CustomNodeFactory, PluginJSONLoader, globalEventBus } from "./core";
 import type { CustomNodeJSON, PluginJSON } from "./core";
+import type {
+  WorkflowState,
+  WorkflowActions,
+} from "./core/store/workflowStore";
+import type { BaseNodeConfig, BaseEdgeConfig } from "./core/types/base.types";
 import type { UITranslations } from "./workflow/translations/ui.translations";
 
 const WorkflowBuilder = WorkflowModule.default;
@@ -44,7 +49,13 @@ class BPMCore {
   private config: BPMConfig;
   public eventBus: typeof globalEventBus;
   private languageSetter: ((language: string) => void) | null = null;
+  private languagesGetter: (() => string[]) | null = null;
   private currentLanguage: string = "en";
+  private storeGetter: (() => WorkflowState & WorkflowActions) | null = null;
+  private themeGetter:
+    | (() => { theme: string; setTheme: (theme: string) => void })
+    | null = null;
+  private themeSetter: ((theme: string) => void) | null = null;
 
   constructor(config: BPMConfig) {
     this.config = {
@@ -115,7 +126,10 @@ class BPMCore {
       if (typeof this.config.onReady === "function") {
         // Register this instance globally for language setter callback
         if (typeof window !== "undefined") {
-          const win = window as any;
+          const win = window as Window & {
+            __BPM_CORE_INSTANCE__?: BPMCore;
+            __BPM_CORE_ON_READY__?: (() => void) | null;
+          };
           win.__BPM_CORE_INSTANCE__ = this;
           // Store onReady callback to be called from WorkflowProvider after language setter is registered
           win.__BPM_CORE_ON_READY__ = this.config.onReady;
@@ -123,7 +137,7 @@ class BPMCore {
       } else {
         // If no onReady callback, still register instance
         if (typeof window !== "undefined") {
-          const win = window as any;
+          const win = window as Window & { __BPM_CORE_INSTANCE__?: BPMCore };
           win.__BPM_CORE_INSTANCE__ = this;
         }
       }
@@ -179,11 +193,14 @@ class BPMCore {
     }
   }
 
-  on(event: string, handler: (event: any) => void) {
+  on(
+    event: string,
+    handler: (event: { type: string; payload?: unknown }) => void
+  ) {
     return this.eventBus.on(event, handler);
   }
 
-  emit(event: string, payload?: any) {
+  emit(event: string, payload?: unknown) {
     this.eventBus.emit(event, payload);
   }
 
@@ -216,6 +233,16 @@ class BPMCore {
     }
   }
 
+  getAvailableLanguages(): string[] {
+    if (this.languagesGetter) {
+      return this.languagesGetter();
+    }
+    console.warn(
+      `[BPM SDK] Languages getter not registered yet, returning defaults`
+    );
+    return ["en", "vi"];
+  }
+
   _registerLanguageSetter(
     setter: (language: string) => void,
     currentLanguage?: string
@@ -230,8 +257,260 @@ class BPMCore {
     }
   }
 
+  _registerLanguagesGetter(getter: () => string[]) {
+    this.languagesGetter = getter;
+  }
+
   _setCurrentLanguage(language: string) {
     this.currentLanguage = language;
+  }
+
+  _registerStoreGetter(getter: () => WorkflowState & WorkflowActions) {
+    this.storeGetter = getter;
+  }
+
+  _registerThemeGetter(
+    getter: () => { theme: string; setTheme: (theme: string) => void }
+  ) {
+    this.themeGetter = getter;
+  }
+
+  _registerThemeSetter(setter: (theme: string) => void) {
+    this.themeSetter = setter;
+  }
+
+  // ========== History Methods ==========
+  undo() {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      if (store && typeof store.undo === "function") {
+        store.undo();
+      }
+    }
+  }
+
+  redo() {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      if (store && typeof store.redo === "function") {
+        store.redo();
+      }
+    }
+  }
+
+  canUndo(): boolean {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      if (store && store.history) {
+        return store.history.past.length > 0;
+      }
+    }
+    return false;
+  }
+
+  canRedo(): boolean {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      if (store && store.history) {
+        return store.history.future.length > 0;
+      }
+    }
+    return false;
+  }
+
+  // ========== Theme Methods ==========
+  getTheme(): string {
+    if (this.themeGetter) {
+      const theme = this.themeGetter();
+      return theme?.theme || "system";
+    }
+    return "system";
+  }
+
+  setTheme(theme: "light" | "dark" | "system") {
+    if (this.themeSetter) {
+      this.themeSetter(theme);
+    }
+  }
+
+  setLightMode() {
+    this.setTheme("light");
+  }
+
+  setDarkMode() {
+    this.setTheme("dark");
+  }
+
+  setSystemMode() {
+    this.setTheme("system");
+  }
+
+  toggleTheme() {
+    const current = this.getTheme();
+    if (current === "light") this.setDarkMode();
+    else if (current === "dark") this.setSystemMode();
+    else this.setLightMode();
+  }
+
+  // ========== Workflow State Methods ==========
+  getWorkflow() {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      if (store) {
+        return {
+          nodes: store.nodes || [],
+          edges: store.edges || [],
+          workflowName: store.workflowName || "Untitled Workflow",
+          workflowDescription: store.workflowDescription || "",
+        };
+      }
+    }
+    return { nodes: [], edges: [], workflowName: "", workflowDescription: "" };
+  }
+
+  getNodes() {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      return store?.nodes || [];
+    }
+    return [];
+  }
+
+  getEdges() {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      return store?.edges || [];
+    }
+    return [];
+  }
+
+  clearWorkflow() {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      if (store && typeof store.clearWorkflow === "function") {
+        store.clearWorkflow();
+      }
+    }
+  }
+
+  // ========== Import/Export Methods ==========
+  importWorkflow(data: {
+    nodes?: BaseNodeConfig[];
+    edges?: BaseEdgeConfig[];
+    metadata?: { name?: string; description?: string };
+    workflowName?: string;
+    workflowDescription?: string;
+  }) {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      if (store && typeof store.loadWorkflow === "function") {
+        store.loadWorkflow({
+          nodes: data.nodes || [],
+          edges: data.edges || [],
+          workflowName: data.metadata?.name || data.workflowName,
+          workflowDescription:
+            data.metadata?.description || data.workflowDescription,
+        });
+      }
+    }
+  }
+
+  exportWorkflow(includeMetadata = true) {
+    const workflow = this.getWorkflow();
+    const data: {
+      nodes: unknown[];
+      edges: unknown[];
+      metadata?: {
+        name: string;
+        description: string;
+        version: string;
+        exportedAt: string;
+      };
+    } = {
+      nodes: workflow.nodes,
+      edges: workflow.edges,
+    };
+
+    if (includeMetadata) {
+      data.metadata = {
+        name: workflow.workflowName,
+        description: workflow.workflowDescription,
+        version: "1.0.0",
+        exportedAt: new Date().toISOString(),
+      };
+    }
+
+    return data;
+  }
+
+  downloadWorkflow(filename = "workflow.json") {
+    const data = this.exportWorkflow();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  uploadWorkflow(): Promise<unknown> {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+
+      input.onchange = async (e: Event) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) {
+          reject(new Error("No file selected"));
+          return;
+        }
+
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          this.importWorkflow(data);
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      input.click();
+    });
+  }
+
+  viewWorkflow() {
+    return this.getWorkflow();
+  }
+
+  // ========== Validation Methods ==========
+  getValidationErrors() {
+    if (this.storeGetter) {
+      const store = this.storeGetter();
+      return store?.validationErrors || [];
+    }
+    return [];
+  }
+
+  hasErrors(): boolean {
+    return this.getValidationErrors().length > 0;
+  }
+
+  async validate() {
+    // Trigger validation via event bus
+    this.eventBus.emit("workflow:validate", {});
+    // Wait a bit for validation to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return {
+      valid: !this.hasErrors(),
+      errors: this.getValidationErrors(),
+    };
   }
 
   update(config: Partial<BPMConfig>) {

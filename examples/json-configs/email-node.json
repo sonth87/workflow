@@ -2,8 +2,14 @@
   {
     "id": "sendEmailTask",
     "extends": "task",
-    "name": "Send Email",
-    "description": "Send email notification to specified recipients",
+    "name": {
+      "en": "Send Email",
+      "vi": "Gửi Email"
+    },
+    "description": {
+      "en": "Send email notification to specified recipients",
+      "vi": "Gửi thông báo email đến người nhận được chỉ định"
+    },
     "icon": {
       "type": "lucide",
       "value": "Mail",
