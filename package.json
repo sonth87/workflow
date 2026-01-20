@@ -12,6 +12,11 @@
       "import": "./lib-dist/bpm-core.es.js",
       "require": "./lib-dist/bpm-core.cjs.js"
     },
+    "./i18n": {
+      "types": "./lib-dist/workflow/i18n.d.ts",
+      "import": "./lib-dist/bpm-core.es.js",
+      "require": "./lib-dist/bpm-core.cjs.js"
+    },
     "./styles": "./lib-dist/bpm-core.css"
   },
   "files": [

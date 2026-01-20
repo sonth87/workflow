@@ -56,6 +56,18 @@ export {
 export { WorkflowProvider } from "./workflow/context/WorkflowProvider";
 export { WorkflowActionsProvider } from "./workflow/context/WorkflowActionsProvider";
 
+// ==================== i18n / Internationalization ====================
+export {
+  LanguageProvider,
+  useLanguageContext,
+  type LanguageType,
+} from "./workflow/context/LanguageContext";
+export {
+  DEFAULT_UI_TRANSLATIONS,
+  type UITranslations,
+} from "./workflow/translations/ui.translations";
+export { LanguageSwitcher } from "./workflow/components/LanguageSwitcher";
+
 // ==================== Utils ====================
 export { cx } from "./utils/cx";
 export { getNestedValue } from "./utils/nested-value";
