@@ -197,7 +197,7 @@ export function Toolbox({ className }: ToolboxProps) {
           <button
             onClick={() => setToolboxState("collapsed")}
             className="p-2 rounded-lg hover:bg-foreground/10 transition-colors"
-            title={getUIText("toolbox.expandToolbox")}
+            title={getUIText("ui.toolbox.expandToolbox")}
           >
             <ChevronDown size={16} />
           </button>
@@ -319,12 +319,12 @@ export function Toolbox({ className }: ToolboxProps) {
         <>
           <div className="flex items-center justify-between px-4 py-4">
             <h1 className="text-lg font-semibold text-ink800">
-              {getUIText("toolbox.toolbox")}
+              {getUIText("ui.toolbox.toolbox")}
             </h1>
             <button
               onClick={() => setToolboxState("collapsed")}
               className="p-2 rounded-lg hover:bg-foreground/10 transition-colors"
-              title={getUIText("toolbox.collapseToolbox")}
+              title={getUIText("ui.toolbox.collapseToolbox")}
             >
               <PanelRight size={16} />
             </button>

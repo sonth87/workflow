@@ -41,7 +41,12 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
       data: {
         ...defaultConfig.data,
         ...overrides?.data,
-        label: item.name || overrides?.data?.label || "New Node",
+        // Use metadata.title (translation key) instead of item.name (English text)
+        label:
+          defaultConfig.metadata?.title ||
+          item.name ||
+          overrides?.data?.label ||
+          "New Node",
         // Pass metadata into data so it's accessible in React components
         metadata: {
           ...defaultConfig.metadata,
@@ -59,7 +64,12 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
       properties: {
         ...defaultConfig.properties,
         ...overrides?.properties,
-        label: item.name || overrides?.properties?.label || "New Node",
+        // Use metadata.title (translation key) for properties label as well
+        label:
+          defaultConfig.metadata?.title ||
+          item.name ||
+          overrides?.properties?.label ||
+          "New Node",
       },
     } as BaseNodeConfig;
   }

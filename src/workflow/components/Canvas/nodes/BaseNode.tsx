@@ -150,7 +150,9 @@ export default function BaseNode(props: Props) {
                 layoutDirection === "vertical",
             })}
           >
-            <div className="truncate w-full">{getText(data?.label)}</div>
+            <div className="truncate w-full">
+              {getText(metadata.title || data?.label)}
+            </div>
             {metadata?.description && (
               <div className="text-muted-foreground line-clamp-3 mt-1 text-xs font-normal w-40">
                 {getText(metadata.description)}

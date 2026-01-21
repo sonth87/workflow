@@ -67,7 +67,7 @@ export function Toolbar({
   return (
     <footer className="flex items-center justify-center gap-1 rounded-lg bg-card p-2 shadow-md border border-border">
       <button
-        title={getUIText("toolbar.selectTool")}
+        title={getUIText("ui.toolbar.selectTool")}
         onClick={() => onPanModeChange?.(false)}
         className={`rounded p-2 transition-colors ${
           !isPanMode
@@ -79,7 +79,7 @@ export function Toolbar({
       </button>
 
       <button
-        title={getUIText("toolbar.handTool")}
+        title={getUIText("ui.toolbar.handTool")}
         onClick={() => onPanModeChange?.(true)}
         className={`rounded p-2 transition-colors ${
           isPanMode
@@ -94,7 +94,7 @@ export function Toolbar({
 
       <button
         onClick={handleZoomOut}
-        title={getUIText("toolbar.zoomOut")}
+        title={getUIText("ui.toolbar.zoomOut")}
         className="rounded p-2 hover:bg-muted transition-colors"
       >
         <Minus size={18} className="text-foreground" />
@@ -106,20 +106,20 @@ export function Toolbar({
 
       <button
         onClick={handleZoomIn}
-        title={getUIText("toolbar.zoomIn")}
+        title={getUIText("ui.toolbar.zoomIn")}
         className="rounded p-2 hover:bg-muted transition-colors"
       >
         <Plus size={18} className="text-foreground" />
       </button>
 
       <Tooltip
-        content={getUIText("toolbar.resetView")}
+        content={getUIText("ui.toolbar.resetView")}
         delayDuration={0}
         sideOffset={4}
       >
         <button
           onClick={handleFitView}
-          title={getUIText("toolbar.resetView")}
+          title={getUIText("ui.toolbar.resetView")}
           className="rounded p-2 hover:bg-muted transition-colors"
         >
           <RefreshCcw size={18} className="text-foreground" />
@@ -129,13 +129,13 @@ export function Toolbar({
       <div className="h-6 w-px bg-border" />
 
       <Tooltip
-        content={getUIText("toolbar.fullscreen")}
+        content={getUIText("ui.toolbar.fullscreen")}
         delayDuration={0}
         sideOffset={4}
       >
         <button
           onClick={toggleFullscreen}
-          title={getUIText("toolbar.fullscreen")}
+          title={getUIText("ui.toolbar.fullscreen")}
           className="rounded p-2 hover:bg-muted transition-colors"
         >
           <Maximize size={18} className="text-foreground" />
@@ -145,7 +145,7 @@ export function Toolbar({
       <Popover
         trigger={
           <button
-            title={getUIText("toolbar.moreOptions")}
+            title={getUIText("ui.toolbar.moreOptions")}
             className="rounded p-2 hover:bg-muted transition-colors"
           >
             <Menu size={18} />
@@ -155,12 +155,12 @@ export function Toolbar({
         content={
           <Command className="rounded-lg border shadow-md min-w-40">
             <Command.List>
-              <Command.Group heading={getUIText("toolbar.options")}>
+              <Command.Group heading={getUIText("ui.toolbar.options")}>
                 <Command.Item
                   onSelect={() => onMinimapToggle?.(!showMinimap)}
                   className="flex justify-between"
                 >
-                  <span>{getUIText("toolbar.minimap")}</span>
+                  <span>{getUIText("ui.toolbar.minimap")}</span>
                   {showMinimap && (
                     <span>
                       <Check />
