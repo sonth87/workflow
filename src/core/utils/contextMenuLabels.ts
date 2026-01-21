@@ -14,51 +14,62 @@
  */
 
 export const contextMenuLabels = {
-  resetColor: { en: "Reset Color", vi: "Đặt lại màu" },
-  changeColor: { en: "Change Color", vi: "Đổi màu" },
-  delete: { en: "Delete", vi: "Xóa" },
-  changeType: { en: "Change Type", vi: "Đổi loại" },
-  startType: { en: "Start Type", vi: "Loại bắt đầu" },
-  taskType: { en: "Task Type", vi: "Loại nhiệm vụ" },
-  gatewayType: { en: "Gateway Type", vi: "Loại cổng" },
-  immediateType: { en: "Immediate Type", vi: "Loại tức thì" },
-  endType: { en: "End Type", vi: "Loại kết thúc" },
-  properties: { en: "Properties", vi: "Thuộc tính" },
-  appearance: { en: "Appearance", vi: "Giao diện" },
-  borderStyle: { en: "Border Style", vi: "Kiểu đường viền" },
-  duplicate: { en: "Duplicate", vi: "Sao chép" },
-  bezierCurved: { en: "Bezier (Curved)", vi: "Bezier (Cong)" },
-  straight: { en: "Straight", vi: "Thẳng" },
-  step: { en: "Step", vi: "Bước" },
-  solid: { en: "Solid", vi: "Liền" },
-  dashed: { en: "Dashed", vi: "Đứt đoạn" },
-  dotted: { en: "Dotted", vi: "Chấm" },
-  double: { en: "Double", vi: "Đôi" },
-  enable: { en: "Enable", vi: "Bật" },
-  disable: { en: "Disable", vi: "Tắt" },
-  labelAtStart: { en: "Label at Start", vi: "Nhãn ở đầu" },
-  labelAtCenter: { en: "Label at Center", vi: "Nhãn ở giữa" },
-  labelAtEnd: { en: "Label at End", vi: "Nhãn ở cuối" },
-  pathType: { en: "Path Type", vi: "Loại đường dẫn" },
-  pathStyle: { en: "Path Style", vi: "Kiểu đường dẫn" },
-  animation: { en: "Animation", vi: "Hiệu ứng" },
-  addLabel: { en: "Add Label", vi: "Thêm nhãn" },
-  yellow: { en: "Yellow", vi: "Vàng" },
-  blue: { en: "Blue", vi: "Xanh" },
-  green: { en: "Green", vi: "Xanh lá" },
-  pink: { en: "Pink", vi: "Hồng" },
-  purple: { en: "Purple", vi: "Tím" },
-  orange: { en: "Orange", vi: "Cam" },
-  gray: { en: "Gray", vi: "Xám" },
+  resetColor: "common.contextMenu.resetColor",
+  changeColor: "common.contextMenu.changeColor",
+  delete: "common.contextMenu.delete",
+  changeType: "common.contextMenu.changeType",
+  startType: "common.contextMenu.startType",
+  taskType: "common.contextMenu.taskType",
+  gatewayType: "common.contextMenu.gatewayType",
+  immediateType: "common.contextMenu.immediateType",
+  endType: "common.contextMenu.endType",
+  properties: "common.contextMenu.properties",
+  appearance: "common.contextMenu.appearance",
+  borderStyle: "common.contextMenu.borderStyle",
+  duplicate: "common.contextMenu.duplicate",
+  bezierCurved: "common.contextMenu.bezierCurved",
+  straight: "common.contextMenu.straight",
+  step: "common.contextMenu.step",
+  solid: "common.contextMenu.solid",
+  dashed: "common.contextMenu.dashed",
+  dotted: "common.contextMenu.dotted",
+  double: "common.contextMenu.double",
+  enable: "common.contextMenu.enable",
+  disable: "common.contextMenu.disable",
+  labelAtStart: "common.contextMenu.labelAtStart",
+  labelAtCenter: "common.contextMenu.labelAtCenter",
+  labelAtEnd: "common.contextMenu.labelAtEnd",
+  pathType: "common.contextMenu.pathType",
+  pathStyle: "common.contextMenu.pathStyle",
+  animation: "common.contextMenu.animation",
+  addLabel: "common.contextMenu.addLabel",
+  yellow: "common.contextMenu.yellow",
+  blue: "common.contextMenu.blue",
+  green: "common.contextMenu.green",
+  pink: "common.contextMenu.pink",
+  purple: "common.contextMenu.purple",
+  orange: "common.contextMenu.orange",
+  gray: "common.contextMenu.gray",
+  color: "common.contextMenu.color",
+  fontSize: "common.contextMenu.fontSize",
+  transparent: "common.contextMenu.transparent",
+  extraSmall: "common.contextMenu.extraSmall",
+  small: "common.contextMenu.small",
+  base: "common.contextMenu.base",
+  large: "common.contextMenu.large",
+  black: "common.contextMenu.black",
+  white: "common.contextMenu.white",
+  red: "common.contextMenu.red",
+  flipArrow: "common.contextMenu.flipArrow",
 };
 
 /**
- * Get a multilingual label object by key
+ * Get a translation key for context menu label
  * @param key - The key of the label
- * @returns Object with language codes as keys
+ * @returns Translation key string
  */
-export function getContextMenuLabel(key: keyof typeof contextMenuLabels): {
-  [key: string]: string;
-} {
-  return contextMenuLabels[key] || { en: key, vi: key };
+export function getContextMenuLabel(
+  key: keyof typeof contextMenuLabels
+): string {
+  return contextMenuLabels[key] || key;
 }

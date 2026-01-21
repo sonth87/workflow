@@ -47,6 +47,10 @@ import {
   Trash2,
 } from "lucide-react";
 
+// Import plugin translations
+import pluginTranslationsEn from "@/translations/plugins.en.json";
+import pluginTranslationsVi from "@/translations/plugins.vi.json";
+
 // ============================================
 // Default Node Configurations
 // ============================================
@@ -113,67 +117,35 @@ const createCategory = (
 // ============================================
 
 const defaultCategories: PluginConfig["categories"] = [
-  createCategory(
-    CategoryType.START,
-    { en: "Start Events", vi: "Sự kiện bắt đầu" },
-    {
-      description: {
-        en: "Start events for workflows",
-        vi: "Các sự kiện bắt đầu workflow",
-      },
-      order: 1,
-    }
-  ),
-  createCategory(
-    CategoryType.TASK,
-    { en: "Tasks", vi: "Nhiệm vụ" },
-    {
-      description: {
-        en: "Task types in workflows",
-        vi: "Các loại nhiệm vụ trong workflow",
-      },
-      order: 2,
-    }
-  ),
-  createCategory(
-    CategoryType.GATEWAY,
-    { en: "Gateways", vi: "Cổng quyết định" },
-    {
-      description: {
-        en: "Decision points in workflows",
-        vi: "Các điểm quyết định trong workflow",
-      },
-      order: 3,
-    }
-  ),
-  createCategory(
-    CategoryType.END,
-    { en: "End Events", vi: "Sự kiện kết thúc" },
-    {
-      description: {
-        en: "Workflow end events",
-        vi: "Các sự kiện kết thúc workflow",
-      },
-      order: 4,
-    }
-  ),
+  createCategory(CategoryType.START, "plugin.default.category.start.name", {
+    description: "plugin.default.category.start.description",
+    order: 1,
+  }),
+  createCategory(CategoryType.TASK, "plugin.default.category.task.name", {
+    description: "plugin.default.category.task.description",
+    order: 2,
+  }),
+  createCategory(CategoryType.GATEWAY, "plugin.default.category.gateway.name", {
+    description: "plugin.default.category.gateway.description",
+    order: 3,
+  }),
+  createCategory(CategoryType.END, "plugin.default.category.end.name", {
+    description: "plugin.default.category.end.description",
+    order: 4,
+  }),
   createCategory(
     CategoryType.IMMEDIATE,
-    { en: "Immediate", vi: "Tức thì" },
+    "plugin.default.category.immediate.name",
     {
-      description: { en: "Immediate events", vi: "Các sự kiện tức thì" },
+      description: "plugin.default.category.immediate.description",
       order: 5,
       separator: { show: true, style: "line", color: "#e5e7eb" },
     }
   ),
-  createCategory(
-    CategoryType.OTHER,
-    { en: "Other", vi: "Khác" },
-    {
-      description: { en: "Other nodes", vi: "Các nodes khác" },
-      order: 6,
-    }
-  ),
+  createCategory(CategoryType.OTHER, "plugin.default.category.other.name", {
+    description: "plugin.default.category.other.description",
+    order: 6,
+  }),
 ];
 
 const defaultNodes: PluginConfig["nodes"] = [
@@ -187,11 +159,8 @@ const defaultNodes: PluginConfig["nodes"] = [
         NodeType.START_EVENT_DEFAULT,
         CategoryType.START,
         {
-          title: { en: "Start Event", vi: "Sự kiện bắt đầu" },
-          description: {
-            en: "Workflow start point",
-            vi: "Điểm bắt đầu của workflow",
-          },
+          title: "plugin.default.startEventDefault.title",
+          description: "plugin.default.startEventDefault.description",
         }
       ),
       icon: {
@@ -210,11 +179,8 @@ const defaultNodes: PluginConfig["nodes"] = [
       NodeType.START_EVENT_API,
       CategoryType.START,
       {
-        title: { en: "API Start Event", vi: "Sự kiện bắt đầu từ API" },
-        description: {
-          en: "Start workflow via API",
-          vi: "Bắt đầu workflow thông qua API",
-        },
+        title: "plugin.default.startEventApi.title",
+        description: "plugin.default.startEventApi.description",
       }
     ),
   },
@@ -226,14 +192,8 @@ const defaultNodes: PluginConfig["nodes"] = [
       NodeType.START_EVENT_TIMER,
       CategoryType.START,
       {
-        title: {
-          en: "Timer Start Event",
-          vi: "Sự kiện bắt đầu theo lịch biểu",
-        },
-        description: {
-          en: "Start workflow on schedule",
-          vi: "Bắt đầu workflow theo lịch biểu",
-        },
+        title: "plugin.default.startEventTimer.title",
+        description: "plugin.default.startEventTimer.description",
       }
     ),
   },
@@ -245,11 +205,8 @@ const defaultNodes: PluginConfig["nodes"] = [
       NodeType.START_EVENT_WEB,
       CategoryType.START,
       {
-        title: { en: "Web Start Event", vi: "Sự kiện bắt đầu từ web" },
-        description: {
-          en: "Start workflow from web",
-          vi: "Bắt đầu workflow từ web",
-        },
+        title: "plugin.default.startEventWeb.title",
+        description: "plugin.default.startEventWeb.description",
       }
     ),
   },
@@ -261,14 +218,8 @@ const defaultNodes: PluginConfig["nodes"] = [
       NodeType.START_EVENT_RECEIVE_SIGNAL,
       CategoryType.START,
       {
-        title: {
-          en: "Receive Signal Start Event",
-          vi: "Sự kiện bắt đầu khi nhận tín hiệu",
-        },
-        description: {
-          en: "Start workflow on signal receipt",
-          vi: "Bắt đầu workflow khi nhận được tín hiệu",
-        },
+        title: "plugin.default.startEventReceiveSignal.title",
+        description: "plugin.default.startEventReceiveSignal.description",
       }
     ),
   },
@@ -280,8 +231,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     name: "Task",
     config: {
       ...createDefaultNodeConfig(NodeType.TASK_DEFAULT, CategoryType.TASK, {
-        title: { en: "Task", vi: "Nhiệm vụ" },
-        description: { en: "Generic task", vi: "Nhiệm vụ chung" },
+        title: "plugin.default.taskDefault.title",
+        description: "plugin.default.taskDefault.description",
       }),
       icon: {
         type: "lucide",
@@ -296,11 +247,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     type: NodeType.TASK_USER,
     name: "User Task",
     config: createDefaultNodeConfig(NodeType.TASK_USER, CategoryType.TASK, {
-      title: { en: "User Task", vi: "Nhiệm vụ của người dùng" },
-      description: {
-        en: "Task requiring user interaction",
-        vi: "Nhiệm vụ yêu cầu tương tác với người dùng",
-      },
+      title: "plugin.default.taskUser.title",
+      description: "plugin.default.taskUser.description",
     }),
   },
   {
@@ -308,11 +256,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     type: NodeType.TASK_SYSTEM,
     name: "System Task",
     config: createDefaultNodeConfig(NodeType.TASK_SYSTEM, CategoryType.TASK, {
-      title: { en: "System Task", vi: "Nhiệm vụ hệ thống" },
-      description: {
-        en: "Automated system task",
-        vi: "Nhiệm vụ hệ thống tự động",
-      },
+      title: "plugin.default.taskSystem.title",
+      description: "plugin.default.taskSystem.description",
     }),
   },
   {
@@ -320,8 +265,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     type: NodeType.TASK_SCRIPT,
     name: "Script Task",
     config: createDefaultNodeConfig(NodeType.TASK_SCRIPT, CategoryType.TASK, {
-      title: { en: "Script Task", vi: "Nhiệm vụ tập lệnh" },
-      description: { en: "Execute script", vi: "Thực thi tập lệnh" },
+      title: "plugin.default.taskScript.title",
+      description: "plugin.default.taskScript.description",
     }),
   },
   {
@@ -329,11 +274,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     type: NodeType.SERVICE_TASK,
     name: "Service Task",
     config: createDefaultNodeConfig(NodeType.SERVICE_TASK, CategoryType.TASK, {
-      title: { en: "Service Task", vi: "Nhiệm vụ dịch vụ" },
-      description: {
-        en: "Service integration task",
-        vi: "Nhiệm vụ tích hợp dịch vụ",
-      },
+      title: "plugin.default.serviceTask.title",
+      description: "plugin.default.serviceTask.description",
     }),
   },
 
@@ -347,11 +289,8 @@ const defaultNodes: PluginConfig["nodes"] = [
         NodeType.EXCLUSIVE_GATEWAY,
         CategoryType.GATEWAY,
         {
-          title: { en: "Exclusive Gateway", vi: "Cổng độc quyền" },
-          description: {
-            en: "Choose one path (XOR)",
-            vi: "Chọn một đường dẫn (XOR)",
-          },
+          title: "plugin.default.exclusiveGateway.title",
+          description: "plugin.default.exclusiveGateway.description",
         }
       ),
       icon: {
@@ -370,11 +309,8 @@ const defaultNodes: PluginConfig["nodes"] = [
       NodeType.PARALLEL_GATEWAY,
       CategoryType.GATEWAY,
       {
-        title: { en: "Parallel Gateway", vi: "Cổng song song" },
-        description: {
-          en: "Execute all paths (AND)",
-          vi: "Thực thi tất cả các đường dẫn (AND)",
-        },
+        title: "plugin.default.parallelGateway.title",
+        description: "plugin.default.parallelGateway.description",
       }
     ),
   },
@@ -386,8 +322,8 @@ const defaultNodes: PluginConfig["nodes"] = [
       NodeType.EVENT_BASED_GATEWAY,
       CategoryType.GATEWAY,
       {
-        title: { en: "Event Based Gateway", vi: "Cổng dựa trên sự kiện" },
-        description: { en: "Wait for events", vi: "Chờ đợi các sự kiện" },
+        title: "plugin.default.eventBasedGateway.title",
+        description: "plugin.default.eventBasedGateway.description",
       }
     ),
   },
@@ -402,11 +338,8 @@ const defaultNodes: PluginConfig["nodes"] = [
         NodeType.IMMEDIATE_EMAIL,
         CategoryType.IMMEDIATE,
         {
-          title: { en: "Immediate Email", vi: "Email tức thì" },
-          description: {
-            en: "Trigger immediately based on email",
-            vi: "Kích hoạt tức thì dựa trên email",
-          },
+          title: "plugin.default.immediateEmail.title",
+          description: "plugin.default.immediateEmail.description",
         },
         BaseNodeType.IMMEDIATE // Tự động lấy visual config từ base IMMEDIATE
       ),
@@ -425,14 +358,8 @@ const defaultNodes: PluginConfig["nodes"] = [
         NodeType.IMMEDIATE_RECEIVE_MESSAGE,
         CategoryType.IMMEDIATE,
         {
-          title: {
-            en: "Immediate Receive Message",
-            vi: "Nhận tin nhắn tức thì",
-          },
-          description: {
-            en: "Trigger immediately based on received message",
-            vi: "Kích hoạt tức thì khi nhận được tin nhắn",
-          },
+          title: "plugin.default.immediateReceiveMessage.title",
+          description: "plugin.default.immediateReceiveMessage.description",
         },
         BaseNodeType.IMMEDIATE
       ),
@@ -451,11 +378,8 @@ const defaultNodes: PluginConfig["nodes"] = [
         NodeType.IMMEDIATE_TIMER,
         CategoryType.IMMEDIATE,
         {
-          title: { en: "Immediate Timer", vi: "Bộ định thời tức thì" },
-          description: {
-            en: "Trigger immediately based on timer",
-            vi: "Kích hoạt tức thì dựa trên bộ định thời",
-          },
+          title: "plugin.default.immediateTimer.title",
+          description: "plugin.default.immediateTimer.description",
         },
         BaseNodeType.IMMEDIATE
       ),
@@ -474,11 +398,8 @@ const defaultNodes: PluginConfig["nodes"] = [
         NodeType.IMMEDIATE_SIGNAL,
         CategoryType.IMMEDIATE,
         {
-          title: { en: "Immediate Signal", vi: "Tín hiệu tức thì" },
-          description: {
-            en: "Trigger immediately based on signal",
-            vi: "Kích hoạt tức thì dựa trên tín hiệu",
-          },
+          title: "plugin.default.immediateSignal.title",
+          description: "plugin.default.immediateSignal.description",
         },
         BaseNodeType.IMMEDIATE
       ),
@@ -497,11 +418,8 @@ const defaultNodes: PluginConfig["nodes"] = [
         NodeType.IMMEDIATE_CONDITION,
         CategoryType.IMMEDIATE,
         {
-          title: { en: "Immediate Condition", vi: "Điều kiện tức thì" },
-          description: {
-            en: "Trigger immediately based on condition",
-            vi: "Kích hoạt tức thì dựa trên điều kiện",
-          },
+          title: "plugin.default.immediateCondition.title",
+          description: "plugin.default.immediateCondition.description",
         },
         BaseNodeType.IMMEDIATE
       ),
@@ -519,11 +437,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     name: "End Event",
     config: {
       ...createDefaultNodeConfig(NodeType.END_EVENT_DEFAULT, CategoryType.END, {
-        title: { en: "End Event", vi: "Sự kiện kết thúc" },
-        description: {
-          en: "Workflow end point",
-          vi: "Điểm kết thúc của workflow",
-        },
+        title: "plugin.default.endEventDefault.title",
+        description: "plugin.default.endEventDefault.description",
       }),
       connectionRules: [
         {
@@ -546,14 +461,8 @@ const defaultNodes: PluginConfig["nodes"] = [
         NodeType.END_EVENT_SEND_SIGNAL,
         CategoryType.END,
         {
-          title: {
-            en: "Send Signal End Event",
-            vi: "Sự kiện kết thúc gửi tín hiệu",
-          },
-          description: {
-            en: "End workflow and send signal",
-            vi: "Kết thúc workflow và gửi tín hiệu",
-          },
+          title: "plugin.default.endEventSendSignal.title",
+          description: "plugin.default.endEventSendSignal.description",
         }
       ),
       connectionRules: [
@@ -576,8 +485,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     name: "Note",
     config: {
       ...createDefaultNodeConfig(NodeType.NOTE, CategoryType.OTHER, {
-        title: { en: "Note", vi: "Ghi chú" },
-        description: { en: "Annotation note", vi: "Ghi chú chú thích" },
+        title: "plugin.default.note.title",
+        description: "plugin.default.note.description",
       }),
       width: 250,
       height: 200,
@@ -590,8 +499,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     config: {
       ...createDefaultNodeConfig(NodeType.ANNOTATION, CategoryType.OTHER, {
         level: "1",
-        title: { en: "Annotation", vi: "Chú thích" },
-        description: { en: "Annotation note", vi: "Ghi chú chú thích" },
+        title: "plugin.default.annotation.title",
+        description: "plugin.default.annotation.description",
       }),
     },
   },
@@ -602,11 +511,8 @@ const defaultNodes: PluginConfig["nodes"] = [
     name: "Pool",
     config: {
       ...createDefaultNodeConfig(NodeType.POOL, CategoryType.OTHER, {
-        title: { en: "Pool", vi: "Nhóm" },
-        description: {
-          en: "Container for organizing workflow elements by participant",
-          vi: "Vùng chứa để tổ chức các phần tử workflow theo người tham gia",
-        },
+        title: "plugin.default.pool.title",
+        description: "plugin.default.pool.description",
       }),
       nodeType: NodeType.POOL, // Store nodeType in config
       icon: {
@@ -643,11 +549,8 @@ const defaultEdges: Array<{
       pathType: EdgePathType.Bezier, // Path rendering type
       metadata: {
         id: "sequence-flow",
-        title: { en: "Sequence Flow", vi: "Luồng tuần tự" },
-        description: {
-          en: "Standard BPMN sequence flow connection",
-          vi: "Kết nối luồng tuần tự BPMN tiêu chuẩn",
-        },
+        title: "plugin.default.edge.sequenceFlow.title",
+        description: "plugin.default.edge.sequenceFlow.description",
         version: "1.0.0",
       },
       pathStyle: EdgePathStyle.Solid,
@@ -678,11 +581,8 @@ const defaultEdges: Array<{
       pathType: EdgePathType.Straight,
       metadata: {
         id: "message-flow",
-        title: { en: "Message Flow", vi: "Luồng tin nhắn" },
-        description: {
-          en: "BPMN message flow between pools/participants",
-          vi: "Luồng tin nhắn BPMN giữa các nhóm/người tham gia",
-        },
+        title: "plugin.default.edge.messageFlow.title",
+        description: "plugin.default.edge.messageFlow.description",
         version: "1.0.0",
       },
       pathStyle: EdgePathStyle.Dashed,
@@ -702,41 +602,50 @@ const defaultEdges: Array<{
           id: "messageType",
           name: "messageType",
           type: "select",
-          label: { en: "Message Type", vi: "Loại tin nhắn" },
-          description: {
-            en: "Type of message being sent",
-            vi: "Loại tin nhắn được gửi",
-          },
+          label: "plugin.default.edge.property.messageType.label",
+          description: "plugin.default.edge.property.messageType.description",
           defaultValue: "default",
           required: false,
           order: 0,
           options: [
-            { label: { en: "Default", vi: "Mặc định" }, value: "default" },
-            { label: { en: "Email", vi: "Email" }, value: "email" },
-            { label: { en: "API Call", vi: "Gọi API" }, value: "api" },
-            { label: { en: "Event", vi: "Sự kiện" }, value: "event" },
+            {
+              label: "plugin.default.edge.property.messageType.option.default",
+              value: "default",
+            },
+            {
+              label: "plugin.default.edge.property.messageType.option.email",
+              value: "email",
+            },
+            {
+              label: "plugin.default.edge.property.messageType.option.api",
+              value: "api",
+            },
+            {
+              label: "plugin.default.edge.property.messageType.option.event",
+              value: "event",
+            },
           ],
         },
         {
           id: "pathType",
           name: "pathType",
           type: "select",
-          label: { en: "Path Type", vi: "Loại đường dẫn" },
-          description: {
-            en: "Visual rendering type",
-            vi: "Loại hiển thị hình ảnh",
-          },
+          label: "plugin.default.edge.property.pathType.label",
+          description: "plugin.default.edge.property.pathType.description",
           defaultValue: EdgePathType.Straight,
           options: [
             {
-              label: { en: "Bezier", vi: "Bezier" },
+              label: "plugin.default.edge.property.pathType.option.bezier",
               value: EdgePathType.Bezier,
             },
             {
-              label: { en: "Straight", vi: "Thẳng" },
+              label: "plugin.default.edge.property.pathType.option.straight",
               value: EdgePathType.Straight,
             },
-            { label: { en: "Step", vi: "Bước" }, value: EdgePathType.Step },
+            {
+              label: "plugin.default.edge.property.pathType.option.step",
+              value: EdgePathType.Step,
+            },
           ],
         },
       ],
@@ -754,11 +663,8 @@ const defaultEdges: Array<{
       pathType: EdgePathType.Straight,
       metadata: {
         id: "association",
-        title: { en: "Association", vi: "Liên kết" },
-        description: {
-          en: "BPMN association for artifacts and annotations",
-          vi: "Liên kết BPMN cho các hiện vật và chú thích",
-        },
+        title: "plugin.default.edge.association.title",
+        description: "plugin.default.edge.association.description",
         version: "1.0.0",
       },
       pathStyle: EdgePathStyle.Dotted,
@@ -778,34 +684,43 @@ const defaultEdges: Array<{
           id: "direction",
           name: "direction",
           type: "select",
-          label: { en: "Direction", vi: "Hướng" },
-          description: { en: "Association direction", vi: "Hướng liên kết" },
+          label: "plugin.default.edge.property.direction.label",
+          description: "plugin.default.edge.property.direction.description",
           defaultValue: "none",
           options: [
-            { label: { en: "None", vi: "Không" }, value: "none" },
-            { label: { en: "One Way", vi: "Một chiều" }, value: "one" },
-            { label: { en: "Both Ways", vi: "Hai chiều" }, value: "both" },
+            {
+              label: "plugin.default.edge.property.direction.option.none",
+              value: "none",
+            },
+            {
+              label: "plugin.default.edge.property.direction.option.one",
+              value: "one",
+            },
+            {
+              label: "plugin.default.edge.property.direction.option.both",
+              value: "both",
+            },
           ],
         },
         {
           id: "pathType",
           type: "select",
-          label: { en: "Path Type", vi: "Loại đường dẫn" },
-          description: {
-            en: "Visual rendering type",
-            vi: "Loại hiển thị hình ảnh",
-          },
+          label: "plugin.default.edge.property.pathType.label",
+          description: "plugin.default.edge.property.pathType.description",
           defaultValue: EdgePathType.Straight,
           options: [
             {
-              label: { en: "Bezier", vi: "Bezier" },
+              label: "plugin.default.edge.property.pathType.option.bezier",
               value: EdgePathType.Bezier,
             },
             {
-              label: { en: "Straight", vi: "Thẳng" },
+              label: "plugin.default.edge.property.pathType.option.straight",
               value: EdgePathType.Straight,
             },
-            { label: { en: "Step", vi: "Bước" }, value: EdgePathType.Step },
+            {
+              label: "plugin.default.edge.property.pathType.option.step",
+              value: EdgePathType.Step,
+            },
           ],
         },
       ],
@@ -1061,7 +976,7 @@ const defaultContextMenus: Array<{
       items: [
         {
           id: "add-node",
-          label: { en: "Add Node", vi: "Thêm nút" },
+          label: "common.contextMenu.addNode",
           icon: "",
           onClick: async () => {
             console.log("Add node action triggered");
@@ -1069,7 +984,7 @@ const defaultContextMenus: Array<{
           children: [
             {
               id: "add-start-node",
-              label: { en: "Add Start Node", vi: "Thêm nút bắt đầu" },
+              label: "common.contextMenu.addStartNode",
               icon: "○",
               onClick: async (context: ContextMenuContext) => {
                 console.log("Add Start Node clicked", context);
@@ -1077,7 +992,7 @@ const defaultContextMenus: Array<{
               children: [
                 {
                   id: "add-api-start-event",
-                  label: { en: "API Start Event", vi: "Sự kiện bắt đầu API" },
+                  label: "common.contextMenu.apiStartEvent",
                   icon: "▷",
                   onClick: async (context: ContextMenuContext) => {
                     console.log("Add API Start Event clicked", context);
@@ -1087,7 +1002,7 @@ const defaultContextMenus: Array<{
             },
             {
               id: "add-task-node",
-              label: { en: "Add Task Node", vi: "Thêm nút nhiệm vụ" },
+              label: "common.contextMenu.addTaskNode",
               icon: "□",
               onClick: async (context: ContextMenuContext) => {
                 console.log("Add Task Node clicked", context);
@@ -1152,7 +1067,7 @@ const defaultContextMenus: Array<{
       items: [
         {
           id: "add-lane",
-          label: { en: "Add Lane", vi: "Thêm làn đường" },
+          label: "common.contextMenu.addLane",
           icon: { type: "lucide", value: Plus },
           onClick: async (context: ContextMenuContext) => {
             const action =
@@ -1180,7 +1095,7 @@ const defaultContextMenus: Array<{
         },
         {
           id: "toggle-lock",
-          label: { en: "Toggle Lock Mode", vi: "Bật/tắt chế độ khóa" },
+          label: "common.contextMenu.toggleLockMode",
           icon: { type: "lucide", value: LockOpen },
           onClick: async (context: ContextMenuContext) => {
             const action =
@@ -1193,7 +1108,7 @@ const defaultContextMenus: Array<{
         },
         {
           id: "switch-orientation",
-          label: { en: "Switch Orientation", vi: "Chuyển hướng" },
+          label: "common.contextMenu.switchOrientation",
           icon: { type: "lucide", value: FlipVertical },
           onClick: async (context: ContextMenuContext) => {
             const action =
@@ -1214,7 +1129,7 @@ const defaultContextMenus: Array<{
         },
         {
           id: "appearance",
-          label: { en: "Appearance", vi: "Giao diện" },
+          label: "common.contextMenu.appearance",
           icon: {
             type: "lucide",
             value: Highlighter,
@@ -1222,12 +1137,12 @@ const defaultContextMenus: Array<{
           children: [
             {
               id: "color-submenu",
-              label: { en: "Change Color", vi: "Thay đổi màu sắc" },
+              label: "common.contextMenu.changeColor",
               icon: { type: "lucide", value: Palette },
               children: [
                 {
                   id: "color-yellow",
-                  label: { en: "Yellow", vi: "Vàng" },
+                  label: "common.contextMenu.yellow",
                   color: "#fde68a",
                   onClick: async (context: ContextMenuContext) => {
                     const action =
@@ -1239,7 +1154,7 @@ const defaultContextMenus: Array<{
                 },
                 {
                   id: "color-blue",
-                  label: { en: "Blue", vi: "Xanh" },
+                  label: "common.contextMenu.blue",
                   color: "#bfdbfe",
                   onClick: async (context: ContextMenuContext) => {
                     const action =
@@ -1251,7 +1166,7 @@ const defaultContextMenus: Array<{
                 },
                 {
                   id: "color-green",
-                  label: { en: "Green", vi: "Xanh lá" },
+                  label: "common.contextMenu.green",
                   color: "#d9f99d",
                   onClick: async (context: ContextMenuContext) => {
                     const action =
@@ -1263,7 +1178,7 @@ const defaultContextMenus: Array<{
                 },
                 {
                   id: "color-pink",
-                  label: { en: "Pink", vi: "Hồng" },
+                  label: "common.contextMenu.pink",
                   color: "#fecdd3",
                   onClick: async (context: ContextMenuContext) => {
                     const action =
@@ -1275,7 +1190,7 @@ const defaultContextMenus: Array<{
                 },
                 {
                   id: "color-purple",
-                  label: { en: "Purple", vi: "Tím" },
+                  label: "common.contextMenu.purple",
                   color: "#ddd6fe",
                   onClick: async (context: ContextMenuContext) => {
                     const action =
@@ -1287,7 +1202,7 @@ const defaultContextMenus: Array<{
                 },
                 {
                   id: "color-orange",
-                  label: { en: "Orange", vi: "Cam" },
+                  label: "common.contextMenu.orange",
                   color: "#fed7aa",
                   onClick: async (context: ContextMenuContext) => {
                     const action =
@@ -1299,7 +1214,7 @@ const defaultContextMenus: Array<{
                 },
                 {
                   id: "color-gray",
-                  label: { en: "Gray", vi: "Xám" },
+                  label: "common.contextMenu.gray",
                   color: "#e4e4e7",
                   onClick: async (context: ContextMenuContext) => {
                     const action =
@@ -1322,7 +1237,7 @@ const defaultContextMenus: Array<{
         },
         {
           id: "delete-pool-lane",
-          label: { en: "Delete Pool", vi: "Xóa nhóm" },
+          label: "common.contextMenu.deletePool",
           icon: { type: "lucide", value: Trash2, color: "red" },
           onClick: async (context: ContextMenuContext) => {
             const action = contextMenuActionsRegistry.getAction(
@@ -1357,6 +1272,10 @@ export const defaultBpmPlugin: Plugin = {
     themes: defaultThemes,
     categories: defaultCategories,
     contextMenus: defaultContextMenus,
+    translations: {
+      en: pluginTranslationsEn as Record<string, string>,
+      vi: pluginTranslationsVi as Record<string, string>,
+    },
   },
   async initialize() {
     console.log("Default BPM Plugin initialized");

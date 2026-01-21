@@ -16,7 +16,6 @@ import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
 import { LanguageProvider, useLanguageContext } from "./LanguageContext";
 import { useLanguage } from "../hooks/useLanguage";
 import { useAvailableLanguages } from "../hooks/useAvailableLanguages";
-import type { UITranslations } from "../translations/ui.translations";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -64,7 +63,6 @@ export interface PluginOptions {
    */
   languageConfig?: {
     defaultLanguage?: string;
-    uiTranslations?: UITranslations;
   };
 }
 
@@ -223,7 +221,6 @@ export function WorkflowProvider({
   return (
     <LanguageProvider
       defaultLanguage={pluginOptions.languageConfig?.defaultLanguage || "en"}
-      uiTranslations={pluginOptions.languageConfig?.uiTranslations}
     >
       <WorkflowProviderInner pluginOptions={pluginOptions}>
         {children}

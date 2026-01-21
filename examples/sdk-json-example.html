@@ -112,95 +112,170 @@
     </select>
 
     <!-- Load BPM SDK -->
-    <script src="../sdk-dist/bpm-sdk.js"></script>
+    <script src="../sdk-dist/bpm-sdk.js?v=1768973826232"></script>
 
     <script>
-      // UI Translations with Korean support
-      const uiTranslations = {
-        toolbar: {
-          selectTool: {
-            en: "Select tool (V)",
-            vi: "Công cụ chọn (V)",
-            ko: "선택 도구 (V)",
-          },
-          handTool: {
-            en: "Hand tool (H) - Pan canvas only",
-            vi: "Công cụ cầm nắm (H)",
-            ko: "손 도구 (H) - 캔버스만 이동",
-          },
-          zoomOut: { en: "Zoom out", vi: "Thu nhỏ", ko: "축소" },
-          zoomIn: { en: "Zoom in", vi: "Phóng to", ko: "확대" },
-          resetView: {
-            en: "Reset view",
-            vi: "Đặt lại chế độ xem",
-            ko: "보기 재설정",
-          },
-          fullscreen: {
-            en: "Fullscreen",
-            vi: "Toàn màn hình",
-            ko: "전체 화면",
-          },
-          moreOptions: {
-            en: "More options",
-            vi: "Thêm tùy chọn",
-            ko: "더 많은 옵션",
-          },
-          options: { en: "Options", vi: "Tùy chọn", ko: "옵션" },
-          minimap: { en: "Minimap", vi: "Bản đồ thu nhỏ", ko: "미니맵" },
-        },
-        toolbox: {
-          toolbox: { en: "Toolbox", vi: "Hộp công cụ", ko: "도구 상자" },
-          expandToolbox: {
-            en: "Expand toolbox",
-            vi: "Mở rộng hộp công cụ",
-            ko: "도구 상자 확장",
-          },
-          minimizeToolbox: {
-            en: "Minimize toolbox",
-            vi: "Thu nhỏ hộp công cụ",
-            ko: "도구 상자 최소화",
-          },
-          collapseToolbox: {
-            en: "Collapse toolbox",
-            vi: "Đóng hộp công cụ",
-            ko: "도구 상자 축소",
-          },
-        },
-        properties: {
-          nodeProperties: {
-            en: "Node Properties",
-            vi: "Thuộc tính nút",
-            ko: "노드 속성",
-          },
-          edgeProperties: {
-            en: "Edge Properties",
-            vi: "Thuộc tính cạnh",
-            ko: "엣지 속성",
-          },
-        },
-        contextMenu: {
-          resetColor: {
-            en: "Reset Color",
-            vi: "Đặt lại màu",
-            ko: "색상 재설정",
-          },
-          changeColor: { en: "Change Color", vi: "Đổi màu", ko: "색상 변경" },
-          delete: { en: "Delete", vi: "Xóa", ko: "삭제" },
-          properties: { en: "Properties", vi: "Thuộc tính", ko: "속성" },
-        },
+      // Inline translations for file:// protocol (when opened directly)
+      // Flat format - one object per language
+      const enTranslations = {
+        "toolbar.selectTool": "Select tool (V)",
+        "toolbar.handTool": "Hand tool (H) - Pan canvas only",
+        "toolbar.zoomOut": "Zoom out",
+        "toolbar.zoomIn": "Zoom in",
+        "toolbar.resetView": "Reset view",
+        "toolbar.fullscreen": "Fullscreen",
+        "toolbar.moreOptions": "More options",
+        "toolbar.options": "Options",
+        "toolbar.minimap": "Minimap",
+        "toolbox.toolbox": "Toolbox",
+        "toolbox.expandToolbox": "Expand toolbox",
+        "toolbox.minimizeToolbox": "Minimize toolbox",
+        "toolbox.collapseToolbox": "Collapse toolbox",
+        "properties.nodeProperties": "Node Properties",
+        "properties.edgeProperties": "Edge Properties",
+        "contextMenu.resetColor": "Reset Color",
+        "contextMenu.changeColor": "Change Color",
+        "contextMenu.delete": "Delete",
+        "contextMenu.properties": "Properties",
+        "sendEmailTask.name": "Send Email",
+        "sendEmailTask.description": "Send email notification",
+        "sendEmailTask.properties.to.label": "To",
+        "sendEmailTask.properties.to.placeholder": "email@example.com",
+        "sendEmailTask.properties.subject.label": "Subject",
+        "sendEmailTask.properties.body.label": "Body",
+        "sendEmailTask.contextMenu.testEmail": "Send Test Email",
+        "httpRequestTask.name": "HTTP Request",
+        "httpRequestTask.description": "Make HTTP/REST API calls",
+        "httpRequestTask.properties.url.label": "URL",
+        "httpRequestTask.properties.url.placeholder": "https://api.example.com",
+        "httpRequestTask.properties.method.label": "Method",
+        "httpRequestTask.contextMenu.testRequest": "Test Request",
+        "conditionalStart.name": "Conditional Start",
+        "conditionalStart.description": "Start with condition",
+        "conditionalStart.properties.condition.label": "Condition",
+        "conditionalStart.properties.condition.placeholder":
+          "variable === 'value'",
+        "simpleTask.name": "Simple Task",
+        "simpleTask.description": "Task with minimal context menu",
+        "simpleTask.contextMenu.markComplete": "Mark Complete",
+        "lockedTask.name": "Locked Task",
+        "lockedTask.description": "Task with no duplicate/delete",
+        "lockedTask.contextMenu.unlock": "Unlock Task",
+        "minimalTask.name": "Minimal Task",
+        "minimalTask.description": "Task with only custom menu",
+        "minimalTask.contextMenu.execute": "Execute Task",
+        "minimalTask.contextMenu.configure": "Configure",
       };
 
-      // Define custom nodes as JSON
+      const viTranslations = {
+        "toolbar.selectTool": "Công cụ chọn (V)",
+        "toolbar.handTool": "Công cụ cầm nắm (H) - Chỉ di chuyển canvas",
+        "toolbar.zoomOut": "Thu nhỏ",
+        "toolbar.zoomIn": "Phóng to",
+        "toolbar.resetView": "Đặt lại chế độ xem",
+        "toolbar.fullscreen": "Toàn màn hình",
+        "toolbar.moreOptions": "Thêm tùy chọn",
+        "toolbar.options": "Tùy chọn",
+        "toolbar.minimap": "Bản đồ thu nhỏ",
+        "toolbox.toolbox": "Hộp công cụ",
+        "toolbox.expandToolbox": "Mở rộng hộp công cụ",
+        "toolbox.minimizeToolbox": "Thu nhỏ hộp công cụ",
+        "toolbox.collapseToolbox": "Đóng hộp công cụ",
+        "properties.nodeProperties": "Thuộc tính nút",
+        "properties.edgeProperties": "Thuộc tính cạnh",
+        "contextMenu.resetColor": "Đặt lại màu",
+        "contextMenu.changeColor": "Đổi màu",
+        "contextMenu.delete": "Xóa",
+        "contextMenu.properties": "Thuộc tính",
+        "sendEmailTask.name": "Gửi Email",
+        "sendEmailTask.description": "Gửi thông báo email",
+        "sendEmailTask.properties.to.label": "Gửi tới",
+        "sendEmailTask.properties.to.placeholder": "email@example.com",
+        "sendEmailTask.properties.subject.label": "Chủ đề",
+        "sendEmailTask.properties.body.label": "Nội dung",
+        "sendEmailTask.contextMenu.testEmail": "Gửi Email Test",
+        "httpRequestTask.name": "Yêu cầu HTTP",
+        "httpRequestTask.description": "Thực hiện gọi HTTP/REST API",
+        "httpRequestTask.properties.url.label": "URL",
+        "httpRequestTask.properties.url.placeholder": "https://api.example.com",
+        "httpRequestTask.properties.method.label": "Phương thức",
+        "httpRequestTask.contextMenu.testRequest": "Kiểm tra Yêu cầu",
+        "conditionalStart.name": "Bắt đầu Điều kiện",
+        "conditionalStart.description": "Bắt đầu với điều kiện",
+        "conditionalStart.properties.condition.label": "Điều kiện",
+        "conditionalStart.properties.condition.placeholder":
+          "variable === 'value'",
+        "simpleTask.name": "Nhiệm vụ Đơn giản",
+        "simpleTask.description": "Nhiệm vụ với menu ngữ cảnh tối thiểu",
+        "simpleTask.contextMenu.markComplete": "Đánh dấu Hoàn thành",
+        "lockedTask.name": "Nhiệm vụ Khóa",
+        "lockedTask.description": "Nhiệm vụ không sao chép/xóa",
+        "lockedTask.contextMenu.unlock": "Mở Khóa Nhiệm vụ",
+        "minimalTask.name": "Nhiệm vụ Tối thiểu",
+        "minimalTask.description": "Nhiệm vụ chỉ với menu tùy chỉnh",
+        "minimalTask.contextMenu.execute": "Thực thi Nhiệm vụ",
+        "minimalTask.contextMenu.configure": "Cấu hình",
+      };
+
+      const koTranslations = {
+        "toolbar.selectTool": "선택 도구 (V)",
+        "toolbar.handTool": "손 도구 (H) - 캔버스만 이동",
+        "toolbar.zoomOut": "축소",
+        "toolbar.zoomIn": "확대",
+        "toolbar.resetView": "보기 재설정",
+        "toolbar.fullscreen": "전체 화면",
+        "toolbar.moreOptions": "더 많은 옵션",
+        "toolbar.options": "옵션",
+        "toolbar.minimap": "미니맵",
+        "toolbox.toolbox": "도구 상자",
+        "toolbox.expandToolbox": "도구 상자 확장",
+        "toolbox.minimizeToolbox": "도구 상자 최소화",
+        "toolbox.collapseToolbox": "도구 상자 축소",
+        "properties.nodeProperties": "노드 속성",
+        "properties.edgeProperties": "엣지 속성",
+        "contextMenu.resetColor": "색상 재설정",
+        "contextMenu.changeColor": "색상 변경",
+        "contextMenu.delete": "삭제",
+        "contextMenu.properties": "속성",
+        "sendEmailTask.name": "이메일 전송",
+        "sendEmailTask.description": "이메일 알림 발송",
+        "sendEmailTask.properties.to.label": "받는 사람",
+        "sendEmailTask.properties.to.placeholder": "email@example.com",
+        "sendEmailTask.properties.subject.label": "제목",
+        "sendEmailTask.properties.body.label": "본문",
+        "sendEmailTask.contextMenu.testEmail": "테스트 이메일 전송",
+        "httpRequestTask.name": "HTTP 요청",
+        "httpRequestTask.description": "HTTP/REST API 호출 수행",
+        "httpRequestTask.properties.url.label": "URL",
+        "httpRequestTask.properties.url.placeholder": "https://api.example.com",
+        "httpRequestTask.properties.method.label": "메서드",
+        "httpRequestTask.contextMenu.testRequest": "요청 테스트",
+        "conditionalStart.name": "조건부 시작",
+        "conditionalStart.description": "조건으로 시작",
+        "conditionalStart.properties.condition.label": "조건",
+        "conditionalStart.properties.condition.placeholder":
+          "variable === 'value'",
+        "simpleTask.name": "단순 작업",
+        "simpleTask.description": "최소 컨텍스트 메뉴가 있는 작업",
+        "simpleTask.contextMenu.markComplete": "완료로 표시",
+        "lockedTask.name": "잠긴 작업",
+        "lockedTask.description": "복제/삭제 없는 작업",
+        "lockedTask.contextMenu.unlock": "작업 잠금 해제",
+        "minimalTask.name": "최소 작업",
+        "minimalTask.description": "맞춤 메뉴만 있는 작업",
+        "minimalTask.contextMenu.execute": "작업 실행",
+        "minimalTask.contextMenu.configure": "구성",
+      };
+
+      // Define custom nodes as JSON with translation keys (flat format)
+      // ✅ All translations now loaded from separate JSON files
+      // ✅ No more nested uiTranslations object needed!
       const customNodes = [
         {
           id: "sendEmailTask",
           extends: "task",
-          name: { en: "Send Email", vi: "Gửi Email", ko: "이메일 전송" },
-          description: {
-            en: "Send email notification",
-            vi: "Gửi thông báo email",
-            ko: "이메일 알림 발송",
-          },
+          name: "sendEmailTask.name", // Translation key
+          description: "sendEmailTask.description",
           icon: {
             type: "lucide",
             value: "Mail",
@@ -216,17 +291,17 @@
             {
               id: "to",
               name: "to",
-              label: { en: "To", vi: "Gửi tới", ko: "받는 사람" },
+              label: "sendEmailTask.properties.to.label",
               type: "text",
               required: true,
-              placeholder: "email@example.com",
+              placeholder: "sendEmailTask.properties.to.placeholder",
               group: "custom",
               order: 1,
             },
             {
               id: "subject",
               name: "subject",
-              label: { en: "Subject", vi: "Chủ đề", ko: "제목" },
+              label: "sendEmailTask.properties.subject.label",
               type: "text",
               required: true,
               group: "custom",
@@ -235,7 +310,7 @@
             {
               id: "body",
               name: "body",
-              label: { en: "Body", vi: "Nội dung", ko: "본문" },
+              label: "sendEmailTask.properties.body.label",
               type: "textarea",
               required: true,
               group: "custom",
@@ -245,11 +320,7 @@
           contextMenuItems: [
             {
               id: "test-email",
-              label: {
-                en: "Send Test Email",
-                vi: "Gửi Email Test",
-                ko: "테스트 이메일 전송",
-              },
+              label: "sendEmailTask.contextMenu.testEmail",
               icon: "Send",
               action: {
                 type: "event",
@@ -272,12 +343,8 @@
         {
           id: "httpRequestTask",
           extends: "task",
-          name: { en: "HTTP Request", vi: "Yêu cầu HTTP", ko: "HTTP 요청" },
-          description: {
-            en: "Make HTTP/REST API calls",
-            vi: "Thực hiện gọi HTTP/REST API",
-            ko: "HTTP/REST API 호출 수행",
-          },
+          name: "httpRequestTask.name",
+          description: "httpRequestTask.description",
           icon: {
             type: "lucide",
             value: "Globe",
@@ -288,17 +355,17 @@
             {
               id: "url",
               name: "url",
-              label: { en: "URL", vi: "URL", ko: "URL" },
+              label: "httpRequestTask.properties.url.label",
               type: "text",
               required: true,
-              placeholder: "https://api.example.com",
+              placeholder: "httpRequestTask.properties.url.placeholder",
               group: "custom",
               order: 1,
             },
             {
               id: "method",
               name: "method",
-              label: { en: "Method", vi: "Phương thức", ko: "메서드" },
+              label: "httpRequestTask.properties.method.label",
               type: "select",
               required: true,
               defaultValue: "GET",
@@ -315,11 +382,7 @@
           contextMenuItems: [
             {
               id: "test-request",
-              label: {
-                en: "Test Request",
-                vi: "Kiểm tra Yêu cầu",
-                ko: "요청 테스트",
-              },
+              label: "httpRequestTask.contextMenu.testRequest",
               icon: "Play",
               action: {
                 type: "event",
@@ -331,16 +394,8 @@
         {
           id: "conditionalStart",
           extends: "start",
-          name: {
-            en: "Conditional Start",
-            vi: "Bắt đầu Điều kiện",
-            ko: "조건부 시작",
-          },
-          description: {
-            en: "Start with condition",
-            vi: "Bắt đầu với điều kiện",
-            ko: "조건으로 시작",
-          },
+          name: "conditionalStart.name",
+          description: "conditionalStart.description",
           icon: {
             type: "lucide",
             value: "AlarmClock",
@@ -349,10 +404,10 @@
             {
               id: "condition",
               name: "condition",
-              label: { en: "Condition", vi: "Điều kiện", ko: "조건" },
+              label: "conditionalStart.properties.condition.label",
               type: "text",
               required: true,
-              placeholder: "variable === 'value'",
+              placeholder: "conditionalStart.properties.condition.placeholder",
               group: "custom",
             },
           ],
@@ -360,12 +415,8 @@
         {
           id: "simpleTask",
           extends: "task",
-          name: { en: "Simple Task", vi: "Nhiệm vụ Đơn giản", ko: "단순 작업" },
-          description: {
-            en: "Task with minimal context menu",
-            vi: "Nhiệm vụ với menu ngữ cảnh tối thiểu",
-            ko: "최소 컨텍스트 메뉴가 있는 작업",
-          },
+          name: "simpleTask.name",
+          description: "simpleTask.description",
           icon: {
             type: "lucide",
             value: "CheckSquare",
@@ -382,11 +433,7 @@
           contextMenuItems: [
             {
               id: "mark-complete",
-              label: {
-                en: "Mark Complete",
-                vi: "Đánh dấu Hoàn thành",
-                ko: "완료로 표시",
-              },
+              label: "simpleTask.contextMenu.markComplete",
               icon: "Check",
               action: {
                 type: "event",
@@ -398,12 +445,8 @@
         {
           id: "lockedTask",
           extends: "task",
-          name: { en: "Locked Task", vi: "Nhiệm vụ Khóa", ko: "잠긴 작업" },
-          description: {
-            en: "Task with no duplicate/delete",
-            vi: "Nhiệm vụ không sao chép/xóa",
-            ko: "복제/삭제 없는 작업",
-          },
+          name: "lockedTask.name",
+          description: "lockedTask.description",
           icon: {
             type: "lucide",
             value: "Lock",
@@ -420,11 +463,7 @@
           contextMenuItems: [
             {
               id: "unlock",
-              label: {
-                en: "Unlock Task",
-                vi: "Mở Khóa Nhiệm vụ",
-                ko: "작업 잠금 해제",
-              },
+              label: "lockedTask.contextMenu.unlock",
               icon: "Unlock",
               action: {
                 type: "event",
@@ -436,16 +475,8 @@
         {
           id: "minimalTask",
           extends: "task",
-          name: {
-            en: "Minimal Task",
-            vi: "Nhiệm vụ Tối thiểu",
-            ko: "최소 작업",
-          },
-          description: {
-            en: "Task with only custom menu",
-            vi: "Nhiệm vụ chỉ với menu tùy chỉnh",
-            ko: "맞춤 메뉴만 있는 작업",
-          },
+          name: "minimalTask.name",
+          description: "minimalTask.description",
           icon: {
             type: "lucide",
             value: "Minimize",
@@ -462,11 +493,7 @@
           contextMenuItems: [
             {
               id: "execute",
-              label: {
-                en: "Execute Task",
-                vi: "Thực thi Nhiệm vụ",
-                ko: "작업 실행",
-              },
+              label: "minimalTask.contextMenu.execute",
               icon: "Play",
               action: {
                 type: "event",
@@ -475,7 +502,7 @@
             },
             {
               id: "configure",
-              label: { en: "Configure", vi: "Cấu hình", ko: "구성" },
+              label: "minimalTask.contextMenu.configure",
               icon: "Settings",
               action: {
                 type: "event",
@@ -485,15 +512,16 @@
           ],
         },
       ];
-
       // Initialize BPM with JSON config
       var bpm = new BPM({
         selector: "#bpm-container",
         options: {
-          // Load custom nodes from JSON
+          // Load custom nodes from JSON with translation keys
           customNodes: customNodes,
-          // Pass custom translations with Korean support
-          uiTranslations: uiTranslations,
+
+          // ✅ Pass English translations (default language)
+          translations: enTranslations,
+
           // Set default language
           defaultLanguage: "en",
 
@@ -505,30 +533,34 @@
           },
         },
 
-        onReady: function (instance) {
-          console.log(
-            "BPM Core initialized with JSON config and Korean language support"
-          );
+        onReady: async function (instance) {
+          console.log("BPM Core initialized");
 
-          // Get current language and set it in the select
           const currentLanguage = bpm.getLanguage();
           console.log("Current language:", currentLanguage);
+
+          // Preload all available translations
+          await bpm.loadTranslationsForLanguage("vi", viTranslations);
+          await bpm.loadTranslationsForLanguage("ko", koTranslations);
+          console.log("All translations preloaded");
+
           const languageSwitcher = document.getElementById("language-select");
           languageSwitcher.value = currentLanguage;
 
-          // Handle language change
+          // Handle language change - translations already preloaded
           languageSwitcher.addEventListener("change", function (e) {
-            console.log("Language changed to:", e.target.value);
-            bpm.setLanguage(e.target.value);
-            console.log("Language updated successfully!");
+            const newLang = e.target.value;
+            console.log("Switching language to:", newLang);
+            bpm.setLanguage(newLang);
           });
 
           // Update UI with loaded nodes
           const nodesList = document.getElementById("loaded-nodes");
           customNodes.forEach(function (node) {
             const li = document.createElement("li");
-            const nodeName = node.name.en || node.name; // Handle both string and multilingual names
-            li.textContent = nodeName + " (" + node.id + ")";
+            // node.name is now a translation key
+            li.textContent =
+              node.id + " (uses translation key: " + node.name + ")";
             nodesList.appendChild(li);
           });
 

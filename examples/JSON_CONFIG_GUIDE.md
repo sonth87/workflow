@@ -332,11 +332,20 @@ You can subscribe to these events in your custom nodes:
 
 ### Overview
 
-All text fields in JSON configurations support multilingual format. This allows your nodes to automatically adapt to the user's selected language.
+BPM Core supports **two translation formats**:
 
-### Supported Fields
+1. **Flat Key-Based Format** (Recommended) - Use translation keys with separate language files
+2. **Nested Format** (Legacy) - Embed all languages in config
 
-The following fields support multilingual text:
+**⭐ The flat format is strongly recommended** for better scalability, smaller payloads, and easier maintenance.
+
+**📖 See [TRANSLATION_SYSTEM_GUIDE.md](../readme/TRANSLATION_SYSTEM_GUIDE.md) for comprehensive documentation on the new flat translation system.**
+
+### Nested Format (Original)
+
+All text fields support multilingual objects with language codes as keys.
+
+#### Supported Fields
 
 - Node `name` and `description`
 - Plugin metadata `name` and `description`
@@ -347,7 +356,7 @@ The following fields support multilingual text:
 - Context menu `label`
 - Property group `label` and `description`
 
-### Basic Usage
+#### Basic Usage
 
 Instead of a simple string, provide an object with language codes as keys:
 
@@ -362,7 +371,136 @@ Instead of a simple string, provide an object with language codes as keys:
 }
 ```
 
-### Complete Multilingual Example
+### Flat Format (New - Recommended for Scale)
+
+Use translation keys instead of nested objects:
+
+```json
+{
+  "name": "sendEmailTask.name",
+  "description": "sendEmailTask.description"
+}
+```
+
+Then provide separate translation files:
+
+**en.json:**
+
+```json
+{
+  "sendEmailTask.name": "Send Email",
+  "sendEmailTask.description": "Send email notification"
+}
+```
+
+**vi.json:**
+
+```json
+{
+  "sendEmailTask.name": "Gửi Email",
+  "sendEmailTask.description": "Gửi thông báo email"
+}
+```
+
+**Benefits:**
+
+- ✅ 90% smaller payload (load only active language)
+- ✅ Easy to add new languages
+- ✅ Better separation of concerns
+- ✅ Translator-friendly format
+
+**See [TRANSLATION_SYSTEM_GUIDE.md](../readme/TRANSLATION_SYSTEM_GUIDE.md) for complete usage examples.**
+
+### Complete Example (Flat Format - Recommended)
+
+```json
+{
+  "id": "customNotification",
+  "extends": "task",
+  "name": "customNotification.name",
+  "description": "customNotification.description",
+  "properties": [
+    {
+      "id": "recipient",
+      "name": "recipient",
+      "label": "customNotification.properties.recipient.label",
+      "type": "text",
+      "required": true,
+      "placeholder": "customNotification.properties.recipient.placeholder",
+      "description": "customNotification.properties.recipient.description"
+    },
+    {
+      "id": "type",
+      "name": "type",
+      "label": "customNotification.properties.type.label",
+      "type": "select",
+      "options": [
+        {
+          "label": "customNotification.properties.type.options.email",
+          "value": "email"
+        },
+        {
+          "label": "customNotification.properties.type.options.sms",
+          "value": "sms"
+        }
+      ]
+    }
+  ],
+  "propertyGroups": [
+    {
+      "id": "recipient-info",
+      "label": "customNotification.groups.recipientInfo"
+    }
+  ],
+  "contextMenuItems": [
+    {
+      "id": "test-notification",
+      "label": "customNotification.contextMenu.test",
+      "icon": "Send"
+    }
+  ]
+}
+```
+
+**Translation files:**
+
+**en.json:**
+
+```json
+{
+  "customNotification.name": "Custom Notification",
+  "customNotification.description": "Send customized notifications to users",
+  "customNotification.properties.recipient.label": "Recipient",
+  "customNotification.properties.recipient.placeholder": "Enter recipient email",
+  "customNotification.properties.recipient.description": "Email address of the recipient",
+  "customNotification.properties.type.label": "Notification Type",
+  "customNotification.properties.type.options.email": "Email",
+  "customNotification.properties.type.options.sms": "SMS",
+  "customNotification.groups.recipientInfo": "Recipient Information",
+  "customNotification.contextMenu.test": "Send Test Notification"
+}
+```
+
+**vi.json:**
+
+```json
+{
+  "customNotification.name": "Thông báo tùy chỉnh",
+  "customNotification.description": "Gửi thông báo tùy chỉnh cho người dùng",
+  "customNotification.properties.recipient.label": "Người nhận",
+  "customNotification.properties.recipient.placeholder": "Nhập email người nhận",
+  "customNotification.properties.recipient.description": "Địa chỉ email của người nhận",
+  "customNotification.properties.type.label": "Loại thông báo",
+  "customNotification.properties.type.options.email": "Email",
+  "customNotification.properties.type.options.sms": "Tin nhắn",
+  "customNotification.groups.recipientInfo": "Thông tin người nhận",
+  "customNotification.contextMenu.test": "Gửi thông báo thử"
+}
+```
+
+### Legacy: Complete Multilingual Example (Nested Format)
+
+> ⚠️ **Note:** This format still works but is **not recommended** for new projects. Use the flat format above for better scalability.
 
 ```json
 {

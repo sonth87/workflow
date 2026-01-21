@@ -12,6 +12,10 @@ import type { BaseNodeConfig, BaseRuleConfig } from "@/core/types/base.types";
 import { CategoryType } from "@/enum/workflow.enum";
 import { globalEventBus, WorkflowEventTypes } from "@/core/events/EventBus";
 
+// Import plugin translations
+import pluginTranslationsEn from "@/translations/plugins.en.json";
+import pluginTranslationsVi from "@/translations/plugins.vi.json";
+
 // Custom node types cho AI/ML workflows
 export enum AINodeType {
   ML_TRAINING = "mlTraining",
@@ -47,14 +51,23 @@ const createAINodeConfig = (
     {
       id: "modelType",
       name: "modelType",
-      label: "Model Type",
+      label: "plugin.aiml.property.modelType.label",
       type: "select",
       required: true,
       defaultValue: "classification",
       options: [
-        { label: "Classification", value: "classification" },
-        { label: "Regression", value: "regression" },
-        { label: "Clustering", value: "clustering" },
+        {
+          label: "plugin.aiml.property.modelType.option.classification",
+          value: "classification",
+        },
+        {
+          label: "plugin.aiml.property.modelType.option.regression",
+          value: "regression",
+        },
+        {
+          label: "plugin.aiml.property.modelType.option.clustering",
+          value: "clustering",
+        },
       ],
       order: 0,
       group: "model",
@@ -62,14 +75,20 @@ const createAINodeConfig = (
     {
       id: "algorithm",
       name: "algorithm",
-      label: "Algorithm",
+      label: "plugin.aiml.property.algorithm.label",
       type: "select",
       required: true,
       defaultValue: "random_forest",
       options: [
-        { label: "Random Forest", value: "random_forest" },
-        { label: "Neural Network", value: "neural_network" },
-        { label: "SVM", value: "svm" },
+        {
+          label: "plugin.aiml.property.algorithm.option.randomForest",
+          value: "random_forest",
+        },
+        {
+          label: "plugin.aiml.property.algorithm.option.neuralNetwork",
+          value: "neural_network",
+        },
+        { label: "plugin.aiml.property.algorithm.option.svm", value: "svm" },
       ],
       order: 1,
       group: "model",
@@ -77,7 +96,7 @@ const createAINodeConfig = (
     {
       id: "datasetPath",
       name: "datasetPath",
-      label: "Dataset Path",
+      label: "plugin.aiml.property.datasetPath.label",
       type: "text",
       required: true,
       defaultValue: "",
@@ -161,8 +180,8 @@ export const aiMLPlugin: Plugin = {
         type: AINodeType.ML_TRAINING,
         name: "ML Training",
         config: createAINodeConfig(AINodeType.ML_TRAINING, {
-          title: "ML Training",
-          description: "Train machine learning model",
+          title: "plugin.aiml.mlTraining.title",
+          description: "plugin.aiml.mlTraining.description",
         }),
       },
       {
@@ -170,8 +189,8 @@ export const aiMLPlugin: Plugin = {
         type: AINodeType.ML_PREDICTION,
         name: "ML Prediction",
         config: createAINodeConfig(AINodeType.ML_PREDICTION, {
-          title: "ML Prediction",
-          description: "Make predictions with trained model",
+          title: "plugin.aiml.mlPrediction.title",
+          description: "plugin.aiml.mlPrediction.description",
         }),
       },
       {
@@ -179,8 +198,8 @@ export const aiMLPlugin: Plugin = {
         type: AINodeType.DATA_PREPROCESSING,
         name: "Data Preprocessing",
         config: createAINodeConfig(AINodeType.DATA_PREPROCESSING, {
-          title: "Data Preprocessing",
-          description: "Preprocess and clean data",
+          title: "plugin.aiml.dataPreprocessing.title",
+          description: "plugin.aiml.dataPreprocessing.description",
         }),
       },
       {
@@ -188,12 +207,16 @@ export const aiMLPlugin: Plugin = {
         type: AINodeType.MODEL_EVALUATION,
         name: "Model Evaluation",
         config: createAINodeConfig(AINodeType.MODEL_EVALUATION, {
-          title: "Model Evaluation",
-          description: "Evaluate model performance",
+          title: "plugin.aiml.modelEvaluation.title",
+          description: "plugin.aiml.modelEvaluation.description",
         }),
       },
     ],
     rules: aiWorkflowRules,
+    translations: {
+      en: pluginTranslationsEn as Record<string, string>,
+      vi: pluginTranslationsVi as Record<string, string>,
+    },
   },
 
   // Lifecycle hooks

@@ -14,7 +14,7 @@ import { Info, Settings2 } from "lucide-react";
 export const baseNodePropertyGroups: PropertyGroupDefinition[] = [
   {
     id: "basic",
-    label: "Basic",
+    label: "common.propertyGroup.basic",
     description: "Basic node properties",
     icon: Settings2,
     order: 1,
@@ -56,7 +56,7 @@ export const baseNodePropertyGroups: PropertyGroupDefinition[] = [
 export const baseEdgePropertyGroups: PropertyGroupDefinition[] = [
   {
     id: "basic",
-    label: "Basic",
+    label: "common.propertyGroup.basic",
     description: "Basic edge properties",
     icon: Settings2,
     order: 1,

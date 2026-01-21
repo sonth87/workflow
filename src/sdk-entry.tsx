@@ -10,13 +10,13 @@ import type {
   WorkflowBuilderProps,
 } from "./workflow";
 import { CustomNodeFactory, PluginJSONLoader, globalEventBus } from "./core";
+import { translationRegistry } from "./core/registry/TranslationRegistry";
 import type { CustomNodeJSON, PluginJSON } from "./core";
 import type {
   WorkflowState,
   WorkflowActions,
 } from "./core/store/workflowStore";
 import type { BaseNodeConfig, BaseEdgeConfig } from "./core/types/base.types";
-import type { UITranslations } from "./workflow/translations/ui.translations";
 
 const WorkflowBuilder = WorkflowModule.default;
 import "@xyflow/react/dist/style.css";
@@ -37,8 +37,10 @@ interface BPMConfig {
   pluginsFromJSON?: PluginJSON[];
   pluginUrls?: string[];
   // Language configuration
-  uiTranslations?: UITranslations;
   defaultLanguage?: string;
+  // Translation support (flat key-based system)
+  translations?: Record<string, string> | string; // Inline object or URL
+  translationsUrl?: string; // Alternative way to specify URL
   onReady?: () => void;
   onError?: (error: Error) => void;
 }
@@ -111,7 +113,6 @@ class BPMCore {
           ...(this.config.pluginOptions || {}),
           languageConfig: {
             defaultLanguage: this.config.defaultLanguage || "en",
-            uiTranslations: this.config.uiTranslations,
           },
         },
         uiConfig: this.config.ui,
@@ -150,6 +151,10 @@ class BPMCore {
   }
 
   private async loadJSONConfigs() {
+    // Load translations first (before nodes, so keys can be resolved)
+    // This won't throw errors - just logs warnings
+    await this.loadTranslations();
+
     try {
       // Load custom nodes from inline config
       if (this.config.customNodes && Array.isArray(this.config.customNodes)) {
@@ -189,6 +194,80 @@ class BPMCore {
       }
     } catch (error) {
       console.error("[BPM SDK] Error loading JSON configs:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load translations from config or URL
+   * Called internally during initialization and can be called externally for dynamic loading
+   * Note: Errors are caught and logged, but won't prevent initialization
+   */
+  private async loadTranslations(): Promise<void> {
+    const language = this.currentLanguage;
+
+    try {
+      // Load from translations option (inline object or URL)
+      if (this.config.translations) {
+        if (typeof this.config.translations === "string") {
+          // It's a URL
+          await translationRegistry.loadFromUrl(
+            this.config.translations,
+            language
+          );
+        } else if (typeof this.config.translations === "object") {
+          // It's an inline object
+          translationRegistry.register(language, this.config.translations);
+        }
+      }
+
+      // Load from translationsUrl option
+      if (this.config.translationsUrl) {
+        await translationRegistry.loadFromUrl(
+          this.config.translationsUrl,
+          language
+        );
+      }
+    } catch (error) {
+      // Log error but don't throw - translations are optional
+      console.warn(
+        `[BPM SDK] Could not load translations. If using file:// protocol, consider:
+1. Serve files via HTTP server (e.g., python -m http.server or npx serve)
+2. Pass translations as inline object instead of URL
+3. Use React library integration for local development
+
+Error:`,
+        error
+      );
+    }
+  }
+
+  /**
+   * Public method to dynamically load translations for a specific language
+   * @param urlOrLanguage - URL to translation file or language code
+   * @param translations - Optional translations object (if first param is language code)
+   */
+  async loadTranslationsForLanguage(
+    urlOrLanguage: string,
+    translations?: Record<string, string>
+  ): Promise<void> {
+    try {
+      if (translations) {
+        // First param is language code, second is translations object
+        translationRegistry.register(urlOrLanguage, translations);
+      } else if (
+        urlOrLanguage.includes(".json") ||
+        urlOrLanguage.startsWith("http")
+      ) {
+        // It's a URL
+        await translationRegistry.loadFromUrl(urlOrLanguage);
+      } else {
+        console.warn(
+          `[BPM SDK] loadTranslationsForLanguage: Invalid parameters. Expected URL or (language, translations object)`
+        );
+      }
+    } catch (error) {
+      console.error("[BPM SDK] Error loading translations:", error);
       throw error;
     }
   }
@@ -525,7 +604,6 @@ class BPMCore {
           ...(this.config.pluginOptions || {}),
           languageConfig: {
             defaultLanguage: this.config.defaultLanguage || "en",
-            uiTranslations: this.config.uiTranslations,
           },
         },
         uiConfig: this.config.ui,

@@ -24,6 +24,7 @@ import { contextMenuRegistry } from "../registry/ContextMenuRegistry";
 import { categoryRegistry } from "../registry/CategoryRegistry";
 import { propertyRegistry } from "../properties";
 import { globalEventBus, WorkflowEventTypes } from "../events/EventBus";
+import { translationRegistry } from "../registry/TranslationRegistry";
 
 /**
  * Convert propertyDefinitions array thành propertyGroups
@@ -141,6 +142,9 @@ export interface PluginConfig {
     name: string | { [key: string]: string };
     config: CategoryConfig;
   }>;
+  translations?: {
+    [languageCode: string]: Record<string, string>;
+  };
   [key: string]: unknown;
 }
 
@@ -293,6 +297,15 @@ export class PluginManager {
    */
   private registerPluginResources(plugin: Plugin): void {
     const { config } = plugin;
+
+    // Register translations first (if provided)
+    if (config.translations) {
+      Object.entries(config.translations).forEach(
+        ([languageCode, translations]) => {
+          translationRegistry.register(languageCode, translations);
+        }
+      );
+    }
 
     // Register categories first (before nodes)
     if (config.categories) {

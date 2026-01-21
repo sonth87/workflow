@@ -8,10 +8,13 @@ import { BaseNodeType } from "../../nodes/BaseNodeDefinitions";
 
 /**
  * Multilingual text schema
- * Supports both plain string and multilingual object format: { en: "English", vi: "Vietnamese" }
+ * Supports three formats:
+ * 1. Plain string (used as-is or as translation key)
+ * 2. Nested multilingual object: { en: "English", vi: "Vietnamese" }
+ * 3. Translation key string (will be resolved at runtime via TranslationRegistry)
  */
 export const MultilingualTextSchema = z.union([
-  z.string(),
+  z.string(), // Can be plain text or translation key
   z
     .record(z.string(), z.string())
     .refine(obj => Object.keys(obj).length > 0 && "en" in obj, {

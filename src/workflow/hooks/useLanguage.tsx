@@ -1,16 +1,44 @@
 import type { MultilingualTextType } from "@/types/dynamic-bpm.type";
 import { useLanguageContext } from "@/workflow/context/LanguageContext";
 import { useCallback } from "react";
+import { translationRegistry } from "@/core/registry/TranslationRegistry";
 
 export const useLanguage = () => {
-  const { language, setLanguage, uiTranslations } = useLanguageContext();
+  const { language, setLanguage } = useLanguageContext();
 
   const getText = useCallback(
     (text?: MultilingualTextType | string): string => {
       if (!text) return "";
 
-      // If text is a string, return it as is
+      // If text is a string, check if it's a translation key or plain text
       if (typeof text === "string") {
+        // Check if it's a translation key (contains "." and not a URL)
+        // URLs must have "://" to be considered URLs (http://, https://, etc.)
+        if (text.includes(".") && !text.includes("://")) {
+          // Try to resolve from TranslationRegistry
+          if (
+            typeof window !== "undefined" &&
+            window.__BPM_TRANSLATION_REGISTRY__
+          ) {
+            const registry = window.__BPM_TRANSLATION_REGISTRY__;
+
+            // Try current language
+            const translation = registry.get(text, language);
+            if (translation) {
+              return translation;
+            }
+
+            // Fallback to English
+            if (language !== "en") {
+              const enTranslation = registry.get(text, "en");
+              if (enTranslation) {
+                return enTranslation;
+              }
+            }
+          }
+        }
+
+        // Return as plain text if not found in registry
         return text;
       }
 
@@ -47,45 +75,42 @@ export const useLanguage = () => {
 
   /**
    * Get UI text from translations dictionary
-   * Supports nested keys like "toolbar.zoomIn"
-   * and template variables like "error: {count}"
+   * Supports flat keys with 'ui.' prefix and template variables
    *
    * @example
-   * const title = getUIText("toolbar.zoomIn");
-   * const msg = getUIText("run.cannotRunWorkflow", { count: 5 });
+   * const title = getUIText("ui.toolbar.zoomIn");
+   * const msg = getUIText("ui.run.cannotRunWorkflow", { count: 5 });
    */
   const getUIText = useCallback(
     (path: string, params?: Record<string, string | number>): string => {
       try {
-        // Navigate nested object using dot notation
-        const keys = path.split(".");
-        let value: any = uiTranslations;
+        // Get from TranslationRegistry (flat format)
+        const translatedText = translationRegistry.get(path, language);
 
-        for (const key of keys) {
-          value = value?.[key];
+        if (!translatedText) {
+          console.warn(`Translation key not found: ${path}`);
+          return "";
         }
 
-        // If value is multilingual object, use getText
-        if (value && typeof value === "object" && !Array.isArray(value)) {
-          let text = getText(value);
-
-          // Replace template variables if provided
-          if (params) {
-            Object.entries(params).forEach(([key, val]) => {
-              text = text.replace(new RegExp(`\\{${key}\\}`, "g"), String(val));
-            });
-          }
-
-          return text;
+        // Replace template variables if provided
+        if (params) {
+          let result = translatedText;
+          Object.entries(params).forEach(([key, val]) => {
+            result = result.replace(
+              new RegExp(`\\{${key}\\}`, "g"),
+              String(val)
+            );
+          });
+          return result;
         }
 
-        return "";
+        return translatedText;
       } catch (error) {
         console.warn(`Failed to get UI text for path: ${path}`, error);
         return "";
       }
     },
-    [getText]
+    [language]
   );
 
   return { getText, getUIText, setLanguage };

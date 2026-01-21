@@ -62,11 +62,12 @@ export {
   useLanguageContext,
   type LanguageType,
 } from "./workflow/context/LanguageContext";
-export {
-  DEFAULT_UI_TRANSLATIONS,
-  type UITranslations,
-} from "./workflow/translations/ui.translations";
+
 export { LanguageSwitcher } from "./workflow/components/LanguageSwitcher";
+
+// Plugin translations (includes UI translations with 'ui.*' prefix)
+export { default as pluginTranslationsEn } from "./translations/plugins.en.json";
+export { default as pluginTranslationsVi } from "./translations/plugins.vi.json";
 
 // ==================== Utils ====================
 export { cx } from "./utils/cx";

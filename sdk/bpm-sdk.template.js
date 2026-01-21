@@ -426,6 +426,27 @@
     },
 
     /**
+     * Load translations for a specific language dynamically
+     * @param {string} urlOrLanguage - URL to translation file or language code
+     * @param {object} translations - Optional translations object (if first param is language code)
+     * @returns {Promise} Promise that resolves when translations are loaded
+     */
+    loadTranslationsForLanguage: function (urlOrLanguage, translations) {
+      if (
+        this.instance &&
+        typeof this.instance.loadTranslationsForLanguage === "function"
+      ) {
+        return this.instance.loadTranslationsForLanguage(
+          urlOrLanguage,
+          translations
+        );
+      }
+      return Promise.reject(
+        new Error("loadTranslationsForLanguage not available")
+      );
+    },
+
+    /**
      * Undo last action
      */
     undo: function () {

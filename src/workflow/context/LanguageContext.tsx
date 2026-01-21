@@ -2,20 +2,7 @@
  * Language Context
  * Manages global language state for dynamic i18n support
  *
- * Supports custom translations for external project integration:
- * ```
- * import { DEFAULT_UI_TRANSLATIONS, UITranslations } from 'bpm-core/translations'
- *
- * const customTranslations: UITranslations = {
- *   ...DEFAULT_UI_TRANSLATIONS,
- *   toolbar: { ...DEFAULT_UI_TRANSLATIONS.toolbar, ... }
- * }
- *
- * <LanguageProvider
- *   defaultLanguage="en"
- *   uiTranslations={customTranslations}
- * >
- * ```
+ * All UI translations use flat key-based format via TranslationRegistry.
  */
 
 import {
@@ -26,10 +13,6 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import {
-  DEFAULT_UI_TRANSLATIONS,
-  type UITranslations,
-} from "../translations/ui.translations";
 
 // Support any language dynamically - not limited to en/vi
 export type LanguageType = string;
@@ -37,7 +20,6 @@ export type LanguageType = string;
 interface LanguageContextValue {
   language: LanguageType;
   setLanguage: (language: LanguageType) => void;
-  uiTranslations: UITranslations;
 }
 
 const LanguageContext = createContext<LanguageContextValue | undefined>(
@@ -55,13 +37,11 @@ export function useLanguageContext() {
 interface LanguageProviderProps {
   children: ReactNode;
   defaultLanguage?: LanguageType;
-  uiTranslations?: UITranslations;
 }
 
 export function LanguageProvider({
   children,
   defaultLanguage = "en",
-  uiTranslations = DEFAULT_UI_TRANSLATIONS,
 }: LanguageProviderProps) {
   const [language, setLanguageState] = useState<LanguageType>(() => {
     // Load from localStorage if available
@@ -84,7 +64,6 @@ export function LanguageProvider({
   const value: LanguageContextValue = {
     language,
     setLanguage,
-    uiTranslations,
   };
 
   return (

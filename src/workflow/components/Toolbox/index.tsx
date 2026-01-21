@@ -154,9 +154,11 @@ export function Toolbox({ className }: ToolboxProps) {
       const targetCategory = ensureCategory(categoryType);
 
       if (!targetCategory.nodes.some(item => item?.type === nodeType)) {
+        const label = registryItem.config.metadata?.title || registryItem.name;
+
         targetCategory.nodes.push({
           type: nodeType,
-          label: registryItem.config.metadata?.title || registryItem.name,
+          label,
           description: registryItem?.config?.metadata?.description,
           icon: registryItem?.config?.icon,
           visualConfig: registryItem?.config?.visualConfig,

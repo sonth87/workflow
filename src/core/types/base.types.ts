@@ -12,11 +12,27 @@ import type { CSSProperties, ReactNode } from "react";
 // ============================================
 
 /**
- * Multilingual text support: either a plain string or an object with language keys
+ * Multilingual text support
+ * Can be:
+ * - A simple string (plain text or translation key)
+ * - An object with language codes as keys (nested format)
+ * Translation keys will be resolved via TranslationRegistry at runtime
  */
 export type MultilingualText =
   | string
   | { en: string; vi: string; [key: string]: string };
+
+/**
+ * Type guard to check if a value is a translation key
+ * Translation keys typically follow pattern: "nodeId.field" or "nodeId.properties.fieldName"
+ */
+export function isTranslationKey(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    value.includes(".") &&
+    !value.startsWith("http") // Not a URL
+  );
+}
 
 // ============================================
 // Metadata & Configuration Types

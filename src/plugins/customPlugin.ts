@@ -12,6 +12,10 @@ import DataCategoryIcon from "./icon/data.svg";
 import IntegrationCategoryIcon from "./icon/intergration.svg";
 import { CheckCircle2, Database, Globe, Sparkles } from "lucide-react";
 
+// Import plugin translations
+import pluginTranslationsEn from "@/translations/plugins.en.json";
+import pluginTranslationsVi from "@/translations/plugins.vi.json";
+
 // Custom node types
 export enum CustomNodeType {
   AI_ASSISTANT = "aiAssistant",
@@ -172,11 +176,11 @@ export const customPlugin: Plugin = {
         name: "AI & ML",
         config: {
           id: "category-ai-ml",
-          name: "AI & Machine Learning",
+          name: "plugin.custom.category.aiMl.name",
           categoryType: CustomCategoryType.AI_ML,
           isOpen: true,
           icon: AICategoryIcon,
-          description: "AI and Machine Learning nodes",
+          description: "plugin.custom.category.aiMl.description",
           order: 10,
         },
       },
@@ -186,11 +190,11 @@ export const customPlugin: Plugin = {
         name: "Data Processing",
         config: {
           id: "category-data-processing",
-          name: "Data Processing",
+          name: "plugin.custom.category.dataProcessing.name",
           categoryType: CustomCategoryType.DATA_PROCESSING,
           isOpen: true,
           icon: DataCategoryIcon,
-          description: "Data processing and transformation nodes",
+          description: "plugin.custom.category.dataProcessing.description",
           order: 20,
         },
       },
@@ -200,11 +204,11 @@ export const customPlugin: Plugin = {
         name: "Integrations",
         config: {
           id: "category-integrations",
-          name: "Integrations",
+          name: "plugin.custom.category.integrations.name",
           categoryType: CustomCategoryType.INTEGRATIONS,
           isOpen: true,
           icon: IntegrationCategoryIcon,
-          description: "External system integration nodes",
+          description: "plugin.custom.category.integrations.description",
           order: 30,
         },
       },
@@ -221,8 +225,8 @@ export const customPlugin: Plugin = {
             CustomCategoryType.AI_ML as any,
             aiAssistantVisualConfig,
             {
-              title: "AI Assistant",
-              description: "AI-powered task automation",
+              title: "plugin.custom.aiAssistant.title",
+              description: "plugin.custom.aiAssistant.description",
             }
           ),
           icon: {
@@ -236,22 +240,34 @@ export const customPlugin: Plugin = {
             {
               id: "modelName",
               name: "modelName",
-              label: "AI Model Name",
+              label: "plugin.custom.aiAssistant.property.modelName.label",
               type: "select",
               required: true,
               defaultValue: "gpt-4",
               order: 3,
               group: "config",
               options: [
-                { label: "GPT-4", value: "gpt-4" },
-                { label: "GPT-3.5", value: "gpt-3.5" },
-                { label: "Claude", value: "claude" },
+                {
+                  label:
+                    "plugin.custom.aiAssistant.property.modelName.option.gpt4",
+                  value: "gpt-4",
+                },
+                {
+                  label:
+                    "plugin.custom.aiAssistant.property.modelName.option.gpt35",
+                  value: "gpt-3.5",
+                },
+                {
+                  label:
+                    "plugin.custom.aiAssistant.property.modelName.option.claude",
+                  value: "claude",
+                },
               ],
             },
             {
               id: "prompt",
               name: "prompt",
-              label: "Prompt",
+              label: "plugin.custom.aiAssistant.property.prompt.label",
               type: "textarea",
               required: true,
               defaultValue: "",
@@ -285,8 +301,8 @@ export const customPlugin: Plugin = {
             CustomCategoryType.DATA_PROCESSING as any,
             dataProcessorVisualConfig,
             {
-              title: "Data Processor",
-              description: "Process and transform data",
+              title: "plugin.custom.dataProcessor.title",
+              description: "plugin.custom.dataProcessor.description",
             }
           ),
           icon: {
@@ -347,8 +363,8 @@ export const customPlugin: Plugin = {
             CustomCategoryType.INTEGRATIONS as any,
             apiIntegratorVisualConfig,
             {
-              title: "API Integrator",
-              description: "Integrate with external APIs",
+              title: "plugin.custom.apiIntegrator.title",
+              description: "plugin.custom.apiIntegrator.description",
             }
           ),
           icon: {
@@ -409,8 +425,8 @@ export const customPlugin: Plugin = {
             CustomCategoryType.DATA_PROCESSING as any,
             customValidatorVisualConfig,
             {
-              title: "Custom Validator",
-              description: "Custom validation logic",
+              title: "plugin.custom.customValidator.title",
+              description: "plugin.custom.customValidator.description",
             }
           ),
           icon: {
@@ -569,6 +585,12 @@ export const customPlugin: Plugin = {
         },
       },
     ],
+
+    // Plugin translations
+    translations: {
+      en: pluginTranslationsEn as Record<string, string>,
+      vi: pluginTranslationsVi as Record<string, string>,
+    },
   },
 
   // Lifecycle hooks
