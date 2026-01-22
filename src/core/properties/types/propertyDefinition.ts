@@ -22,6 +22,8 @@ export type PropertyFieldType =
   | "json"
   | "date"
   | "slider"
+  | "logic"
+  | "expression"
   | "custom";
 
 /**

@@ -246,10 +246,35 @@ const defaultNodes: PluginConfig["nodes"] = [
     id: NodeType.TASK_USER,
     type: NodeType.TASK_USER,
     name: "User Task",
-    config: createDefaultNodeConfig(NodeType.TASK_USER, CategoryType.TASK, {
-      title: "plugin.default.taskUser.title",
-      description: "plugin.default.taskUser.description",
-    }),
+    config: {
+      ...createDefaultNodeConfig(NodeType.TASK_USER, CategoryType.TASK, {
+        title: "plugin.default.taskUser.title",
+        description: "plugin.default.taskUser.description",
+      }),
+      propertyDefinitions: [
+        {
+          id: "assignee",
+          name: "assignee",
+          type: "text",
+          label: "Assignee",
+          group: "assignment",
+        },
+        {
+          id: "candidateGroups",
+          name: "candidateGroups",
+          type: "text",
+          label: "Candidate Groups",
+          group: "assignment",
+        },
+        {
+          id: "dueDate",
+          name: "dueDate",
+          type: "date",
+          label: "Due Date",
+          group: "assignment",
+        },
+      ],
+    },
   },
   {
     id: NodeType.TASK_SYSTEM,
@@ -264,19 +289,69 @@ const defaultNodes: PluginConfig["nodes"] = [
     id: NodeType.TASK_SCRIPT,
     type: NodeType.TASK_SCRIPT,
     name: "Script Task",
-    config: createDefaultNodeConfig(NodeType.TASK_SCRIPT, CategoryType.TASK, {
-      title: "plugin.default.taskScript.title",
-      description: "plugin.default.taskScript.description",
-    }),
+    config: {
+      ...createDefaultNodeConfig(NodeType.TASK_SCRIPT, CategoryType.TASK, {
+        title: "plugin.default.taskScript.title",
+        description: "plugin.default.taskScript.description",
+      }),
+      propertyDefinitions: [
+        {
+          id: "script",
+          name: "script",
+          type: "logic",
+          label: "Script",
+          group: "logic",
+        },
+      ],
+    },
   },
   {
     id: NodeType.SERVICE_TASK,
     type: NodeType.SERVICE_TASK,
     name: "Service Task",
-    config: createDefaultNodeConfig(NodeType.SERVICE_TASK, CategoryType.TASK, {
-      title: "plugin.default.serviceTask.title",
-      description: "plugin.default.serviceTask.description",
-    }),
+    config: {
+      ...createDefaultNodeConfig(NodeType.SERVICE_TASK, CategoryType.TASK, {
+        title: "plugin.default.serviceTask.title",
+        description: "plugin.default.serviceTask.description",
+      }),
+      propertyDefinitions: [
+        {
+          id: "apiUrl",
+          name: "apiUrl",
+          type: "text",
+          label: "API URL",
+          group: "service",
+        },
+        {
+          id: "method",
+          name: "method",
+          type: "select",
+          label: "Method",
+          group: "service",
+          options: [
+            { label: "GET", value: "GET" },
+            { label: "POST", value: "POST" },
+            { label: "PUT", value: "PUT" },
+            { label: "DELETE", value: "DELETE" },
+          ],
+          defaultValue: "GET",
+        },
+        {
+          id: "headers",
+          name: "headers",
+          type: "json",
+          label: "Headers",
+          group: "service",
+        },
+        {
+          id: "payloadMapping",
+          name: "payloadMapping",
+          type: "logic",
+          label: "Payload Mapping",
+          group: "service",
+        },
+      ],
+    },
   },
 
   // Gateways
@@ -299,6 +374,15 @@ const defaultNodes: PluginConfig["nodes"] = [
         backgroundColor: "#ff9d57",
         color: "#ffffff",
       },
+      propertyDefinitions: [
+        {
+          id: "defaultFlow",
+          name: "defaultFlow",
+          type: "text",
+          label: "Default Flow ID",
+          group: "gateway",
+        },
+      ],
     },
   },
   {
@@ -565,7 +649,14 @@ const defaultEdges: Array<{
         pathStyle: EdgePathStyle.Solid,
       },
       propertyDefinitions: [
-        // Property
+        {
+          id: "condition",
+          name: "condition",
+          type: "expression",
+          label: "Condition Expression",
+          group: "logic",
+          helpText: "Condition to follow this flow (e.g. amount > 100)",
+        },
       ],
     },
   },

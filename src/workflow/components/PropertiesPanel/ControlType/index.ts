@@ -6,5 +6,7 @@ export { BooleanControl } from "./BooleanInput";
 export { ColorControl } from "./ColorInput";
 export { JsonControl } from "./JsonInput";
 export { SliderControl } from "./SliderInput";
+export * from "./LogicInput";
+export * from "./ExpressionInput";
 export { MultiSelectControl } from "./MultiSelectInput";
 export { DateControl } from "./DateInput";

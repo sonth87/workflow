@@ -106,7 +106,7 @@ CustomNodeFactory.registerFromConfig(nodeConfig);
   "id": "string (required)",
   "name": "string (required)",
   "label": "string OR MultilingualText (required)",
-  "type": "text|number|textarea|boolean|select|multiselect|color|json|date|slider (required)",
+  "type": "text|number|textarea|boolean|select|multiselect|color|json|date|slider|logic|expression (required)",
   "required": boolean,
   "defaultValue": any,
   "placeholder": "string OR MultilingualText",
