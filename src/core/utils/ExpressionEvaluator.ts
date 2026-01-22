@@ -10,14 +10,13 @@ export class ExpressionEvaluator {
    * @param context The context object containing variables
    * @returns The result of the expression
    */
-  static evaluate(expression: string, context: Record<string, any>): any {
+  evaluateExpression(expression: string, context: Record<string, any>): any {
     if (!expression) return true;
 
     try {
       // Create a function from the expression
-      // We use the keys of the context as arguments
-      const keys = Object.keys(context);
-      const values = Object.values(context);
+      const keys = ["variables", ...Object.keys(context)];
+      const values = [context, ...Object.values(context)];
 
       const fn = new Function(...keys, `return (${expression})`);
       return fn(...values);
@@ -33,14 +32,15 @@ export class ExpressionEvaluator {
    * @param context The context object
    * @returns The modified context or result
    */
-  static execute(script: string, context: Record<string, any>): any {
+  evaluateScript(script: string, context: Record<string, any>): any {
     if (!script) return context;
 
     try {
-      const keys = Object.keys(context);
-      const values = Object.values(context);
+      // We wrap the script to allow returning values or modifying the variables object
+      const keys = ["variables", ...Object.keys(context)];
+      const values = [context, ...Object.values(context)];
 
-      const fn = new Function(...keys, script);
+      const fn = new Function(...keys, `${script}; return variables;`);
       return fn(...values);
     } catch (error) {
       console.error(`Error executing script`, error);
@@ -48,3 +48,5 @@ export class ExpressionEvaluator {
     }
   }
 }
+
+export const expressionEvaluator = new ExpressionEvaluator();

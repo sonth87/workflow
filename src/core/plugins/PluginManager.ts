@@ -78,12 +78,14 @@ function convertPropertyDefinitionsToGroups(
       placeholder: propDef.placeholder,
       helpText: propDef.description,
       options: propDef.options
-        ? {
-            options: propDef.options.map(opt => ({
-              label: opt.label,
-              value: opt.value as string | number | boolean,
-            })),
-          }
+        ? Array.isArray(propDef.options)
+          ? {
+              options: propDef.options.map((opt: any) => ({
+                label: opt.label,
+                value: opt.value as string | number | boolean,
+              })),
+            }
+          : (propDef.options as any)
         : undefined,
       order: 0, // Will be set later
       group: groupId,

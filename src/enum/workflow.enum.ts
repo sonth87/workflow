@@ -5,6 +5,7 @@ export enum NodeType {
   START_EVENT_TIMER = "startEventTimer",
   START_EVENT_WEB = "startEventWeb",
   START_EVENT_RECEIVE_SIGNAL = "startEventReceiveSignal",
+  START_EVENT_MESSAGE = "startEventMessage",
 
   TASK_DEFAULT = "taskDefault",
   TASK_USER = "taskUser",
@@ -21,6 +22,11 @@ export enum NodeType {
   IMMEDIATE_SIGNAL = "immediateSignal",
   IMMEDIATE_CONDITION = "immediateCondition",
 
+  BOUNDARY_MESSAGE = "boundaryMessage",
+  BOUNDARY_ERROR = "boundaryError",
+  BOUNDARY_TIMER = "boundaryTimer",
+  BOUNDARY_SIGNAL = "boundarySignal",
+
   SERVICE_TASK = "serviceTask",
   NOTIFICATION = "notification",
   TIME_DELAY = "timeDelay",
@@ -32,6 +38,9 @@ export enum NodeType {
 
   END_EVENT_DEFAULT = "endEventDefault",
   END_EVENT_SEND_SIGNAL = "endEventSendSignal",
+  END_EVENT_ERROR = "endEventError",
+  END_EVENT_TERMINATE = "endEventTerminate",
+  END_EVENT_COMPENSATION = "endEventCompensation",
 
   SUBFLOW = "subflow",
   POOL = "pool",
@@ -85,6 +94,7 @@ export enum CategoryType {
   GATEWAY = "gateway",
   IMMEDIATE = "immediate",
   SUBFLOW = "subflow",
+  BOUNDARY = "boundary",
   CUSTOM = "custom",
   OTHER = "other",
 }

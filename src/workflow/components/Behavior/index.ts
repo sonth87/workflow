@@ -7,3 +7,4 @@ export * from "./Layout";
 export * from "./Run";
 export * from "./Theme";
 export * from "./Shortcuts";
+export * from "./SimulationControls";

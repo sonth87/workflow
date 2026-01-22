@@ -11,6 +11,8 @@ import {
 } from "./context/WorkflowProvider";
 import { WorkflowActionsProvider } from "./context/WorkflowActionsProvider";
 import { initializePropertySystem } from "@/core/properties";
+import { useWorkflowStore } from "@/core/store/workflowStore";
+import { useEffect } from "react";
 
 export interface WorkflowCoreProps {
   /**
@@ -56,6 +58,14 @@ export function WorkflowCore({
   if (initProperties) {
     initializePropertySystem();
   }
+
+  const store = useWorkflowStore();
+  useEffect(() => {
+    // Expose store to window for debugging/testing in dev mode
+    if (typeof window !== "undefined" && import.meta.env.DEV) {
+      (window as any).store = store;
+    }
+  }, [store]);
 
   return (
     <WorkflowProvider pluginOptions={pluginOptions}>

@@ -494,3 +494,29 @@ export const customPlugin: Plugin = {
 │ - Property Sync Handlers │
 │ - Validation Engine │
 └─────────────────────────────────────────────────────────────┘
+
+## 🎮 Simulation & Execution Logic
+
+BPM Core tích hợp trình mô phỏng (Simulation Engine) cho phép chạy thử quy trình ngay trong trình thiết kế.
+
+### 🔹 Cơ chế hoạt động
+
+1.  **Expression Evaluator**: Sử dụng một engine an toàn để đánh giá các biểu thức JavaScript (ES6+).
+2.  **Workflow Simulation State**: Quản lý trạng thái thực thi (active node, variables, history) trong Zustand store.
+3.  **Path Selection**:
+    *   Tự động di chuyển qua các Tasks/Events thông thường.
+    *   Đánh giá điều kiện (`condition`) trên các luồng rẽ nhánh (`Sequence Flow`) tại các Gateway để quyết định hướng đi.
+    *   Hỗ trợ luồng mặc định (`Default Flow`) nếu không có điều kiện nào thỏa mãn.
+
+### 🔹 Cách cấu hình Logic
+
+*   **Script Task**: Sử dụng field `script` (Logic editor) để thay đổi biến hệ thống.
+    *   *Ví dụ:* `variables.amount = 500; variables.status = 'pending';`
+*   **Gateway / Sequence Flow**: Sử dụng field `condition` (Expression editor) để rẽ nhánh.
+    *   *Ví dụ:* `variables.amount > 1000`
+
+### 🔹 Trình soạn thảo chuyên nghiệp
+
+Hệ thống cung cấp các bộ soạn thảo chuyên dụng:
+*   **Logic Editor**: Hỗ trợ viết script đa dòng với font monospaced và giao diện IDE thu nhỏ.
+*   **Expression Editor**: Chuyên dụng cho các công thức logic một dòng, hỗ trợ cú pháp `f(x) = ...`.

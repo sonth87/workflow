@@ -12,7 +12,7 @@ import {
   type ReactNode,
 } from "react";
 import { pluginManager, type Plugin } from "@/core/plugins/PluginManager";
-import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
+import { defaultBpmPlugin } from "@/plugins/default-bpm";
 import { LanguageProvider, useLanguageContext } from "./LanguageContext";
 import { useLanguage } from "../hooks/useLanguage";
 import { useAvailableLanguages } from "../hooks/useAvailableLanguages";

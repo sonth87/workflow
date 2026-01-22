@@ -26,31 +26,36 @@ export function ExpressionControl({
 
   return (
     <div className="space-y-1.5">
-      <label className="text-sm font-medium text-foreground flex items-center gap-2">
-        <Variable className="w-4 h-4 text-primary" />
+      <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+        <Variable className="w-3.5 h-3.5" />
         {getText(definition.label)}
         {definition.required && (
-          <span className="text-destructive ml-1">*</span>
+          <span className="text-destructive ml-0.5">*</span>
         )}
       </label>
-      <Input
-        value={(value as string) || ""}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          onChange(e.target.value);
-        }}
-        placeholder={(getText(definition.placeholder as any) || "e.g. status === 'approved'") as string}
-        required={definition.required}
-        disabled={disabled || !!definition.readonly}
-        className={cn(
-          "font-mono text-xs",
-          hasError && "border-destructive"
-        )}
-        infoTooltip={
-          (getText(definition?.helpText as any) || undefined) as
-            | string
-            | undefined
-        }
-      />
+      <div className="relative flex items-center">
+        <div className="absolute left-3 text-primary/50 font-mono text-xs select-none">
+          f(x) =
+        </div>
+        <Input
+          value={(value as string) || ""}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange(e.target.value);
+          }}
+          placeholder={(getText(definition.placeholder as any) || "e.g. status === 'approved'") as string}
+          required={definition.required}
+          disabled={disabled || !!definition.readonly}
+          className={cn(
+            "font-mono text-xs pl-12 bg-slate-950 text-slate-100 border-border focus:ring-1 focus:ring-primary/50 h-9",
+            hasError && "border-destructive"
+          )}
+          infoTooltip={
+            (getText(definition?.helpText as any) || undefined) as
+              | string
+              | undefined
+          }
+        />
+      </div>
       {hasError && (
         <p className="text-xs text-destructive">{errors[0].message}</p>
       )}

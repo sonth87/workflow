@@ -38,8 +38,16 @@ export type PropertyCondition =
   | ((entity: PropertyEntity) => boolean)
   | {
       field: string;
-      operator: "equals" | "notEquals" | "includes" | "notIncludes" | "custom";
-      value: unknown;
+      operator?:
+        | "equals"
+        | "notEquals"
+        | "includes"
+        | "notIncludes"
+        | "custom"
+        | "==="
+        | "!=="
+        | "contains";
+      value?: unknown;
       customCheck?: (fieldValue: unknown, entity: PropertyEntity) => boolean;
     };
 
