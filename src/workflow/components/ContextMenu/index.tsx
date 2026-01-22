@@ -17,6 +17,7 @@ import { CategoryType } from "@/enum/workflow.enum";
 import { Settings2 } from "lucide-react";
 import { contextMenuActionsRegistry } from "@/core/registry";
 import { useLanguage } from "@/workflow/hooks/useLanguage";
+import IconConfig from "../IconConfig";
 
 interface ContextMenuProps {
   x: number;
@@ -39,21 +40,28 @@ function MenuItemIcon({ icon, color }: { icon?: any; color?: string }) {
 
   if (icon) {
     // Nếu icon là string (emoji hoặc text), hiển thị trực tiếp
-    if (typeof icon === "string") {
+    if (typeof icon === "string" && !icon.startsWith("data:")) {
       return <span className="mr-2 text-base shrink-0">{icon}</span>;
     }
 
     // Nếu icon là object (lucide icon config)
-    if (typeof icon === "object" && icon.type === "lucide" && icon.value) {
-      const LucideIcon = icon.value;
+    if (
+      typeof icon === "object" &&
+      (icon.type === "lucide" || icon.type === "image") &&
+      icon.value
+    ) {
       const size = icon.size || 16;
       const iconColor = icon.color;
+      const backgroundColor = icon.backgroundColor;
 
       return (
-        <LucideIcon
-          className="mr-2 shrink-0"
+        <IconConfig
+          icon={icon}
+          compactView={false}
+          type={icon.type}
           size={size}
-          style={iconColor ? { color: iconColor } : undefined}
+          colorConfig={{ iconColor, backgroundColor }}
+          className="mr-2 shrink-0 w-5 h-5"
         />
       );
     }
@@ -61,7 +69,7 @@ function MenuItemIcon({ icon, color }: { icon?: any; color?: string }) {
     // Nếu là React component trực tiếp
     if (typeof icon === "function") {
       const IconComponent = icon;
-      return <IconComponent className="mr-2 shrink-0" size={16} />;
+      return <IconComponent className="mr-2 shrink-0 w-5 h-5" size={16} />;
     }
   }
 
@@ -117,7 +125,7 @@ function ContextMenuItems({
               {isOpen && (
                 <div
                   data-context-menu
-                  className="absolute left-full top-0 ml-0 min-w-40 bg-popover border border-border rounded-md shadow-lg z-50"
+                  className="absolute left-full top-0 ml-0 w-full min-w-40 max-w-60 bg-popover border border-border rounded-md shadow-lg z-50"
                 >
                   <ContextMenuItems
                     items={item.children}
@@ -268,11 +276,8 @@ export function ContextMenu({ x, y, context, onClose }: ContextMenuProps) {
   return (
     <div
       data-context-menu
-      className="fixed z-50 min-w-[200px] bg-popover border border-border rounded-md shadow-lg"
-      style={{
-        left: x,
-        top: y,
-      }}
+      className="fixed z-50 min-w-50 bg-popover border border-border rounded-md shadow-lg"
+      style={{ left: x, top: y }}
       onClick={e => e.stopPropagation()}
     >
       <ContextMenuItems items={items} context={context} onClose={onClose} />

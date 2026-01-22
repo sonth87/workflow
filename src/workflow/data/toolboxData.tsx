@@ -32,7 +32,7 @@ export interface NodeCategory {
 
 export const NODES_BY_CATEGORIES: NodeCategory[] = [
   {
-    name: "Start",
+    name: "plugin.default.category.start.name",
     isOpen: true,
     categoryType: CategoryType.START,
     nodes: [],
@@ -52,7 +52,7 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
     ),
   },
   {
-    name: "Task",
+    name: "plugin.default.category.task.name",
     isOpen: true,
     categoryType: CategoryType.TASK,
     nodes: [],
@@ -84,7 +84,7 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
     ),
   },
   {
-    name: "Gateway",
+    name: "plugin.default.category.gateway.name",
     isOpen: false,
     categoryType: CategoryType.GATEWAY,
     nodes: [],
@@ -108,7 +108,7 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
     ),
   },
   {
-    name: "Immediate",
+    name: "plugin.default.category.immediate.name",
     isOpen: false,
     categoryType: CategoryType.IMMEDIATE,
     nodes: [],
@@ -132,7 +132,7 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
     ),
   },
   {
-    name: "End",
+    name: "plugin.default.category.end.name",
     isOpen: true,
     categoryType: CategoryType.END,
     nodes: [],
@@ -156,7 +156,7 @@ export const NODES_BY_CATEGORIES: NodeCategory[] = [
     ),
   },
   {
-    name: "Other",
+    name: "plugin.default.category.other.name",
     isOpen: false,
     categoryType: CategoryType.OTHER,
     nodes: [],

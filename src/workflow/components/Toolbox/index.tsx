@@ -89,23 +89,17 @@ export function Toolbox({ className }: ToolboxProps) {
     const getCategoryDisplayName = (
       categoryType: CategoryType | string
     ): string => {
-      const categoryNames: Record<string, { [key: string]: string }> = {
-        [CategoryType.START]: { en: "Start Events", vi: "Sự kiện bắt đầu" },
-        [CategoryType.TASK]: { en: "Tasks", vi: "Nhiệm vụ" },
-        [CategoryType.GATEWAY]: { en: "Gateways", vi: "Cổng quyết định" },
-        [CategoryType.IMMEDIATE]: { en: "Immediate", vi: "Tức thì" },
-        [CategoryType.END]: { en: "End Events", vi: "Sự kiện kết thúc" },
-        [CategoryType.OTHER]: { en: "Other", vi: "Khác" },
-        [CategoryType.CUSTOM]: { en: "Custom", vi: "Tùy chỉnh" },
-        [CategoryType.SUBFLOW]: { en: "Subflow", vi: "Luồng con" },
-      };
+      // Use flat translation keys for category names
+      const categoryKey = `plugin.default.category.${categoryType}.name`;
 
-      const names = categoryNames[categoryType];
-      if (names) {
-        return getText(names);
+      const translatedName = getText(categoryKey);
+
+      // If translation key is not found, return formatted category type
+      if (translatedName === categoryKey) {
+        return categoryType.charAt(0).toUpperCase() + categoryType.slice(1);
       }
-      // Fallback for unknown categories
-      return categoryType.charAt(0).toUpperCase() + categoryType.slice(1);
+
+      return translatedName;
     };
 
     const ensureCategory = (

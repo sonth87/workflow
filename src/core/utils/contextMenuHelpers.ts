@@ -11,6 +11,7 @@ import type {
   NodeVisualConfig,
   EdgeVisualConfig,
   ContextMenuContext,
+  IconConfig,
 } from "../types/base.types";
 import { themeRegistry } from "../registry/ThemeRegistry";
 import { contextMenuActionsRegistry } from "../registry/ContextMenuActionsRegistry";
@@ -25,6 +26,7 @@ import {
   ArrowLeftRight,
 } from "lucide-react";
 import { getContextMenuLabel } from "./contextMenuLabels";
+import { getIconConfig } from "../../workflow/utils/iconConfig";
 
 /**
  * Generate unique separator ID
@@ -168,14 +170,41 @@ export function createChangeTypeSubmenuItems(
   const nodesInCategory = nodeRegistry.getByCategory(category);
 
   // Create menu items for each node type
-  return nodesInCategory.map(item => ({
-    id: `change-type-${item.id}`,
-    label: item.name || item.id,
-    disabled: item.id === currentNodeType, // Disable current node type
-    onClick: async (ctx: ContextMenuContext) => {
-      await onTypeChange(item.id, ctx);
-    },
-  }));
+  return nodesInCategory.map(item => {
+    // Get icon with fallback from iconConfig
+    let icon: any = item.config?.icon || item.icon;
+    if (!icon) {
+      const config = getIconConfig(item.id as any);
+
+      if (config?.icon) {
+        if (typeof config.icon === "string") {
+          icon = {
+            type: "image",
+            value: config.icon,
+            color: config.color,
+            backgroundColor: config.bgColor,
+          } as IconConfig;
+        } else {
+          icon = {
+            type: "lucide",
+            value: config.icon,
+            color: config.color,
+            backgroundColor: config.bgColor,
+          } as IconConfig;
+        }
+      }
+    }
+
+    return {
+      id: `change-type-${item.id}`,
+      label: item.config?.metadata?.title || item.name, // Use translation key from metadata
+      icon,
+      disabled: item.id === currentNodeType, // Disable current node type
+      onClick: async (ctx: ContextMenuContext) => {
+        await onTypeChange(item.id, ctx);
+      },
+    };
+  });
 }
 
 /**
