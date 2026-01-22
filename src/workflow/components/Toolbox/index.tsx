@@ -6,17 +6,31 @@
 import { categoryRegistry } from "@/core/registry/CategoryRegistry";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { CategoryType, NodeType } from "@/enum/workflow.enum";
-import {
-  X,
-  ChevronDown,
-  ChevronRight,
-  PanelLeft,
-  PanelRight,
-} from "lucide-react";
-import React, { useMemo, useState } from "react";
+import { X, PanelLeft, PanelRight } from "lucide-react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../../data/toolboxData";
 import IconConfig from "../IconConfig";
 import { cn } from "@sth87/shadcn-design-system";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
+
+// Custom hook for click outside
+const useOnClickOutside = (
+  ref: React.RefObject<HTMLElement | null>,
+  handler: () => void
+) => {
+  useEffect(() => {
+    const listener = (event: MouseEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
+        return;
+      }
+      handler();
+    };
+    document.addEventListener("mousedown", listener);
+    return () => {
+      document.removeEventListener("mousedown", listener);
+    };
+  }, [ref, handler]);
+};
 
 // Default icon for custom category
 const CustomCategoryIcon = () => (
@@ -44,6 +58,10 @@ export function Toolbox({ className }: ToolboxProps) {
   const [selectedCategoryType, setSelectedCategoryType] =
     useState<CategoryType>();
   const [toolboxState, setToolboxState] = useState<ToolboxState>("collapsed");
+  const { getText, getUIText } = useLanguage();
+  const popupRef = useRef<HTMLElement>(null);
+
+  useOnClickOutside(popupRef, () => setSelectedCategoryType(undefined));
 
   const handleDragStart = (e: React.DragEvent, nodeType: NodeType) => {
     e.dataTransfer.effectAllowed = "move";
@@ -68,7 +86,7 @@ export function Toolbox({ className }: ToolboxProps) {
       );
       if (!existing) {
         const newCategory: NodeCategory = {
-          name: registryItem.config.name,
+          name: registryItem.config.name as any,
           isOpen: registryItem.config.isOpen ?? true,
           categoryType: categoryType as CategoryType,
           nodes: [],
@@ -84,6 +102,22 @@ export function Toolbox({ className }: ToolboxProps) {
       }
     });
 
+    const getCategoryDisplayName = (
+      categoryType: CategoryType | string
+    ): string => {
+      // Use flat translation keys for category names
+      const categoryKey = `plugin.default.category.${categoryType}.name`;
+
+      const translatedName = getText(categoryKey);
+
+      // If translation key is not found, return formatted category type
+      if (translatedName === categoryKey) {
+        return categoryType.charAt(0).toUpperCase() + categoryType.slice(1);
+      }
+
+      return translatedName;
+    };
+
     const ensureCategory = (
       categoryType: CategoryType | string
     ): NodeCategory => {
@@ -91,7 +125,7 @@ export function Toolbox({ className }: ToolboxProps) {
       if (!existing) {
         // Create new category with default icon
         existing = {
-          name: categoryType.charAt(0).toUpperCase() + categoryType.slice(1),
+          name: getCategoryDisplayName(categoryType),
           isOpen: true,
           categoryType: categoryType as CategoryType,
           nodes: [],
@@ -130,9 +164,11 @@ export function Toolbox({ className }: ToolboxProps) {
       const targetCategory = ensureCategory(categoryType);
 
       if (!targetCategory.nodes.some(item => item?.type === nodeType)) {
+        const label = registryItem.config.metadata?.title || registryItem.name;
+
         targetCategory.nodes.push({
           type: nodeType,
-          label: registryItem.name,
+          label,
           description: registryItem?.config?.metadata?.description,
           icon: registryItem?.config?.icon,
           visualConfig: registryItem?.config?.visualConfig,
@@ -148,7 +184,7 @@ export function Toolbox({ className }: ToolboxProps) {
         const orderB = b.order ?? 999;
         return orderA - orderB;
       });
-  }, []);
+  }, [getText]);
 
   const selectedCategory = useMemo(
     () =>
@@ -162,7 +198,7 @@ export function Toolbox({ className }: ToolboxProps) {
     <aside
       className={cn(
         "border rounded-2xl shadow-xl flex flex-col relative overflow-visible bg-background/90 backdrop-blur-xs",
-        { "h-[calc(100%-1rem)] w-xs": toolboxState === "expanded" },
+        { "h-[calc(100%-1rem)] w-sm": toolboxState === "expanded" },
         className
       )}
     >
@@ -171,7 +207,7 @@ export function Toolbox({ className }: ToolboxProps) {
           <button
             onClick={() => setToolboxState("collapsed")}
             className="p-2 rounded-lg hover:bg-foreground/10 transition-colors"
-            title="Expand toolbox"
+            title={getUIText("ui.toolbox.expandToolbox")}
           >
             <ChevronDown size={16} />
           </button>
@@ -193,17 +229,19 @@ export function Toolbox({ className }: ToolboxProps) {
             <div className="h-px w-[calc(100%-0.5rem)] bg-border my-2" />
 
             {builderCategories.map((category, index) => (
-              <div key={`${category.name}-${index}`}>
+              <div
+                key={`${typeof category.name === "string" ? category.name : JSON.stringify(category.name)}-${index}`}
+              >
                 <div
                   className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"
                   onClick={() => setSelectedCategoryType(category.categoryType)}
-                  title={category.name}
+                  title={getText(category.name)}
                 >
                   {typeof category.icon === "string" &&
                   category.icon.startsWith("data:image/svg") ? (
                     <img
                       src={category.icon}
-                      alt={category.name}
+                      alt={getText(category.name) as string}
                       className="w-4.5 h-4.5"
                     />
                   ) : (
@@ -240,10 +278,13 @@ export function Toolbox({ className }: ToolboxProps) {
             </button> */}
           </div>
           {selectedCategory && (
-            <div className="min-w-[320px] border-border absolute top-0 left-[calc(100%+4px)] border rounded-2xl z-10 bg-background">
+            <div
+              ref={popupRef as React.RefObject<HTMLDivElement>}
+              className="min-w-[320px] border-border absolute top-0 left-[calc(100%+4px)] border rounded-2xl z-10 bg-background"
+            >
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <h2 className="text-base text-ink800 font-medium flex-1">
-                  {selectedCategory?.name}
+                  {getText(selectedCategory?.name)}
                 </h2>
                 <button
                   onClick={() => setSelectedCategoryType(undefined)}
@@ -269,12 +310,12 @@ export function Toolbox({ className }: ToolboxProps) {
                           icon={node?.icon}
                         />
                         <div className="flex flex-col justify-start">
-                          <span className="text-sm font-medium text-ink800">
-                            {node.label}
+                          <span className="text-sm font-medium text-ink800 line-clamp-2">
+                            {getText(node.label)}
                           </span>
                           {node.description && (
-                            <div className="text-xs mt-1 text-ink600 font-normal">
-                              {node.description}
+                            <div className="text-xs mt-1 text-ink600 font-normal line-clamp-3">
+                              {getText(node.description)}
                             </div>
                           )}
                         </div>
@@ -290,11 +331,13 @@ export function Toolbox({ className }: ToolboxProps) {
       {toolboxState === "expanded" && (
         <>
           <div className="flex items-center justify-between px-4 py-4">
-            <h1 className="text-lg font-semibold text-ink800">Toolbox</h1>
+            <h1 className="text-lg font-semibold text-ink800">
+              {getUIText("ui.toolbox.toolbox")}
+            </h1>
             <button
               onClick={() => setToolboxState("collapsed")}
               className="p-2 rounded-lg hover:bg-foreground/10 transition-colors"
-              title="Collapse toolbox"
+              title={getUIText("ui.toolbox.collapseToolbox")}
             >
               <PanelRight size={16} />
             </button>
@@ -310,14 +353,14 @@ export function Toolbox({ className }: ToolboxProps) {
                   category.icon.startsWith("data:image/svg") ? (
                     <img
                       src={category.icon}
-                      alt={category.name}
+                      alt={getText(category.name)}
                       className="w-5 h-5"
                     />
                   ) : (
                     <div className="w-5 h-5">{category.icon}</div>
                   )}
                   <h3 className="text-sm font-semibold text-ink800">
-                    {category.name}
+                    {getText(category.name)}
                   </h3>
                 </div>
                 <div className="pl-5">
@@ -338,11 +381,11 @@ export function Toolbox({ className }: ToolboxProps) {
                           />
                           <div className="flex flex-col justify-start">
                             <span className="text-sm font-medium text-ink800">
-                              {node.label}
+                              {getText(node.label)}
                             </span>
                             {node.description && (
                               <div className="text-xs mt-1 text-ink600 font-normal">
-                                {node.description}
+                                {getText(node.description)}
                               </div>
                             )}
                           </div>
@@ -351,7 +394,7 @@ export function Toolbox({ className }: ToolboxProps) {
                     })}
                 </div>
                 {index < builderCategories.length - 1 && (
-                  <div className="h-px bg-border my-2" />
+                  <div className="h-px bg-border my-0" />
                 )}
               </div>
             ))}

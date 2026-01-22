@@ -4,6 +4,7 @@
  */
 
 import type { Plugin } from "../plugins/PluginManager";
+import type { MultilingualText } from "../types/base.types";
 import { CustomNodeFactory } from "./CustomNodeFactory";
 import { categoryRegistry } from "../registry/CategoryRegistry";
 import { PluginJSONSchema, type PluginJSON } from "./schemas/nodeConfigSchema";
@@ -55,9 +56,9 @@ export class PluginJSONLoader {
     const plugin: Plugin = {
       metadata: {
         id: config.metadata.id,
-        name: config.metadata.name,
+        name: config.metadata.name as string,
         version: config.metadata.version || "1.0.0",
-        description: config.metadata.description,
+        description: config.metadata.description as string | undefined,
         author: config.metadata.author,
         dependencies: config.metadata.dependencies,
       },
@@ -75,14 +76,16 @@ export class PluginJSONLoader {
             categoryRegistry.register({
               id: category.id,
               type: category.id,
-              name: category.name,
+              name: category.name as MultilingualText,
               config: {
                 id: category.id,
-                name: category.name,
+                name: category.name as MultilingualText,
                 categoryType: category.id,
                 isOpen: true,
                 icon: category.icon,
-                description: category.description,
+                description: category.description as
+                  | MultilingualText
+                  | undefined,
                 order: category.order || 999,
               },
             });

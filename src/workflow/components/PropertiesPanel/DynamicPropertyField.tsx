@@ -15,6 +15,7 @@ import {
   MultiSelectControl,
   DateControl,
 } from "./ControlType";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface DynamicPropertyFieldProps {
   definition: PropertyFieldDefinition;
@@ -36,6 +37,8 @@ export function DynamicPropertyField({
   disabled = false,
   errors = [],
 }: DynamicPropertyFieldProps) {
+  const { getText } = useLanguage();
+
   // Nếu có custom renderer, dùng nó
   if (definition.customRenderer) {
     return definition.customRenderer({

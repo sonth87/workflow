@@ -1,6 +1,9 @@
 /**
  * Context Menu Helpers
  * Utility functions for creating common context menu items
+ *
+ * NOTE: Labels use multilingual objects from contextMenuLabels
+ * These are resolved to current language in React components via getText()
  */
 
 import type {
@@ -8,6 +11,7 @@ import type {
   NodeVisualConfig,
   EdgeVisualConfig,
   ContextMenuContext,
+  IconConfig,
 } from "../types/base.types";
 import { themeRegistry } from "../registry/ThemeRegistry";
 import { contextMenuActionsRegistry } from "../registry/ContextMenuActionsRegistry";
@@ -21,6 +25,8 @@ import {
   Trash2,
   ArrowLeftRight,
 } from "lucide-react";
+import { getContextMenuLabel } from "./contextMenuLabels";
+import { getIconConfig } from "../../workflow/utils/iconConfig";
 
 /**
  * Generate unique separator ID
@@ -50,7 +56,7 @@ export function createColorMenuItems(
   return [
     {
       id: "color-reset",
-      label: "Reset Color",
+      label: getContextMenuLabel("resetColor"),
       icon: "↺",
       onClick: async (context: any) => {
         await onColorChange("", context); // Pass empty string to reset
@@ -73,7 +79,7 @@ export function createColorPickerMenuItem(
 ): ContextMenuItem {
   return {
     id: "change-color",
-    label: "Change Color",
+    label: getContextMenuLabel("changeColor"),
     icon: "",
     children: createColorMenuItems(onColorChange),
   };
@@ -87,7 +93,7 @@ export function createDeleteMenuItem(
 ): ContextMenuItem {
   return {
     id: "delete",
-    label: "Delete",
+    label: getContextMenuLabel("delete"),
     icon: {
       type: "lucide",
       value: Trash2,
@@ -108,7 +114,7 @@ export function createChangeTypeMenuItem(
 ): ContextMenuItem {
   return {
     id: "change-type",
-    label: "Change Type",
+    label: getContextMenuLabel("changeType"),
     icon: {
       type: "lucide",
       value: ArrowLeftRight,
@@ -136,13 +142,13 @@ export function createChangeTypeMenuItem(
  */
 export function getCategoryTypeLabel(category: string): string {
   const labels: Record<string, string> = {
-    [CategoryType.START]: "Start Type",
-    [CategoryType.TASK]: "Task Type",
-    [CategoryType.GATEWAY]: "Gateway Type",
-    [CategoryType.IMMEDIATE]: "Immediate Type",
-    [CategoryType.END]: "End Type",
+    [CategoryType.START]: getContextMenuLabel("startType"),
+    [CategoryType.TASK]: getContextMenuLabel("taskType"),
+    [CategoryType.GATEWAY]: getContextMenuLabel("gatewayType"),
+    [CategoryType.IMMEDIATE]: getContextMenuLabel("immediateType"),
+    [CategoryType.END]: getContextMenuLabel("endType"),
   };
-  return labels[category] || "Change Type";
+  return labels[category] || getContextMenuLabel("changeType");
 }
 
 /**
@@ -164,14 +170,41 @@ export function createChangeTypeSubmenuItems(
   const nodesInCategory = nodeRegistry.getByCategory(category);
 
   // Create menu items for each node type
-  return nodesInCategory.map(item => ({
-    id: `change-type-${item.id}`,
-    label: item.name || item.id,
-    disabled: item.id === currentNodeType, // Disable current node type
-    onClick: async (ctx: ContextMenuContext) => {
-      await onTypeChange(item.id, ctx);
-    },
-  }));
+  return nodesInCategory.map(item => {
+    // Get icon with fallback from iconConfig
+    let icon: any = item.config?.icon || item.icon;
+    if (!icon) {
+      const config = getIconConfig(item.id as any);
+
+      if (config?.icon) {
+        if (typeof config.icon === "string") {
+          icon = {
+            type: "image",
+            value: config.icon,
+            color: config.color,
+            backgroundColor: config.bgColor,
+          } as IconConfig;
+        } else {
+          icon = {
+            type: "lucide",
+            value: config.icon,
+            color: config.color,
+            backgroundColor: config.bgColor,
+          } as IconConfig;
+        }
+      }
+    }
+
+    return {
+      id: `change-type-${item.id}`,
+      label: item.config?.metadata?.title || item.name, // Use translation key from metadata
+      icon,
+      disabled: item.id === currentNodeType, // Disable current node type
+      onClick: async (ctx: ContextMenuContext) => {
+        await onTypeChange(item.id, ctx);
+      },
+    };
+  });
 }
 
 /**
@@ -253,15 +286,17 @@ export function createNodeBorderStyleMenuItems(
   ) => void | Promise<void>
 ): ContextMenuItem[] {
   const borderStyles = [
-    { id: "solid", label: "Solid", icon: "━" },
-    { id: "dashed", label: "Dashed", icon: "╍" },
-    { id: "dotted", label: "Dotted", icon: "┄" },
-    { id: "double", label: "Double", icon: "═" },
+    { id: "solid", labelKey: "solid", icon: "━" },
+    { id: "dashed", labelKey: "dashed", icon: "╍" },
+    { id: "dotted", labelKey: "dotted", icon: "┄" },
+    { id: "double", labelKey: "double", icon: "═" },
   ];
 
   return borderStyles.map(style => ({
     id: `border-style-${style.id}`,
-    label: style.label,
+    label: getContextMenuLabel(
+      style.labelKey as keyof typeof import("./contextMenuLabels").contextMenuLabels
+    ),
     icon: style.icon,
     onClick: async (context: any) => {
       await onBorderStyleChange(style.id, context);
@@ -312,7 +347,7 @@ export function createDefaultNodeContextMenuItems(
   menuItems.push(
     {
       id: "properties",
-      label: "Properties",
+      label: getContextMenuLabel("properties"),
       icon: {
         type: "lucide",
         value: Settings2,
@@ -331,7 +366,7 @@ export function createDefaultNodeContextMenuItems(
     },
     {
       id: "appearance",
-      label: "Appearance",
+      label: getContextMenuLabel("appearance"),
       icon: {
         type: "lucide",
         value: Highlighter,
@@ -340,7 +375,7 @@ export function createDefaultNodeContextMenuItems(
         createColorPickerMenuItem(onColorChange),
         {
           id: "change-border-style",
-          label: "Border Style",
+          label: getContextMenuLabel("borderStyle"),
           icon: "",
           children: createNodeBorderStyleMenuItems(onBorderStyleChange),
         },
@@ -353,7 +388,7 @@ export function createDefaultNodeContextMenuItems(
     },
     {
       id: "duplicate",
-      label: "Duplicate",
+      label: getContextMenuLabel("duplicate"),
       icon: {
         type: "lucide",
         value: Copy,
@@ -378,14 +413,16 @@ export function createPathTypeMenuItems(
   onPathTypeChange: (pathType: string, context: any) => void | Promise<void>
 ): ContextMenuItem[] {
   const pathTypes = [
-    { id: "bezier", label: "Bezier (Curved)", icon: "⤴" },
-    { id: "straight", label: "Straight", icon: "→" },
-    { id: "step", label: "Step", icon: "⌐" },
+    { id: "bezier", labelKey: "bezierCurved", icon: "⤴" },
+    { id: "straight", labelKey: "straight", icon: "→" },
+    { id: "step", labelKey: "step", icon: "⌐" },
   ];
 
   return pathTypes.map(type => ({
     id: `path-type-${type.id}`,
-    label: type.label,
+    label: getContextMenuLabel(
+      type.labelKey as keyof typeof import("./contextMenuLabels").contextMenuLabels
+    ),
     icon: type.icon,
     onClick: async (context: any) => {
       await onPathTypeChange(type.id, context);
@@ -400,14 +437,16 @@ export function createEdgePathStyleMenuItems(
   onPathStyleChange: (pathStyle: string, context: any) => void | Promise<void>
 ): ContextMenuItem[] {
   const pathStyles = [
-    { id: "solid", label: "Solid", icon: "━" },
-    { id: "dashed", label: "Dashed", icon: "╍" },
-    { id: "dotted", label: "Dotted", icon: "┄" },
+    { id: "solid", labelKey: "solid", icon: "━" },
+    { id: "dashed", labelKey: "dashed", icon: "╍" },
+    { id: "dotted", labelKey: "dotted", icon: "┄" },
   ];
 
   return pathStyles.map(style => ({
     id: `path-style-${style.id}`,
-    label: style.label,
+    label: getContextMenuLabel(
+      style.labelKey as keyof typeof import("./contextMenuLabels").contextMenuLabels
+    ),
     icon: style.icon,
     onClick: async (context: any) => {
       await onPathStyleChange(style.id, context);
@@ -424,14 +463,14 @@ export function createEdgeAnimationMenuItems(
   return [
     {
       id: "animation-enable",
-      label: "Enable",
+      label: getContextMenuLabel("enable"),
       onClick: async (context: any) => {
         await onAnimationChange(true, context);
       },
     },
     {
       id: "animation-disable",
-      label: "Disable",
+      label: getContextMenuLabel("disable"),
       onClick: async (context: any) => {
         await onAnimationChange(false, context);
       },
@@ -451,21 +490,21 @@ export function createEdgeLabelMenuItems(
   return [
     {
       id: "add-label-start",
-      label: "Label at Start",
+      label: getContextMenuLabel("labelAtStart"),
       onClick: async (context: any) => {
         await onAddLabel("start", context);
       },
     },
     {
       id: "add-label-center",
-      label: "Label at Center",
+      label: getContextMenuLabel("labelAtCenter"),
       onClick: async (context: any) => {
         await onAddLabel("center", context);
       },
     },
     {
       id: "add-label-end",
-      label: "Label at End",
+      label: getContextMenuLabel("labelAtEnd"),
       onClick: async (context: any) => {
         await onAddLabel("end", context);
       },
@@ -490,7 +529,7 @@ export function createDefaultEdgeContextMenuItems(
   return [
     {
       id: "appearance",
-      label: "Appearance",
+      label: getContextMenuLabel("appearance"),
       icon: {
         type: "lucide",
         value: Highlighter,
@@ -504,19 +543,19 @@ export function createDefaultEdgeContextMenuItems(
         },
         {
           id: "change-path-type",
-          label: "Path Type",
+          label: getContextMenuLabel("pathType"),
           icon: "⤴",
           children: createPathTypeMenuItems(onPathTypeChange),
         },
         {
           id: "change-path-style",
-          label: "Path Style",
+          label: getContextMenuLabel("pathStyle"),
           icon: "━",
           children: createEdgePathStyleMenuItems(onPathStyleChange),
         },
         {
           id: "change-animation",
-          label: "Animation",
+          label: getContextMenuLabel("animation"),
           children: createEdgeAnimationMenuItems(onAnimationChange),
         },
       ],
@@ -528,7 +567,7 @@ export function createDefaultEdgeContextMenuItems(
     },
     {
       id: "add-label",
-      label: "Add Label",
+      label: getContextMenuLabel("addLabel"),
       icon: {
         type: "lucide",
         value: Tags,
@@ -542,7 +581,7 @@ export function createDefaultEdgeContextMenuItems(
     },
     {
       id: "properties",
-      label: "Properties",
+      label: getContextMenuLabel("properties"),
       icon: {
         type: "lucide",
         value: Settings2,
@@ -571,27 +610,27 @@ export function createNoteNodeContextMenuItems(
   onFontSizeChange?: (size: string, context: any) => void | Promise<void>
 ): ContextMenuItem[] {
   const noteColors = [
-    { id: "yellow", label: "Yellow", color: "#fde68a" },
-    { id: "blue", label: "Blue", color: "#bfdbfe" },
-    { id: "green", label: "Green", color: "#d9f99d" },
-    { id: "pink", label: "Pink", color: "#fecdd3" },
-    { id: "purple", label: "Purple", color: "#ddd6fe" },
-    { id: "orange", label: "Orange", color: "#fed7aa" },
-    { id: "gray", label: "Gray", color: "#e4e4e7" },
-    { id: "transparent", label: "Transparent", color: "transparent" },
+    { id: "yellow", labelKey: "yellow", color: "#fde68a" },
+    { id: "blue", labelKey: "blue", color: "#bfdbfe" },
+    { id: "green", labelKey: "green", color: "#d9f99d" },
+    { id: "pink", labelKey: "pink", color: "#fecdd3" },
+    { id: "purple", labelKey: "purple", color: "#ddd6fe" },
+    { id: "orange", labelKey: "orange", color: "#fed7aa" },
+    { id: "gray", labelKey: "gray", color: "#e4e4e7" },
+    { id: "transparent", labelKey: "transparent", color: "transparent" },
   ];
 
   const noteFontSizes = [
-    { id: "xs", label: "Extra Small" },
-    { id: "sm", label: "Small" },
-    { id: "base", label: "Base" },
-    { id: "lg", label: "Large" },
+    { id: "xs", labelKey: "extraSmall" },
+    { id: "sm", labelKey: "small" },
+    { id: "base", labelKey: "base" },
+    { id: "lg", labelKey: "large" },
   ];
 
   return [
     {
       id: "appearance",
-      label: "Appearance",
+      label: getContextMenuLabel("appearance"),
       icon: {
         type: "lucide",
         value: Highlighter,
@@ -599,11 +638,13 @@ export function createNoteNodeContextMenuItems(
       children: [
         {
           id: "change-color",
-          label: "Color",
+          label: getContextMenuLabel("color"),
           icon: "",
           children: noteColors.map(noteColor => ({
             id: `color-${noteColor.id}`,
-            label: noteColor.label,
+            label: getContextMenuLabel(
+              noteColor.labelKey as keyof typeof import("./contextMenuLabels").contextMenuLabels
+            ),
             color: noteColor.color,
             onClick: async (context: any) => {
               const action =
@@ -617,11 +658,13 @@ export function createNoteNodeContextMenuItems(
         },
         {
           id: "change-font-size",
-          label: "Font Size",
+          label: getContextMenuLabel("fontSize"),
           icon: "",
           children: noteFontSizes.map(size => ({
             id: `font-size-${size.id}`,
-            label: size.label,
+            label: getContextMenuLabel(
+              size.labelKey as keyof typeof import("./contextMenuLabels").contextMenuLabels
+            ),
             onClick: async (context: any) => {
               const action =
                 contextMenuActionsRegistry.getAction("updateNodeData");
@@ -645,27 +688,27 @@ export function createAnnotationNodeContextMenuItems(
   onFontSizeChange?: (size: string, context: any) => void | Promise<void>
 ): ContextMenuItem[] {
   const textColors = [
-    { id: "black", label: "Black", color: "#000000" },
-    { id: "white", label: "White", color: "#ffffff" },
-    { id: "red", label: "Red", color: "#ef4444" },
-    { id: "blue", label: "Blue", color: "#3b82f6" },
-    { id: "green", label: "Green", color: "#10b981" },
-    { id: "yellow", label: "Yellow", color: "#eab308" },
-    { id: "purple", label: "Purple", color: "#8b5cf6" },
-    { id: "gray", label: "Gray", color: "#6b7280" },
+    { id: "black", labelKey: "black", color: "#000000" },
+    { id: "white", labelKey: "white", color: "#ffffff" },
+    { id: "red", labelKey: "red", color: "#ef4444" },
+    { id: "blue", labelKey: "blue", color: "#3b82f6" },
+    { id: "green", labelKey: "green", color: "#10b981" },
+    { id: "yellow", labelKey: "yellow", color: "#eab308" },
+    { id: "purple", labelKey: "purple", color: "#8b5cf6" },
+    { id: "gray", labelKey: "gray", color: "#6b7280" },
   ];
 
   const noteFontSizes = [
-    { id: "xs", label: "Extra Small" },
-    { id: "sm", label: "Small" },
-    { id: "base", label: "Base" },
-    { id: "lg", label: "Large" },
+    { id: "xs", labelKey: "extraSmall" },
+    { id: "sm", labelKey: "small" },
+    { id: "base", labelKey: "base" },
+    { id: "lg", labelKey: "large" },
   ];
 
   return [
     {
       id: "appearance",
-      label: "Appearance",
+      label: getContextMenuLabel("appearance"),
       icon: {
         type: "lucide",
         value: Highlighter,
@@ -673,11 +716,13 @@ export function createAnnotationNodeContextMenuItems(
       children: [
         {
           id: "change-color",
-          label: "Color",
+          label: getContextMenuLabel("color"),
           icon: "",
           children: textColors.map(textColor => ({
             id: `color-${textColor.id}`,
-            label: textColor.label,
+            label: getContextMenuLabel(
+              textColor.labelKey as keyof typeof import("./contextMenuLabels").contextMenuLabels
+            ),
             color: textColor.color,
             onClick: async (context: any) => {
               const action =
@@ -691,11 +736,13 @@ export function createAnnotationNodeContextMenuItems(
         },
         {
           id: "change-font-size",
-          label: "Font Size",
+          label: getContextMenuLabel("fontSize"),
           icon: "",
           children: noteFontSizes.map(size => ({
             id: `font-size-${size.id}`,
-            label: size.label,
+            label: getContextMenuLabel(
+              size.labelKey as keyof typeof import("./contextMenuLabels").contextMenuLabels
+            ),
             onClick: async (context: any) => {
               const action =
                 contextMenuActionsRegistry.getAction("updateNodeData");
@@ -715,7 +762,7 @@ export function createAnnotationNodeContextMenuItems(
     },
     {
       id: "flip-arrow",
-      label: "Flip Arrow",
+      label: getContextMenuLabel("flipArrow"),
       icon: "↺",
       onClick: async (context: any) => {
         const action = contextMenuActionsRegistry.getAction("updateNodeData");

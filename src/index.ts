@@ -6,6 +6,13 @@
 // ==================== Core ====================
 export * from "./core";
 
+// ==================== Store ====================
+export { useWorkflowStore } from "./core/store/workflowStore";
+export type {
+  WorkflowState,
+  WorkflowActions,
+} from "./core/store/workflowStore";
+
 // ==================== Workflow Core ====================
 // Core component without UI
 export { WorkflowCore, type WorkflowCoreProps } from "./workflow/WorkflowCore";
@@ -16,6 +23,10 @@ export type { WorkflowBuilderProps, PluginOptions } from "./workflow";
 
 // ==================== Workflow Hooks ====================
 export * from "./workflow/hooks";
+
+// ==================== Additional Hooks ====================
+export { useTheme } from "./hooks/useTheme";
+export { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 
 // ==================== Workflow Controls ====================
 // Modular, reusable UI controls
@@ -44,6 +55,19 @@ export {
 // ==================== Context ====================
 export { WorkflowProvider } from "./workflow/context/WorkflowProvider";
 export { WorkflowActionsProvider } from "./workflow/context/WorkflowActionsProvider";
+
+// ==================== i18n / Internationalization ====================
+export {
+  LanguageProvider,
+  useLanguageContext,
+  type LanguageType,
+} from "./workflow/context/LanguageContext";
+
+export { LanguageSwitcher } from "./workflow/components/LanguageSwitcher";
+
+// Plugin translations (includes UI translations with 'ui.*' prefix)
+export { default as pluginTranslationsEn } from "./translations/plugins.en.json";
+export { default as pluginTranslationsVi } from "./translations/plugins.vi.json";
 
 // ==================== Utils ====================
 export { cx } from "./utils/cx";

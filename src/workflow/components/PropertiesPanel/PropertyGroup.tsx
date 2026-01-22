@@ -9,6 +9,7 @@ import type {
 } from "@/core/properties";
 import { DynamicPropertyField } from "./DynamicPropertyField";
 import { usePropertySync, usePropertyValidation } from "./hooks";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 interface PropertyGroupProps {
   group: PropertyGroupDefinition;
@@ -29,6 +30,8 @@ export function PropertyGroup({
 
   const { getFieldErrors } = usePropertyValidation(entity, propertyGroups);
 
+  const { getText } = useLanguage();
+
   // Filter visible fields
   const visibleFields = group.fields.filter(field => isFieldVisible(field));
 
@@ -43,7 +46,9 @@ export function PropertyGroup({
   return (
     <div className="space-y-4">
       {group.description && (
-        <p className="text-sm text-muted-foreground">{group.description}</p>
+        <p className="text-sm text-muted-foreground">
+          {getText(group.description)}
+        </p>
       )}
 
       <div className="space-y-3">

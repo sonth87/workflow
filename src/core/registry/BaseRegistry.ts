@@ -103,12 +103,19 @@ export class BaseRegistry<T = unknown> {
    */
   search(query: string): RegistryItem<T>[] {
     const lowerQuery = query.toLowerCase();
-    return this.getAll().filter(
-      item =>
-        item.name.toLowerCase().includes(lowerQuery) ||
-        item.description?.toLowerCase().includes(lowerQuery) ||
+    return this.getAll().filter(item => {
+      const nameStr =
+        typeof item.name === "string" ? item.name : JSON.stringify(item.name);
+      const descStr =
+        typeof item.description === "string"
+          ? item.description
+          : JSON.stringify(item.description || "");
+      return (
+        nameStr.toLowerCase().includes(lowerQuery) ||
+        descStr.toLowerCase().includes(lowerQuery) ||
         item.id.toLowerCase().includes(lowerQuery)
-    );
+      );
+    });
   }
 
   /**

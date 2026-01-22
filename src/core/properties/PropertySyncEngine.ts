@@ -24,6 +24,22 @@ import type {
 import { ZodError, type ZodType } from "zod";
 
 /**
+ * Helper function to normalize multilingual text to string
+ */
+function normalizeValue(value: unknown): unknown {
+  // If value is an object with language keys (multilingual text), convert to string
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const obj = value as Record<string, any>;
+    // Check if it looks like a multilingual object (has 'en' key)
+    if (typeof obj.en === "string") {
+      // Return English as the canonical value for validation
+      return obj.en;
+    }
+  }
+  return value;
+}
+
+/**
  * Kết quả sau khi sync property
  */
 export interface PropertySyncResult {
@@ -262,8 +278,11 @@ export class PropertySyncEngine {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
 
+    // Normalize multilingual value before validation
+    const normalizedValue = normalizeValue(value);
+
     try {
-      schema.parse(value);
+      schema.parse(normalizedValue);
       return { valid: true, errors, warnings };
     } catch (err) {
       if (err instanceof ZodError) {

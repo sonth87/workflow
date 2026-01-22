@@ -107,8 +107,8 @@ export function createInheritedNodeConfig(
     type: string;
     metadata: {
       id: string;
-      title: string;
-      description?: string;
+      title: string | Record<string, string>;
+      description?: string | Record<string, string>;
       version?: string;
     };
   }
@@ -130,8 +130,8 @@ export function createInheritedNodeConfig(
     category: overrides.category || baseDefinition.category,
     metadata: {
       id: overrides.metadata.id,
-      title: overrides.metadata.title,
-      description: overrides.metadata.description,
+      title: overrides.metadata.title as any,
+      description: overrides.metadata.description as any,
       version: overrides.metadata.version || "1.0.0",
     },
     visualConfig: mergeVisualConfigs(

@@ -12,6 +12,11 @@
       "import": "./lib-dist/bpm-core.es.js",
       "require": "./lib-dist/bpm-core.cjs.js"
     },
+    "./i18n": {
+      "types": "./lib-dist/workflow/i18n.d.ts",
+      "import": "./lib-dist/bpm-core.es.js",
+      "require": "./lib-dist/bpm-core.cjs.js"
+    },
     "./styles": "./lib-dist/bpm-core.css"
   },
   "files": [
@@ -29,7 +34,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@sth87/shadcn-design-system": "^0.0.28",
+    "@sth87/shadcn-design-system": "^0.0.29",
     "@tailwindcss/vite": "^4.1.17",
     "@types/dagre": "^0.7.53",
     "@xyflow/react": "^12.9.3",

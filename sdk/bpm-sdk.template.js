@@ -336,6 +336,9 @@
                     ...self.options.options,
                   });
 
+                  // Store instance for later access
+                  self.instance = instance;
+
                   // Expose event API
                   self.eventBus = {
                     on: function (event, handler) {
@@ -387,7 +390,310 @@
       }
     },
 
+    /**
+     * Get the current language code
+     * @returns {string} Current language code (e.g., 'en', 'vi')
+     */
+    getLanguage: function () {
+      if (this.instance && typeof this.instance.getLanguage === "function") {
+        return this.instance.getLanguage();
+      }
+      return "en"; // Default fallback
+    },
+
+    /**
+     * Set the current language
+     * @param {string} language - Language code (e.g., 'en', 'vi')
+     */
+    setLanguage: function (language) {
+      if (this.instance && typeof this.instance.setLanguage === "function") {
+        return this.instance.setLanguage(language);
+      }
+    },
+
+    /**
+     * Get list of available languages detected from workflow and plugins
+     * @returns {string[]} Array of language codes
+     */
+    getAvailableLanguages: function () {
+      if (
+        this.instance &&
+        typeof this.instance.getAvailableLanguages === "function"
+      ) {
+        return this.instance.getAvailableLanguages();
+      }
+      return ["en"]; // Default fallback
+    },
+
+    /**
+     * Load translations for a specific language dynamically
+     * @param {string} urlOrLanguage - URL to translation file or language code
+     * @param {object} translations - Optional translations object (if first param is language code)
+     * @returns {Promise} Promise that resolves when translations are loaded
+     */
+    loadTranslationsForLanguage: function (urlOrLanguage, translations) {
+      if (
+        this.instance &&
+        typeof this.instance.loadTranslationsForLanguage === "function"
+      ) {
+        return this.instance.loadTranslationsForLanguage(
+          urlOrLanguage,
+          translations
+        );
+      }
+      return Promise.reject(
+        new Error("loadTranslationsForLanguage not available")
+      );
+    },
+
+    /**
+     * Undo last action
+     */
+    undo: function () {
+      if (this.instance && typeof this.instance.undo === "function") {
+        this.instance.undo();
+      }
+    },
+
+    /**
+     * Redo last undone action
+     */
+    redo: function () {
+      if (this.instance && typeof this.instance.redo === "function") {
+        this.instance.redo();
+      }
+    },
+
+    /**
+     * Check if undo is available
+     * @returns {boolean}
+     */
+    canUndo: function () {
+      if (this.instance && typeof this.instance.canUndo === "function") {
+        return this.instance.canUndo();
+      }
+      return false;
+    },
+
+    /**
+     * Check if redo is available
+     * @returns {boolean}
+     */
+    canRedo: function () {
+      if (this.instance && typeof this.instance.canRedo === "function") {
+        return this.instance.canRedo();
+      }
+      return false;
+    },
+
+    /**
+     * Get current theme
+     * @returns {string} 'light', 'dark', or 'system'
+     */
+    getTheme: function () {
+      if (this.instance && typeof this.instance.getTheme === "function") {
+        return this.instance.getTheme();
+      }
+      return "system";
+    },
+
+    /**
+     * Set theme
+     * @param {string} theme - 'light', 'dark', or 'system'
+     */
+    setTheme: function (theme) {
+      if (this.instance && typeof this.instance.setTheme === "function") {
+        this.instance.setTheme(theme);
+      }
+    },
+
+    /**
+     * Set light mode
+     */
+    setLightMode: function () {
+      if (this.instance && typeof this.instance.setLightMode === "function") {
+        this.instance.setLightMode();
+      }
+    },
+
+    /**
+     * Set dark mode
+     */
+    setDarkMode: function () {
+      if (this.instance && typeof this.instance.setDarkMode === "function") {
+        this.instance.setDarkMode();
+      }
+    },
+
+    /**
+     * Set system mode (auto)
+     */
+    setSystemMode: function () {
+      if (this.instance && typeof this.instance.setSystemMode === "function") {
+        this.instance.setSystemMode();
+      }
+    },
+
+    /**
+     * Toggle theme (light -> dark -> system -> light)
+     */
+    toggleTheme: function () {
+      if (this.instance && typeof this.instance.toggleTheme === "function") {
+        this.instance.toggleTheme();
+      }
+    },
+
+    /**
+     * Get current workflow data
+     * @returns {object} Workflow data with nodes, edges, name, description
+     */
+    getWorkflow: function () {
+      if (this.instance && typeof this.instance.getWorkflow === "function") {
+        return this.instance.getWorkflow();
+      }
+      return {
+        nodes: [],
+        edges: [],
+        workflowName: "",
+        workflowDescription: "",
+      };
+    },
+
+    /**
+     * Get workflow nodes
+     * @returns {array} Array of nodes
+     */
+    getNodes: function () {
+      if (this.instance && typeof this.instance.getNodes === "function") {
+        return this.instance.getNodes();
+      }
+      return [];
+    },
+
+    /**
+     * Get workflow edges
+     * @returns {array} Array of edges
+     */
+    getEdges: function () {
+      if (this.instance && typeof this.instance.getEdges === "function") {
+        return this.instance.getEdges();
+      }
+      return [];
+    },
+
+    /**
+     * Clear workflow (remove all nodes and edges)
+     */
+    clearWorkflow: function () {
+      if (this.instance && typeof this.instance.clearWorkflow === "function") {
+        this.instance.clearWorkflow();
+      }
+    },
+
+    /**
+     * Import workflow from data object
+     * @param {object} data - Workflow data with nodes and edges
+     */
+    importWorkflow: function (data) {
+      if (this.instance && typeof this.instance.importWorkflow === "function") {
+        this.instance.importWorkflow(data);
+      }
+    },
+
+    /**
+     * Export workflow as data object
+     * @param {boolean} includeMetadata - Include metadata in export
+     * @returns {object} Exported workflow data
+     */
+    exportWorkflow: function (includeMetadata) {
+      if (includeMetadata === undefined) includeMetadata = true;
+      if (this.instance && typeof this.instance.exportWorkflow === "function") {
+        return this.instance.exportWorkflow(includeMetadata);
+      }
+      return { nodes: [], edges: [] };
+    },
+
+    /**
+     * Download workflow as JSON file
+     * @param {string} filename - Filename for download (default: workflow.json)
+     */
+    downloadWorkflow: function (filename) {
+      if (
+        this.instance &&
+        typeof this.instance.downloadWorkflow === "function"
+      ) {
+        this.instance.downloadWorkflow(filename);
+      }
+    },
+
+    /**
+     * Upload workflow from file (opens file picker)
+     * @returns {Promise} Promise that resolves with uploaded data
+     */
+    uploadWorkflow: function () {
+      if (this.instance && typeof this.instance.uploadWorkflow === "function") {
+        return this.instance.uploadWorkflow();
+      }
+      return Promise.reject(new Error("Upload not available"));
+    },
+
+    /**
+     * View current workflow data (alias for getWorkflow)
+     * @returns {object} Workflow data
+     */
+    viewWorkflow: function () {
+      if (this.instance && typeof this.instance.viewWorkflow === "function") {
+        return this.instance.viewWorkflow();
+      }
+      return this.getWorkflow();
+    },
+
+    /**
+     * Get validation errors
+     * @returns {array} Array of validation errors
+     */
+    getValidationErrors: function () {
+      if (
+        this.instance &&
+        typeof this.instance.getValidationErrors === "function"
+      ) {
+        return this.instance.getValidationErrors();
+      }
+      return [];
+    },
+
+    /**
+     * Check if workflow has validation errors
+     * @returns {boolean}
+     */
+    hasErrors: function () {
+      if (this.instance && typeof this.instance.hasErrors === "function") {
+        return this.instance.hasErrors();
+      }
+      return false;
+    },
+
+    /**
+     * Validate workflow
+     * @returns {Promise} Promise that resolves with validation result
+     */
+    validate: function () {
+      if (this.instance && typeof this.instance.validate === "function") {
+        return this.instance.validate();
+      }
+      return Promise.resolve({ valid: true, errors: [] });
+    },
+
+    update: function (config) {
+      if (this.instance && typeof this.instance.update === "function") {
+        return this.instance.update(config);
+      }
+    },
+
     destroy: function () {
+      if (this.instance && typeof this.instance.destroy === "function") {
+        this.instance.destroy();
+      }
       if (this.selectors && this.options.class) {
         for (var i = 0; i < this.selectors.length; i++) {
           var node = this.selectors[i];

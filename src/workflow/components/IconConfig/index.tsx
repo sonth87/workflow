@@ -3,6 +3,7 @@ import type { NodeType } from "@/enum/workflow.enum";
 import { getIconConfig } from "@/workflow/utils/iconConfig";
 import type { NodeColorConfig } from "../Canvas/nodes/BaseNode";
 import { useTheme } from "@/hooks/useTheme";
+import { cn } from "@sth87/shadcn-design-system";
 
 interface Props {
   type?: NodeType;
@@ -10,6 +11,8 @@ interface Props {
   visualConfig?: NodeVisualConfig; // New: Use this instead
   icon?: IconConfigType; // Icon from node config
   compactView?: boolean;
+  className?: string;
+  size?: number;
 }
 
 export default function IconConfig(props: Props) {
@@ -19,6 +22,8 @@ export default function IconConfig(props: Props) {
     visualConfig,
     icon: nodeIcon,
     compactView,
+    className,
+    size,
   } = props;
   const { theme } = useTheme();
   const isDark =
@@ -43,11 +48,23 @@ export default function IconConfig(props: Props) {
   let iconColor: string | undefined;
 
   if (nodeIcon) {
-    // Use icon from node config (from plugin)
-    Icon = nodeIcon.value;
-    iconBgColor =
-      nodeIcon.backgroundColor || finalVisualConfig.iconBackgroundColor;
-    iconColor = nodeIcon.color || finalVisualConfig.iconColor;
+    if (typeof nodeIcon === "string") {
+      // Handle base64 string icon
+      Icon = nodeIcon;
+      iconBgColor = finalVisualConfig.iconBackgroundColor;
+      iconColor = finalVisualConfig.iconColor;
+    } else if (nodeIcon.type === "image" || nodeIcon.type === "svg") {
+      // Handle image or svg from node config
+      Icon = nodeIcon.value;
+      iconBgColor = finalVisualConfig.iconBackgroundColor;
+      iconColor = finalVisualConfig.iconColor;
+    } else {
+      // Use icon from node config (from plugin)
+      Icon = nodeIcon.value;
+      iconBgColor =
+        nodeIcon.backgroundColor || finalVisualConfig.iconBackgroundColor;
+      iconColor = nodeIcon.color || finalVisualConfig.iconColor;
+    }
   } else if (type) {
     // Fallback to type-based icon
     const iconConfig = getIconConfig(type);
@@ -61,16 +78,23 @@ export default function IconConfig(props: Props) {
   return (
     <>
       {typeof Icon === "string" ? (
-        <img src={Icon} alt="icon" className="w-8 h-8 shrink-0" />
+        <img
+          src={Icon}
+          alt="icon"
+          className={cn("w-8 h-8 rounded-lg shrink-0", className)}
+        />
       ) : Icon ? (
         <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+          className={cn(
+            "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
+            className
+          )}
           style={{
             backgroundColor: !compactView ? iconBgColor : undefined,
           }}
         >
           <Icon
-            size={compactView ? 32 : 18}
+            size={compactView ? 32 : size || 18}
             style={{
               color: !compactView ? iconColor : iconBgColor || defaultColor,
             }}

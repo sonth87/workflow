@@ -12,6 +12,7 @@ import type {
   NodeVisualConfig,
   IconConfig,
   ContextMenuItem,
+  MultilingualText,
 } from "../types/base.types";
 import { nodeRegistry } from "../registry/NodeRegistry";
 import { propertyRegistry } from "../properties";
@@ -351,8 +352,8 @@ export class CustomNodeFactory {
       type: config.id,
       metadata: {
         id: config.id,
-        title: config.name,
-        description: config.description,
+        title: config.name as MultilingualText,
+        description: config.description as MultilingualText | undefined,
         version: "1.0.0",
       },
       category: config.category as CategoryType,
@@ -377,7 +378,7 @@ export class CustomNodeFactory {
     nodeRegistry.register({
       id: config.id,
       type: config.id,
-      name: config.name,
+      name: config.name as MultilingualText,
       config: nodeConfig,
     });
 

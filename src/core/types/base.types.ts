@@ -8,6 +8,33 @@ import type { Node, Edge } from "@xyflow/react";
 import type { CSSProperties, ReactNode } from "react";
 
 // ============================================
+// Multilingual Text Type
+// ============================================
+
+/**
+ * Multilingual text support
+ * Can be:
+ * - A simple string (plain text or translation key)
+ * - An object with language codes as keys (nested format)
+ * Translation keys will be resolved via TranslationRegistry at runtime
+ */
+export type MultilingualText =
+  | string
+  | { en: string; vi: string; [key: string]: string };
+
+/**
+ * Type guard to check if a value is a translation key
+ * Translation keys typically follow pattern: "nodeId.field" or "nodeId.properties.fieldName"
+ */
+export function isTranslationKey(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    value.includes(".") &&
+    !value.startsWith("http") // Not a URL
+  );
+}
+
+// ============================================
 // Metadata & Configuration Types
 // ============================================
 
@@ -16,8 +43,8 @@ import type { CSSProperties, ReactNode } from "react";
  */
 export interface BaseMetadata {
   id: string;
-  title: string;
-  description?: string;
+  title: MultilingualText;
+  description?: MultilingualText;
   version?: string;
   author?: string;
   createdAt?: Date;
@@ -31,10 +58,10 @@ export interface BaseMetadata {
  */
 export interface IODefinition {
   id: string;
-  label?: string;
+  label?: MultilingualText;
   type?: string; // data type: string, number, boolean, object, etc.
   required?: boolean;
-  description?: string;
+  description?: MultilingualText;
   position?: "top" | "right" | "bottom" | "left";
   maxConnections?: number; // Số lượng connection tối đa cho handle này
   validation?: ValidationRule[];
@@ -238,7 +265,7 @@ export interface ConnectionRule {
 
 export interface ContextMenuItem {
   id: string;
-  label: string;
+  label: MultilingualText;
   icon?: IconConfig | string; // Có thể là IconConfig hoặc string (emoji/text)
   color?: string; // Màu sắc để hiển thị (cho color picker)
   disabled?: boolean;
@@ -278,15 +305,15 @@ export interface PropertyDefinition {
     | "date"
     | "json"
     | "custom";
-  label: string;
-  description?: string;
+  label: MultilingualText;
+  description?: MultilingualText;
   defaultValue?: unknown;
   required?: boolean;
   visible?: boolean | ((data: unknown) => boolean);
   disabled?: boolean | ((data: unknown) => boolean);
   validation?: ValidationRule[];
-  options?: Array<{ label: string; value: unknown }>; // For select/multiselect
-  placeholder?: string;
+  options?: Array<{ label: MultilingualText; value: unknown }>; // For select/multiselect
+  placeholder?: MultilingualText;
   group?: string; // Để group các properties lại
   order?: number;
   customRenderer?: (props: PropertyRendererProps) => ReactNode; // Custom component
@@ -458,8 +485,8 @@ export interface BaseRuleConfig {
 export interface RegistryItem<T = unknown> {
   id: string;
   type: string;
-  name: string;
-  description?: string;
+  name: MultilingualText | string;
+  description?: MultilingualText | string;
   category?: string;
   icon?: IconConfig;
   config: T;

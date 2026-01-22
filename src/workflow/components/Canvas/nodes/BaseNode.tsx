@@ -8,6 +8,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import React from "react";
 import { nodeStyle, type CustomNodeProps } from ".";
 import IconConfigComponent from "../../IconConfig";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 import { cn } from "@sth87/shadcn-design-system";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { propertyRegistry } from "@/core/properties";
@@ -44,6 +45,7 @@ export default function BaseNode(props: Props) {
   const { toggleNodeCollapse } = useNodeActions();
   const { compactView, layoutDirection } = useWorkflowStore();
   const { selectNode } = useWorkflowStore();
+  const { getText } = useLanguage();
 
   // Get collapsed state from node data (default to false = expanded)
   const collapsed = data?.collapsed ?? false;
@@ -148,10 +150,12 @@ export default function BaseNode(props: Props) {
                 layoutDirection === "vertical",
             })}
           >
-            <div className="truncate w-full">{data?.label}</div>
+            <div className="truncate w-full">
+              {getText(metadata.title || data?.label)}
+            </div>
             {metadata?.description && (
               <div className="text-muted-foreground line-clamp-3 mt-1 text-xs font-normal w-40">
-                {metadata.description}
+                {getText(metadata.description)}
               </div>
             )}
           </div>
@@ -174,7 +178,7 @@ export default function BaseNode(props: Props) {
                     color: finalVisualConfig.textColor,
                   }}
                 >
-                  {data?.label}
+                  {getText(data?.label as any)}
                 </span>
               </div>
 
@@ -202,7 +206,7 @@ export default function BaseNode(props: Props) {
                 color: finalVisualConfig.descriptionColor,
               }}
             >
-              {metadata?.description}
+              {getText(metadata.description)}
             </div>
           )}
 

@@ -7,6 +7,22 @@ import { z } from "zod";
 import { BaseNodeType } from "../../nodes/BaseNodeDefinitions";
 
 /**
+ * Multilingual text schema
+ * Supports three formats:
+ * 1. Plain string (used as-is or as translation key)
+ * 2. Nested multilingual object: { en: "English", vi: "Vietnamese" }
+ * 3. Translation key string (will be resolved at runtime via TranslationRegistry)
+ */
+export const MultilingualTextSchema = z.union([
+  z.string(), // Can be plain text or translation key
+  z
+    .record(z.string(), z.string())
+    .refine(obj => Object.keys(obj).length > 0 && "en" in obj, {
+      message: "Multilingual text must include at least 'en' (English) key",
+    }),
+]);
+
+/**
  * Icon configuration schema
  */
 export const IconConfigSchema = z.object({
@@ -35,9 +51,9 @@ export const VisualConfigSchema = z.object({
  * Property field option schema
  */
 export const PropertyFieldOptionSchema = z.object({
-  label: z.string(),
+  label: MultilingualTextSchema,
   value: z.union([z.string(), z.number(), z.boolean()]),
-  description: z.string().optional(),
+  description: MultilingualTextSchema.optional(),
   disabled: z.boolean().optional(),
 });
 
@@ -47,7 +63,7 @@ export const PropertyFieldOptionSchema = z.object({
 export const PropertyDefinitionSchema = z.object({
   id: z.string(),
   name: z.string(),
-  label: z.string(),
+  label: MultilingualTextSchema,
   type: z.enum([
     "text",
     "number",
@@ -63,8 +79,8 @@ export const PropertyDefinitionSchema = z.object({
   ]),
   required: z.boolean().optional(),
   defaultValue: z.any().optional(),
-  placeholder: z.string().optional(),
-  description: z.string().optional(),
+  placeholder: MultilingualTextSchema.optional(),
+  description: MultilingualTextSchema.optional(),
   group: z.string().optional(),
   order: z.number().optional(),
   options: z.array(PropertyFieldOptionSchema).optional(),
@@ -75,7 +91,7 @@ export const PropertyDefinitionSchema = z.object({
       max: z.number().optional(),
       minLength: z.number().optional(),
       maxLength: z.number().optional(),
-      message: z.string().optional(),
+      message: MultilingualTextSchema.optional(),
     })
     .optional(),
 });
@@ -85,8 +101,8 @@ export const PropertyDefinitionSchema = z.object({
  */
 export const PropertyGroupSchema = z.object({
   id: z.string(),
-  label: z.string(),
-  description: z.string().optional(),
+  label: MultilingualTextSchema,
+  description: MultilingualTextSchema.optional(),
   icon: z.string().optional(),
   order: z.number().optional(),
 });
@@ -117,7 +133,7 @@ export const ContextMenuActionSchema = z.object({
  */
 export const ContextMenuItemSchema: z.ZodType<{
   id: string;
-  label: string;
+  label: string | Record<string, string>;
   icon?: string;
   action?: Record<string, unknown>;
   condition?: Record<string, unknown>;
@@ -127,7 +143,7 @@ export const ContextMenuItemSchema: z.ZodType<{
 }> = z.lazy(() =>
   z.object({
     id: z.string(),
-    label: z.string(),
+    label: MultilingualTextSchema,
     icon: z.string().optional(),
     action: ContextMenuActionSchema.optional(),
     condition: z
@@ -178,10 +194,10 @@ export const CustomNodeJSONSchema = z.object({
     BaseNodeType.POOL,
     BaseNodeType.NOTE,
   ]),
-  name: z.string().min(1, "Node name is required"),
+  name: MultilingualTextSchema,
 
   // Optional fields
-  description: z.string().optional(),
+  description: MultilingualTextSchema.optional(),
   category: z.string().optional(),
   icon: IconConfigSchema.optional(),
   visualConfig: VisualConfigSchema.optional(),
@@ -236,9 +252,9 @@ export const CustomNodeJSONSchema = z.object({
 export const PluginJSONSchema = z.object({
   metadata: z.object({
     id: z.string().min(1, "Plugin ID is required"),
-    name: z.string().min(1, "Plugin name is required"),
+    name: MultilingualTextSchema,
     version: z.string().default("1.0.0"),
-    description: z.string().optional(),
+    description: MultilingualTextSchema.optional(),
     author: z.string().optional(),
     dependencies: z.array(z.string()).optional(),
   }),
@@ -247,9 +263,9 @@ export const PluginJSONSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        name: z.string(),
+        name: MultilingualTextSchema,
         icon: z.string().optional(),
-        description: z.string().optional(),
+        description: MultilingualTextSchema.optional(),
         order: z.number().optional(),
         separator: z
           .object({

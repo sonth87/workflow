@@ -5,6 +5,7 @@
 
 import { BaseRegistry } from "./BaseRegistry";
 import { CategoryType } from "@/enum/workflow.enum";
+import type { MultilingualTextType } from "@/types/dynamic-bpm.type";
 import type { ReactNode } from "react";
 
 /**
@@ -12,11 +13,11 @@ import type { ReactNode } from "react";
  */
 export interface CategoryConfig {
   id: string;
-  name: string;
+  name: MultilingualTextType | string;
   categoryType: CategoryType | string; // Allow custom category types from plugins
   isOpen?: boolean;
   icon?: ReactNode;
-  description?: string;
+  description?: MultilingualTextType | string;
   order?: number; // Display order in toolbox
   separator?: {
     show?: boolean; // Hiển thị separator sau category này

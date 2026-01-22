@@ -11,6 +11,11 @@ export * from "./events/EventBus";
 
 // Registry
 export * from "./registry";
+export { translationRegistry } from "./registry/TranslationRegistry";
+export type {
+  TranslationData,
+  TranslationStorage,
+} from "./registry/TranslationRegistry";
 
 // Plugins
 export * from "./plugins/PluginManager";

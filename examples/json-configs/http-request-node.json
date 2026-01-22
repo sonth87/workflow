@@ -2,8 +2,14 @@
   {
     "id": "httpRequestTask",
     "extends": "task",
-    "name": "HTTP Request",
-    "description": "Make HTTP/REST API calls",
+    "name": {
+      "en": "HTTP Request",
+      "vi": "Yêu cầu HTTP"
+    },
+    "description": {
+      "en": "Make HTTP/REST API calls",
+      "vi": "Thực hiện cuộc gọi HTTP/REST API"
+    },
     "icon": {
       "type": "lucide",
       "value": "Globe",

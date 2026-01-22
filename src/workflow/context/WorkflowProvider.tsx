@@ -7,11 +7,17 @@ import {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useState,
   type ReactNode,
 } from "react";
 import { pluginManager, type Plugin } from "@/core/plugins/PluginManager";
 import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
+import { LanguageProvider, useLanguageContext } from "./LanguageContext";
+import { useLanguage } from "../hooks/useLanguage";
+import { useAvailableLanguages } from "../hooks/useAvailableLanguages";
+import { useWorkflowStore } from "@/core/store/workflowStore";
+import { useTheme } from "@/hooks/useTheme";
 
 interface WorkflowContextValue {
   isInitialized: boolean;
@@ -51,6 +57,13 @@ export interface PluginOptions {
    * Additional plugins to install
    */
   plugins?: Plugin[];
+
+  /**
+   * Language configuration for i18n
+   */
+  languageConfig?: {
+    defaultLanguage?: string;
+  };
 }
 
 interface WorkflowProviderProps {
@@ -61,18 +74,73 @@ interface WorkflowProviderProps {
   pluginOptions?: PluginOptions;
 }
 
-export function WorkflowProvider({
+function WorkflowProviderInner({
   children,
   pluginOptions = {},
 }: WorkflowProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const { setLanguage } = useLanguage();
+  const { language } = useLanguageContext();
+  const availableLanguages = useAvailableLanguages();
+  const store = useWorkflowStore();
+  const theme = useTheme();
 
   const {
     enableDefaultPlugin = true,
     autoActivate = true,
     plugins = [],
+    languageConfig = {},
   } = pluginOptions;
+
+  // Register language setter for SDK access immediately (before paint)
+  useLayoutEffect(() => {
+    if (typeof window !== "undefined") {
+      const win = window as Window & {
+        __BPM_CORE_INSTANCE__?: unknown;
+        __BPM_CORE_ON_READY__?: (() => void) | null;
+      };
+      if (win.__BPM_CORE_INSTANCE__) {
+        const instance = win.__BPM_CORE_INSTANCE__ as {
+          _registerLanguageSetter: (
+            setter: (lang: string) => void,
+            currentLang: string
+          ) => void;
+          _registerLanguagesGetter: (getter: () => string[]) => void;
+          _registerStoreGetter: (getter: () => unknown) => void;
+          _registerThemeGetter: (getter: () => unknown) => void;
+          _registerThemeSetter: (setter: (theme: string) => void) => void;
+        };
+
+        instance._registerLanguageSetter(setLanguage, language);
+        instance._registerLanguagesGetter(() => availableLanguages);
+        instance._registerStoreGetter(() => store);
+        instance._registerThemeGetter(() => theme);
+        instance._registerThemeSetter((newTheme: string) =>
+          theme.setTheme(newTheme as "light" | "dark" | "system")
+        );
+
+        // Call onReady callback after all registrations
+        if (typeof win.__BPM_CORE_ON_READY__ === "function") {
+          const onReadyCallback = win.__BPM_CORE_ON_READY__;
+          win.__BPM_CORE_ON_READY__ = null;
+          onReadyCallback();
+        }
+      }
+    }
+  }, [setLanguage, language, availableLanguages, store, theme]);
+
+  // Sync current language to BPMCore instance whenever language changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const win = window as Window & {
+        __BPM_CORE_INSTANCE__?: { _setCurrentLanguage: (lang: string) => void };
+      };
+      if (win.__BPM_CORE_INSTANCE__ && language) {
+        win.__BPM_CORE_INSTANCE__._setCurrentLanguage(language);
+      }
+    }
+  }, [language]);
 
   useEffect(() => {
     async function initializeWorkflow() {
@@ -143,5 +211,20 @@ export function WorkflowProvider({
     <WorkflowContext.Provider value={{ isInitialized, error }}>
       {children}
     </WorkflowContext.Provider>
+  );
+}
+
+export function WorkflowProvider({
+  children,
+  pluginOptions = {},
+}: WorkflowProviderProps) {
+  return (
+    <LanguageProvider
+      defaultLanguage={pluginOptions.languageConfig?.defaultLanguage || "en"}
+    >
+      <WorkflowProviderInner pluginOptions={pluginOptions}>
+        {children}
+      </WorkflowProviderInner>
+    </LanguageProvider>
   );
 }

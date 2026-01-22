@@ -1,11 +1,12 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Canvas } from "./components/Canvas";
 import { Toolbox } from "./components/Toolbox";
 import { PropertiesPanel } from "./components/PropertiesPanel";
 import { Header } from "./components/Header";
 import { ValidationPanel } from "./components/ValidationPanel";
-import { Toolbar } from "./components/Toolbar";
+import { ToolbarGroup } from "./controls/toolbar/ToolbarGroup";
 import { useNodeOperations, useWorkflowValidation } from "./hooks/useWorkflow";
+import { useWorkflowActions } from "./hooks/useWorkflowActions";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { UndoRedo } from "./components/Behavior";
@@ -52,9 +53,7 @@ function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
   const { validate } = useWorkflowValidation();
   const { nodes, edges, selectedNodeId, selectedEdgeId } = useWorkflowStore();
   const { fitView } = useReactFlow();
-
-  const [isPanMode, setIsPanMode] = useState(false);
-  const [showMinimap, setShowMinimap] = useState(false);
+  const actions = useWorkflowActions();
 
   const handleNodeDrop = useCallback(
     (nodeType: string, position: { x: number; y: number }) => {
@@ -166,9 +165,9 @@ function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
           )}
           <Canvas
             onNodeDrop={isViewMode ? undefined : handleNodeDrop}
-            isPanMode={isPanMode}
-            onPanModeChange={setIsPanMode}
-            showMinimap={ui.showMinimap && showMinimap}
+            isPanMode={actions.panMode.enabled}
+            onPanModeChange={actions.panMode.set}
+            showMinimap={ui.showMinimap && actions.minimap.visible}
           />
         </div>
 
@@ -184,11 +183,26 @@ function WorkflowBuilderInner({ uiConfig }: { uiConfig?: WorkflowUIConfig }) {
 
         {ui.showToolbar && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
-            <Toolbar
-              isPanMode={isPanMode}
-              onPanModeChange={setIsPanMode}
-              showMinimap={showMinimap}
-              onMinimapToggle={setShowMinimap}
+            <ToolbarGroup
+              panModeProps={{
+                isPanMode: actions.panMode.enabled,
+                onChange: actions.panMode.set,
+              }}
+              zoomProps={{
+                showPercentage: true,
+              }}
+              minimapProps={{
+                show: actions.minimap.visible,
+                onChange: actions.minimap.set,
+              }}
+              optionsProps={{
+                showMinimap: actions.minimap.visible,
+                onMinimapToggle: actions.minimap.set,
+              }}
+              showPanMode={ui.showPanMode && !isViewMode}
+              showZoom={ui.showZoomControls}
+              showMinimap={false}
+              showOptions={true}
             />
           </div>
         )}
@@ -241,3 +255,20 @@ export default function WorkflowBuilder({
 
 // Named export for consistency
 export { WorkflowBuilder };
+
+// Re-export core for custom layouts
+export { WorkflowCore } from "./WorkflowCore";
+export { Canvas } from "./components/Canvas";
+export { Toolbox } from "./components/Toolbox";
+export { PropertiesPanel } from "./components/PropertiesPanel";
+export { Header } from "./components/Header";
+export { ValidationPanel } from "./components/ValidationPanel";
+
+// Export controls
+export { ToolbarGroup } from "./controls/toolbar/ToolbarGroup";
+export { PanModeToggle } from "./controls/toolbar/PanModeToggle";
+export { ZoomControls } from "./controls/toolbar/ZoomControls";
+export { MinimapToggle } from "./controls/toolbar/MinimapToggle";
+
+// Export hooks
+export { useWorkflowActions } from "./hooks/useWorkflowActions";

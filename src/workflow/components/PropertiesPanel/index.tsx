@@ -11,10 +11,13 @@ import type { NodeType } from "@/enum/workflow.enum";
 import { PropertyTabs } from "./PropertyTabs";
 import { usePropertyGroups, useVisibleGroups } from "./hooks";
 import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 
 export const PropertiesPanel = memo(function PropertiesPanel() {
   const { nodes, edges, selectedNodeId, selectedEdgeId, clearSelection } =
     useWorkflowStore();
+
+  const { getText } = useLanguage();
 
   const selectedNode = selectedNodeId
     ? (nodes.find(n => n.id === selectedNodeId) as BaseNodeConfig | null)
@@ -51,9 +54,11 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
             )}
             <h2 className="text-sm font-semibold tracking-wide text-ink800">
               {selectedNode
-                ? (selectedNode.data?.label as string) ||
-                  selectedNode.metadata?.title ||
-                  "Node Properties"
+                ? getText(
+                    (selectedNode.data?.label as string) ||
+                      selectedNode.metadata?.title ||
+                      "Node Properties"
+                  )
                 : "Edge Properties"}
             </h2>
           </div>
@@ -66,7 +71,7 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
         </div>
         {selectedNode?.metadata?.description && (
           <p className="text-xs text-ink500 mt-1">
-            {selectedNode.metadata.description}
+            {getText(selectedNode.metadata.description)}
           </p>
         )}
       </div>
