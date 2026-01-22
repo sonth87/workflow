@@ -1,9 +1,10 @@
 /**
  * Context Menu Component
- * Renders context menu for nodes and edges
+ * Renders context menu for nodes and edges using design system
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import DesignContextMenu from "@sth87/shadcn-design-system/contextmenu";
 import { contextMenuRegistry } from "@/core/registry/ContextMenuRegistry";
 import type {
   ContextMenuItem,
@@ -17,7 +18,7 @@ import { CategoryType } from "@/enum/workflow.enum";
 import { Settings2 } from "lucide-react";
 import { contextMenuActionsRegistry } from "@/core/registry";
 import { useLanguage } from "@/workflow/hooks/useLanguage";
-import IconConfig from "../IconConfig";
+import type { ReactNode } from "react";
 
 interface ContextMenuProps {
   x: number;
@@ -26,138 +27,92 @@ interface ContextMenuProps {
   onClose: () => void;
 }
 
-// Component để render icon cho menu items
-function MenuItemIcon({ icon, color }: { icon?: any; color?: string }) {
-  if (color) {
-    // Render color swatch
+function transformMenuItems(
+  items: ContextMenuItem[],
+  context: ContextMenuContext,
+  onClose: () => void,
+  getText: (key: any) => string
+): any[] {
+  return items
+    .filter(item => !item.visible || item.visible(context))
+    .map(item => {
+      if (item.separator) {
+        return { type: "separator" };
+      }
+
+      const label = getText(item.label as any);
+      const icon = item.color ? (
+        <div
+          className="w-4 h-4 rounded-lg shrink-0"
+          style={{ backgroundColor: item.color }}
+        />
+      ) : (
+        convertIcon(item.icon)
+      );
+      const onClick = item.onClick
+        ? () => {
+            item.onClick!(context);
+            onClose();
+          }
+        : undefined;
+      const children = item.children
+        ? transformMenuItems(item.children, context, onClose, getText)
+        : undefined;
+
+      return {
+        key: item.id,
+        label,
+        icon,
+        onClick,
+        children,
+        disabled: item.disabled,
+      };
+    });
+}
+
+function convertIcon(icon: any): ReactNode {
+  if (!icon) return null;
+
+  if (typeof icon === "string") {
+    return <span className="text-base shrink-0">{icon}</span>;
+  }
+
+  if (typeof icon === "object" && icon.type === "image" && icon.value) {
     return (
-      <div
-        className="w-4 h-4 rounded border border-gray-300 mr-2 shrink-0"
-        style={{ backgroundColor: color }}
+      <img
+        src={icon.value}
+        alt="icon"
+        className="w-5 h-5 rounded-lg shrink-0"
       />
     );
   }
 
-  if (icon) {
-    // Nếu icon là string (emoji hoặc text), hiển thị trực tiếp
-    if (typeof icon === "string" && !icon.startsWith("data:")) {
-      return <span className="mr-2 text-base shrink-0">{icon}</span>;
-    }
+  if (typeof icon === "object" && icon.type === "lucide" && icon.value) {
+    const IconComponent = icon.value;
+    const size = icon.size || 16;
+    const iconColor = icon.color;
+    const backgroundColor = icon.backgroundColor;
 
-    // Nếu icon là object (lucide icon config)
-    if (
-      typeof icon === "object" &&
-      (icon.type === "lucide" || icon.type === "image") &&
-      icon.value
-    ) {
-      const size = icon.size || 16;
-      const iconColor = icon.color;
-      const backgroundColor = icon.backgroundColor;
+    return (
+      <div
+        className="w-5 h-5 rounded-lg flex items-center justify-center shrink-0"
+        style={{ backgroundColor }}
+      >
+        <IconComponent size={size} style={{ color: iconColor }} />
+      </div>
+    );
+  }
 
-      return (
-        <IconConfig
-          icon={icon}
-          compactView={false}
-          type={icon.type}
-          size={size}
-          colorConfig={{ iconColor, backgroundColor }}
-          className="mr-2 shrink-0 w-5 h-5"
-        />
-      );
-    }
-
-    // Nếu là React component trực tiếp
-    if (typeof icon === "function") {
-      const IconComponent = icon;
-      return <IconComponent className="mr-2 shrink-0 w-5 h-5" size={16} />;
-    }
+  if (typeof icon === "function") {
+    const IconComponent = icon;
+    return (
+      <div className="w-5 h-5 rounded-lg flex items-center justify-center shrink-0">
+        <IconComponent size={16} />
+      </div>
+    );
   }
 
   return null;
-}
-
-function ContextMenuItems({
-  items,
-  context,
-  onClose,
-}: {
-  items: ContextMenuItem[];
-  context: ContextMenuContext;
-  onClose: () => void;
-}) {
-  const { getText } = useLanguage();
-  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-
-  return (
-    <div className="py-1">
-      {items.map(item => {
-        // Check visibility
-        if (item.visible && !item.visible(context)) {
-          return null;
-        }
-
-        // Separator
-        if (item.separator) {
-          return <div key={item.id} className="my-1 h-px bg-border" />;
-        }
-
-        // Item with children (submenu)
-        if (item.children && item.children.length > 0) {
-          const isOpen = openSubmenu === item.id;
-
-          return (
-            <div
-              key={item.id}
-              className="relative"
-              onMouseEnter={() => setOpenSubmenu(item.id)}
-              onMouseLeave={() => setOpenSubmenu(null)}
-            >
-              <button
-                className="w-full px-3 py-2 text-sm text-left hover:bg-accent transition-colors flex items-center justify-between"
-                disabled={item.disabled}
-              >
-                <div className="flex items-center flex-1">
-                  <MenuItemIcon icon={item.icon} color={item.color} />
-                  <span>{getText(item.label as any)}</span>
-                </div>
-                <span className="ml-2">›</span>
-              </button>
-              {isOpen && (
-                <div
-                  data-context-menu
-                  className="absolute left-full top-0 ml-0 w-full min-w-40 max-w-60 bg-popover border border-border rounded-md shadow-lg z-50"
-                >
-                  <ContextMenuItems
-                    items={item.children}
-                    context={context}
-                    onClose={onClose}
-                  />
-                </div>
-              )}
-            </div>
-          );
-        }
-
-        // Regular item
-        return (
-          <button
-            key={item.id}
-            className="w-full px-3 py-2 text-sm text-left hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            disabled={item.disabled}
-            onClick={async () => {
-              if (item.onClick) {
-                await item.onClick(context);
-              }
-              onClose();
-            }}
-          >
-            <MenuItemIcon icon={item.icon} color={item.color} />
-            <span>{getText(item.label as any)}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
 }
 
 /**
@@ -204,6 +159,8 @@ function ensurePropertiesMenuItem(
 
 export function ContextMenu({ x, y, context, onClose }: ContextMenuProps) {
   const [items, setItems] = useState<ContextMenuItem[]>([]);
+  const { getText } = useLanguage();
+  const triggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Get appropriate context menu items
@@ -248,39 +205,40 @@ export function ContextMenu({ x, y, context, onClose }: ContextMenuProps) {
     setItems(menuItems);
   }, [context]);
 
+  const transformedItems = transformMenuItems(items, context, onClose, getText);
+
   useEffect(() => {
-    // Close on click outside - delay to avoid immediate close
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      // Check if click is outside context menu
-      if (!target.closest("[data-context-menu]")) {
-        onClose();
-      }
-    };
+    if (triggerRef.current && transformedItems.length > 0) {
+      const event = new MouseEvent("contextmenu", {
+        bubbles: true,
+        clientX: x,
+        clientY: y,
+        button: 2, // right click
+      });
+      triggerRef.current.dispatchEvent(event);
+    }
+  }, [x, y, transformedItems]);
 
-    // Add listener after a small delay to avoid immediate trigger
-    const timeoutId = setTimeout(() => {
-      document.addEventListener("click", handleClickOutside);
-    }, 0);
-
-    return () => {
-      clearTimeout(timeoutId);
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [onClose]);
-
-  if (items.length === 0) {
+  if (transformedItems.length === 0) {
     return null;
   }
 
   return (
-    <div
-      data-context-menu
-      className="fixed z-50 min-w-50 bg-popover border border-border rounded-md shadow-lg"
-      style={{ left: x, top: y }}
-      onClick={e => e.stopPropagation()}
-    >
-      <ContextMenuItems items={items} context={context} onClose={onClose} />
-    </div>
+    <DesignContextMenu
+      trigger={
+        <div
+          ref={triggerRef}
+          style={{
+            position: "fixed",
+            left: x,
+            top: y,
+            width: 1,
+            height: 1,
+            zIndex: 50,
+          }}
+        />
+      }
+      items={transformedItems}
+    />
   );
 }

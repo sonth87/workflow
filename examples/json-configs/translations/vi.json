@@ -1,6 +1,6 @@
 {
-  "toolbar.selectTool": "Công cụ chọn (V)",
-  "toolbar.handTool": "Công cụ cầm nắm (H) - Chỉ di chuyển canvas",
+  "toolbar.selectTool": "Công cụ chọn",
+  "toolbar.handTool": "Công cụ cầm nắm - Chỉ di chuyển canvas",
   "toolbar.zoomOut": "Thu nhỏ",
   "toolbar.zoomIn": "Phóng to",
   "toolbar.resetView": "Đặt lại chế độ xem",

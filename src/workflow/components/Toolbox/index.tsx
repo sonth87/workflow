@@ -6,18 +6,31 @@
 import { categoryRegistry } from "@/core/registry/CategoryRegistry";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { CategoryType, NodeType } from "@/enum/workflow.enum";
-import {
-  X,
-  ChevronDown,
-  ChevronRight,
-  PanelLeft,
-  PanelRight,
-} from "lucide-react";
-import React, { useMemo, useState } from "react";
+import { X, PanelLeft, PanelRight } from "lucide-react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../../data/toolboxData";
 import IconConfig from "../IconConfig";
 import { cn } from "@sth87/shadcn-design-system";
 import { useLanguage } from "@/workflow/hooks/useLanguage";
+
+// Custom hook for click outside
+const useOnClickOutside = (
+  ref: React.RefObject<HTMLElement | null>,
+  handler: () => void
+) => {
+  useEffect(() => {
+    const listener = (event: MouseEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
+        return;
+      }
+      handler();
+    };
+    document.addEventListener("mousedown", listener);
+    return () => {
+      document.removeEventListener("mousedown", listener);
+    };
+  }, [ref, handler]);
+};
 
 // Default icon for custom category
 const CustomCategoryIcon = () => (
@@ -46,6 +59,9 @@ export function Toolbox({ className }: ToolboxProps) {
     useState<CategoryType>();
   const [toolboxState, setToolboxState] = useState<ToolboxState>("collapsed");
   const { getText, getUIText } = useLanguage();
+  const popupRef = useRef<HTMLElement>(null);
+
+  useOnClickOutside(popupRef, () => setSelectedCategoryType(undefined));
 
   const handleDragStart = (e: React.DragEvent, nodeType: NodeType) => {
     e.dataTransfer.effectAllowed = "move";
@@ -262,7 +278,10 @@ export function Toolbox({ className }: ToolboxProps) {
             </button> */}
           </div>
           {selectedCategory && (
-            <div className="min-w-[320px] border-border absolute top-0 left-[calc(100%+4px)] border rounded-2xl z-10 bg-background">
+            <div
+              ref={popupRef as React.RefObject<HTMLDivElement>}
+              className="min-w-[320px] border-border absolute top-0 left-[calc(100%+4px)] border rounded-2xl z-10 bg-background"
+            >
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <h2 className="text-base text-ink800 font-medium flex-1">
                   {getText(selectedCategory?.name)}

@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@sth87/shadcn-design-system": "^0.0.28",
+    "@sth87/shadcn-design-system": "^0.0.29",
     "@tailwindcss/vite": "^4.1.17",
     "@types/dagre": "^0.7.53",
     "@xyflow/react": "^12.9.3",
