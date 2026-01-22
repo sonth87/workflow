@@ -1,6 +1,6 @@
 {
-  "toolbar.selectTool": "Select tool (V)",
-  "toolbar.handTool": "Hand tool (H) - Pan canvas only",
+  "toolbar.selectTool": "Select tool",
+  "toolbar.handTool": "Hand tool - Pan canvas only",
   "toolbar.zoomOut": "Zoom out",
   "toolbar.zoomIn": "Zoom in",
   "toolbar.resetView": "Reset view",
