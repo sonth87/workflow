@@ -77,6 +77,9 @@ function convertPropertyDefinitionsToGroups(
       required: propDef.required,
       placeholder: propDef.placeholder,
       helpText: propDef.description,
+      visible: propDef.visible,
+      disabled: propDef.disabled,
+      readonly: propDef.readonly,
       options: propDef.options
         ? Array.isArray(propDef.options)
           ? {

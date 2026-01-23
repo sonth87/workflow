@@ -45,12 +45,17 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
     }
 
     // Merge parent config with current config
+    const mergedConfig = this.mergeConfigs(parentItem.config, item.config);
+
+    // Important: Ensure nodeType matches the child item type, not the inherited one
+    mergedConfig.nodeType = item.type;
+
     return {
       ...parentItem,
       ...item,
       category: item.category || parentItem.category,
       icon: this.mergeIcons(parentItem.icon, item.icon),
-      config: this.mergeConfigs(parentItem.config, item.config),
+      config: mergedConfig,
       metadata: { ...parentItem.metadata, ...item.metadata },
     };
   }

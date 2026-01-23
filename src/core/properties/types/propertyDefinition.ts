@@ -35,6 +35,7 @@ export type PropertyEntity = BaseNodeConfig | BaseEdgeConfig;
  * Điều kiện để hiển thị/disable field
  */
 export type PropertyCondition =
+  | boolean
   | ((entity: PropertyEntity) => boolean)
   | {
       field: string;

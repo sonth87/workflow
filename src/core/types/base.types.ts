@@ -311,8 +311,9 @@ export interface PropertyDefinition {
   description?: MultilingualText;
   defaultValue?: unknown;
   required?: boolean;
-  visible?: boolean | ((data: unknown) => boolean);
-  disabled?: boolean | ((data: unknown) => boolean);
+  readonly?: boolean;
+  visible?: boolean | any; // Use any to support both simple and complex conditions
+  disabled?: boolean | any;
   validation?: ValidationRule[];
   options?: Array<{ label: MultilingualText; value: unknown }>; // For select/multiselect
   placeholder?: MultilingualText;

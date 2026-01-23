@@ -1,11 +1,12 @@
 import { useCallback, useMemo } from "react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
-import { propertySyncEngine } from "@/core/properties";
+import { propertySyncEngine, propertyRegistry } from "@/core/properties";
 import type {
   PropertyEntity,
   PropertyFieldDefinition,
   PropertyGroupDefinition,
 } from "@/core/properties";
+import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
 
 interface UsePropertySyncReturn {
   handlePropertyChange: (propertyId: string, value: unknown) => void;
@@ -33,6 +34,19 @@ export function usePropertySync(
     });
     return map;
   }, [propertyGroups]);
+
+  // Lấy tất cả values (bao gồm cả defaults) để evaluate conditions
+  const allValues = useMemo(() => {
+    if (!entity) return {};
+    const isNode = "nodeType" in entity;
+    const defaults = isNode
+      ? propertyRegistry.getDefaultNodeProperties((entity as BaseNodeConfig).nodeType)
+      : propertyRegistry.getDefaultEdgeProperties(
+          (entity as BaseEdgeConfig).type || "default"
+        );
+
+    return { ...defaults, ...entity.properties };
+  }, [entity]);
 
   // Handle single property change
   const handlePropertyChange = useCallback(
@@ -94,18 +108,18 @@ export function usePropertySync(
   const isFieldDisabled = useCallback(
     (field: PropertyFieldDefinition): boolean => {
       if (!entity) return false;
-      return propertySyncEngine.isFieldDisabled(field, entity);
+      return propertySyncEngine.isFieldDisabled(field, entity, allValues);
     },
-    [entity]
+    [entity, allValues]
   );
 
   // Check if field is visible
   const isFieldVisible = useCallback(
     (field: PropertyFieldDefinition): boolean => {
       if (!entity) return false;
-      return propertySyncEngine.isFieldVisible(field, entity);
+      return propertySyncEngine.isFieldVisible(field, entity, allValues);
     },
-    [entity]
+    [entity, allValues]
   );
 
   return {

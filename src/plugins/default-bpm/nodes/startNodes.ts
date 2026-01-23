@@ -47,11 +47,14 @@ export const startNodes = [
           group: "config",
           defaultValue: "once",
           options: [
-            { label: "One date/time", value: "once" },
-            { label: "Hourly", value: "hourly" },
-            { label: "Daily", value: "daily" },
-            { label: "Monthly", value: "monthly" },
-            { label: "Every (Interval)", value: "interval" },
+            { label: "ui.properties.timerType.option.once", value: "once" },
+            { label: "ui.properties.timerType.option.hourly", value: "hourly" },
+            { label: "ui.properties.timerType.option.daily", value: "daily" },
+            { label: "ui.properties.timerType.option.monthly", value: "monthly" },
+            {
+              label: "ui.properties.timerType.option.interval",
+              value: "interval",
+            },
           ],
         },
         // For One date/time
@@ -179,7 +182,7 @@ export const startNodes = [
     name: "Message Start Event",
     config: {
       metadata: {
-        title: "plugin.default.boundaryMessage.title",
+        title: "plugin.default.startEventMessage.title",
         description: "Start process when a message is received",
       },
       icon: {
@@ -225,13 +228,19 @@ export const startNodes = [
           id: "authentication",
           name: "authentication",
           type: "select",
-          label: "Authentication",
+          label: "ui.properties.authentication",
           group: "config",
           defaultValue: "none",
           options: [
-            { label: "None", value: "none" },
-            { label: "API Key", value: "apiKey" },
-            { label: "OAuth2", value: "oauth2" },
+            { label: "ui.properties.authentication.option.none", value: "none" },
+            {
+              label: "ui.properties.authentication.option.apiKey",
+              value: "apiKey",
+            },
+            {
+              label: "ui.properties.authentication.option.oauth2",
+              value: "oauth2",
+            },
           ],
         },
       ],
