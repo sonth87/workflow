@@ -136,6 +136,38 @@ class PropertyConfigurationRegistry {
   }
 
   /**
+   * Get default properties cho một node type
+   */
+  getDefaultNodeProperties(nodeType: string): Record<string, any> {
+    const groups = this.getNodePropertyGroups(nodeType);
+    const defaults: Record<string, any> = {};
+    groups.forEach(group => {
+      group.fields.forEach(field => {
+        if (field.defaultValue !== undefined) {
+          defaults[field.id] = field.defaultValue;
+        }
+      });
+    });
+    return defaults;
+  }
+
+  /**
+   * Get default properties cho một edge type
+   */
+  getDefaultEdgeProperties(edgeType: string): Record<string, any> {
+    const groups = this.getEdgePropertyGroups(edgeType);
+    const defaults: Record<string, any> = {};
+    groups.forEach(group => {
+      group.fields.forEach(field => {
+        if (field.defaultValue !== undefined) {
+          defaults[field.id] = field.defaultValue;
+        }
+      });
+    });
+    return defaults;
+  }
+
+  /**
    * Clear toàn bộ registry (useful cho testing)
    */
   clear(): void {

@@ -14,6 +14,8 @@ import {
   SliderControl,
   MultiSelectControl,
   DateControl,
+  LogicControl,
+  ExpressionControl,
 } from "./ControlType";
 import { useLanguage } from "@/workflow/hooks/useLanguage";
 
@@ -154,6 +156,28 @@ export function DynamicPropertyField({
     case "json":
       return (
         <JsonControl
+          definition={definition}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          errors={errors}
+        />
+      );
+
+    case "logic":
+      return (
+        <LogicControl
+          definition={definition}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          errors={errors}
+        />
+      );
+
+    case "expression":
+      return (
+        <ExpressionControl
           definition={definition}
           value={value}
           onChange={onChange}

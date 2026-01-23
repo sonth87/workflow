@@ -305,44 +305,81 @@ export class PropertySyncEngine {
   }
 
   /**
+   * Kiểm tra một điều kiện
+   */
+  private checkCondition(
+    condition: any,
+    entity: PropertyEntity,
+    allValues?: Record<string, unknown>
+  ): boolean {
+    if (typeof condition === "function") {
+      return condition(entity);
+    }
+
+    if ("or" in condition) {
+      return condition.or.some((c: any) =>
+        this.checkCondition(c, entity, allValues)
+      );
+    }
+
+    if ("and" in condition) {
+      return condition.and.every((c: any) =>
+        this.checkCondition(c, entity, allValues)
+      );
+    }
+
+    const { field, operator = "equals", value, customCheck } = condition;
+    const fieldValue = allValues?.[field] ?? entity.properties?.[field];
+
+    if (operator === "custom" && customCheck) {
+      return customCheck(fieldValue, entity);
+    }
+
+    switch (operator) {
+      case "equals":
+      case "===":
+        return fieldValue === value;
+      case "notEquals":
+      case "!==":
+        return fieldValue !== value;
+      case "includes":
+      case "contains":
+        return (
+          (Array.isArray(fieldValue) && fieldValue.includes(value)) ||
+          (typeof fieldValue === "string" && fieldValue.includes(String(value)))
+        );
+      case "notIncludes":
+        return !(Array.isArray(fieldValue) && fieldValue.includes(value));
+      case "regex":
+        if (typeof fieldValue === "string" && typeof value === "string") {
+          return new RegExp(value).test(fieldValue);
+        }
+        return false;
+      case "in":
+        return Array.isArray(value) && value.includes(fieldValue);
+      case "notIn":
+        return Array.isArray(value) && !value.includes(fieldValue);
+      default:
+        if (customCheck) {
+          return customCheck(fieldValue, entity);
+        }
+        return true;
+    }
+  }
+
+  /**
    * Check xem field có visible không dựa trên condition
    */
   isFieldVisible(
     field: PropertyFieldDefinition,
-    entity: PropertyEntity
+    entity: PropertyEntity,
+    allValues?: Record<string, unknown>
   ): boolean {
     if (!field.visible) {
       return true; // Mặc định là visible
     }
 
-    if (typeof field.visible === "function") {
-      return field.visible(entity);
-    }
-
-    // Evaluate condition object
-    const condition = field.visible;
-    const fieldValue = entity.properties?.[condition.field];
-
-    switch (condition.operator) {
-      case "equals":
-        return fieldValue === condition.value;
-      case "notEquals":
-        return fieldValue !== condition.value;
-      case "includes":
-        return (
-          Array.isArray(fieldValue) && fieldValue.includes(condition.value)
-        );
-      case "notIncludes":
-        return (
-          Array.isArray(fieldValue) && !fieldValue.includes(condition.value)
-        );
-      case "custom":
-        return condition.customCheck
-          ? condition.customCheck(fieldValue, entity)
-          : true;
-      default:
-        return true;
-    }
+    return this.checkCondition(field.visible, entity, allValues);
   }
 
   /**
@@ -350,7 +387,8 @@ export class PropertySyncEngine {
    */
   isFieldDisabled(
     field: PropertyFieldDefinition,
-    entity: PropertyEntity
+    entity: PropertyEntity,
+    allValues?: Record<string, unknown>
   ): boolean {
     if (field.readonly) {
       return true;
@@ -360,34 +398,7 @@ export class PropertySyncEngine {
       return false;
     }
 
-    if (typeof field.disabled === "function") {
-      return field.disabled(entity);
-    }
-
-    // Evaluate condition object (giống logic visible)
-    const condition = field.disabled;
-    const fieldValue = entity.properties?.[condition.field];
-
-    switch (condition.operator) {
-      case "equals":
-        return fieldValue === condition.value;
-      case "notEquals":
-        return fieldValue !== condition.value;
-      case "includes":
-        return (
-          Array.isArray(fieldValue) && fieldValue.includes(condition.value)
-        );
-      case "notIncludes":
-        return (
-          Array.isArray(fieldValue) && !fieldValue.includes(condition.value)
-        );
-      case "custom":
-        return condition.customCheck
-          ? condition.customCheck(fieldValue, entity)
-          : false;
-      default:
-        return false;
-    }
+    return this.checkCondition(field.disabled, entity, allValues);
   }
 
   /**
@@ -395,40 +406,14 @@ export class PropertySyncEngine {
    */
   isGroupVisible(
     group: PropertyGroupDefinition,
-    entity: PropertyEntity
+    entity: PropertyEntity,
+    allValues?: Record<string, unknown>
   ): boolean {
     if (!group.visible) {
       return true;
     }
 
-    if (typeof group.visible === "function") {
-      return group.visible(entity);
-    }
-
-    // Evaluate condition object
-    const condition = group.visible;
-    const fieldValue = entity.properties?.[condition.field];
-
-    switch (condition.operator) {
-      case "equals":
-        return fieldValue === condition.value;
-      case "notEquals":
-        return fieldValue !== condition.value;
-      case "includes":
-        return (
-          Array.isArray(fieldValue) && fieldValue.includes(condition.value)
-        );
-      case "notIncludes":
-        return (
-          Array.isArray(fieldValue) && !fieldValue.includes(condition.value)
-        );
-      case "custom":
-        return condition.customCheck
-          ? condition.customCheck(fieldValue, entity)
-          : true;
-      default:
-        return true;
-    }
+    return this.checkCondition(group.visible, entity, allValues);
   }
 
   /**
@@ -436,9 +421,10 @@ export class PropertySyncEngine {
    */
   getVisibleGroups(
     groups: PropertyGroupDefinition[],
-    entity: PropertyEntity
+    entity: PropertyEntity,
+    allValues?: Record<string, unknown>
   ): PropertyGroupDefinition[] {
-    return groups.filter(group => this.isGroupVisible(group, entity));
+    return groups.filter(group => this.isGroupVisible(group, entity, allValues));
   }
 
   /**
@@ -446,9 +432,10 @@ export class PropertySyncEngine {
    */
   getVisibleFields(
     fields: PropertyFieldDefinition[],
-    entity: PropertyEntity
+    entity: PropertyEntity,
+    allValues?: Record<string, unknown>
   ): PropertyFieldDefinition[] {
-    return fields.filter(field => this.isFieldVisible(field, entity));
+    return fields.filter(field => this.isFieldVisible(field, entity, allValues));
   }
 
   /**

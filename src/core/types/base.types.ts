@@ -304,13 +304,16 @@ export interface PropertyDefinition {
     | "color"
     | "date"
     | "json"
+    | "logic"
+    | "expression"
     | "custom";
   label: MultilingualText;
   description?: MultilingualText;
   defaultValue?: unknown;
   required?: boolean;
-  visible?: boolean | ((data: unknown) => boolean);
-  disabled?: boolean | ((data: unknown) => boolean);
+  readonly?: boolean;
+  visible?: boolean | any; // Use any to support both simple and complex conditions
+  disabled?: boolean | any;
   validation?: ValidationRule[];
   options?: Array<{ label: MultilingualText; value: unknown }>; // For select/multiselect
   placeholder?: MultilingualText;
@@ -485,6 +488,7 @@ export interface BaseRuleConfig {
 export interface RegistryItem<T = unknown> {
   id: string;
   type: string;
+  extends?: string;
   name: MultilingualText | string;
   description?: MultilingualText | string;
   category?: string;

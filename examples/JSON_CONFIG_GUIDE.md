@@ -106,7 +106,7 @@ CustomNodeFactory.registerFromConfig(nodeConfig);
   "id": "string (required)",
   "name": "string (required)",
   "label": "string OR MultilingualText (required)",
-  "type": "text|number|textarea|boolean|select|multiselect|color|json|date|slider (required)",
+  "type": "text|number|textarea|boolean|select|multiselect|color|json|date|slider|logic|expression (required)",
   "required": boolean,
   "defaultValue": any,
   "placeholder": "string OR MultilingualText",
@@ -128,9 +128,18 @@ CustomNodeFactory.registerFromConfig(nodeConfig);
     "minLength": number,
     "maxLength": number,
     "message": "string OR MultilingualText"
+  },
+  "visible": {
+    "field": "string (other property id)",
+    "operator": "equals|notEquals|includes|notIncludes|===|!==|contains",
+    "value": any
   }
 }
 ```
+
+#### New Property Types:
+- **`logic`**: Multi-line JavaScript code editor. Used for `Script Task`.
+- **`expression`**: Single-line JavaScript formula bar. Used for `Sequence Flow` conditions.
 
 ### MultilingualText Format
 

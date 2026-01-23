@@ -25,6 +25,29 @@ import { categoryRegistry } from "../registry/CategoryRegistry";
 import { propertyRegistry } from "../properties";
 import { globalEventBus, WorkflowEventTypes } from "../events/EventBus";
 import { translationRegistry } from "../registry/TranslationRegistry";
+import {
+  Settings2,
+  Users,
+  Code2,
+  Cloud,
+  GitBranch,
+  Settings,
+} from "lucide-react";
+
+/**
+ * Common group configuration
+ */
+const COMMON_GROUPS: Record<
+  string,
+  { label: string; icon: any; order: number }
+> = {
+  basic: { label: "Basic", icon: Settings2, order: 1 },
+  assignment: { label: "Assignment", icon: Users, order: 20 },
+  logic: { label: "Logic", icon: Code2, order: 30 },
+  service: { label: "Service", icon: Cloud, order: 40 },
+  gateway: { label: "Gateway", icon: GitBranch, order: 50 },
+  config: { label: "Configuration", icon: Settings, order: 10 },
+};
 
 /**
  * Convert propertyDefinitions array thành propertyGroups
@@ -54,13 +77,18 @@ function convertPropertyDefinitionsToGroups(
       required: propDef.required,
       placeholder: propDef.placeholder,
       helpText: propDef.description,
+      visible: propDef.visible,
+      disabled: propDef.disabled,
+      readonly: propDef.readonly,
       options: propDef.options
-        ? {
-            options: propDef.options.map(opt => ({
-              label: opt.label,
-              value: opt.value as string | number | boolean,
-            })),
-          }
+        ? Array.isArray(propDef.options)
+          ? {
+              options: propDef.options.map((opt: any) => ({
+                label: opt.label,
+                value: opt.value as string | number | boolean,
+              })),
+            }
+          : (propDef.options as any)
         : undefined,
       order: 0, // Will be set later
       group: groupId,
@@ -74,13 +102,18 @@ function convertPropertyDefinitionsToGroups(
   let order = 1;
 
   groupsMap.forEach((fields, groupId) => {
-    // Sort fields by order (not implemented yet, assume insertion order)
-    // Set order: basic=1, custom=90, others increment
-    const groupOrder =
-      groupId === "basic" ? 1 : groupId === "custom" ? 90 : order++;
+    const commonGroup = COMMON_GROUPS[groupId];
+
+    const groupOrder = commonGroup
+      ? commonGroup.order
+      : groupId === "custom"
+        ? 90
+        : order++;
+
     groups.push({
       id: groupId,
-      label: groupId.charAt(0).toUpperCase() + groupId.slice(1), // Capitalize
+      label: commonGroup ? commonGroup.label : groupId.charAt(0).toUpperCase() + groupId.slice(1),
+      icon: commonGroup ? commonGroup.icon : undefined,
       order: groupOrder,
       fields,
     });
@@ -316,11 +349,13 @@ export class PluginManager {
     if (config.nodes) {
       nodeRegistry.registerMany(config.nodes as any);
 
-      // Register property configurations for nodes that have propertyDefinitions
+      // Register property configurations for nodes
       config.nodes.forEach(node => {
-        if (node.config.propertyDefinitions) {
+        // Use resolved config from registry to support inheritance
+        const resolvedNode = nodeRegistry.get(node.type);
+        if (resolvedNode?.config.propertyDefinitions) {
           const propertyGroups = convertPropertyDefinitionsToGroups(
-            node.config.propertyDefinitions
+            resolvedNode.config.propertyDefinitions as any
           );
           propertyRegistry.registerNodeConfig({
             nodeType: node.type,
@@ -333,6 +368,19 @@ export class PluginManager {
     // Register edges
     if (config.edges) {
       edgeRegistry.registerMany(config.edges as any);
+
+      // Register property configurations for edges that have propertyDefinitions
+      config.edges.forEach(edge => {
+        if (edge.config.propertyDefinitions) {
+          const propertyGroups = convertPropertyDefinitionsToGroups(
+            edge.config.propertyDefinitions as any
+          );
+          propertyRegistry.registerEdgeConfig({
+            edgeType: edge.type,
+            propertyGroups,
+          });
+        }
+      });
     }
 
     // Register rules
@@ -371,6 +419,12 @@ export class PluginManager {
     // Unregister edges
     if (config.edges) {
       config.edges.forEach(edge => edgeRegistry.unregister(edge.id));
+      // Unregister property configurations
+      config.edges.forEach(edge => {
+        if (edge.config.propertyDefinitions) {
+          propertyRegistry.unregisterEdgeConfig(edge.type);
+        }
+      });
     }
 
     // Unregister rules

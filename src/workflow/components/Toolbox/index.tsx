@@ -10,8 +10,9 @@ import { X, PanelLeft, PanelRight } from "lucide-react";
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../../data/toolboxData";
 import IconConfig from "../IconConfig";
-import { cn } from "@sth87/shadcn-design-system";
+import { cn, Tooltip } from "@sth87/shadcn-design-system";
 import { useLanguage } from "@/workflow/hooks/useLanguage";
+import { ResizeHandle } from "../ResizeHandle";
 
 // Custom hook for click outside
 const useOnClickOutside = (
@@ -58,6 +59,7 @@ export function Toolbox({ className }: ToolboxProps) {
   const [selectedCategoryType, setSelectedCategoryType] =
     useState<CategoryType>();
   const [toolboxState, setToolboxState] = useState<ToolboxState>("collapsed");
+  const [width, setWidth] = useState(320);
   const { getText, getUIText } = useLanguage();
   const popupRef = useRef<HTMLElement>(null);
 
@@ -198,10 +200,17 @@ export function Toolbox({ className }: ToolboxProps) {
     <aside
       className={cn(
         "border rounded-2xl shadow-xl flex flex-col relative overflow-visible bg-background/90 backdrop-blur-xs",
-        { "h-[calc(100%-1rem)] w-sm": toolboxState === "expanded" },
+        { "h-[calc(100%-1rem)]": toolboxState === "expanded" },
         className
       )}
+      style={toolboxState === "expanded" ? { width: `${width}px` } : {}}
     >
+      {toolboxState === "expanded" && (
+        <ResizeHandle
+          direction="right"
+          onResize={delta => setWidth(prev => Math.max(320, Math.min(600, prev + delta)))}
+        />
+      )}
       {/* {toolboxState === "minimize" && (
         <div className="px-2.5 py-4 flex flex-col items-center gap-2">
           <button
@@ -232,22 +241,29 @@ export function Toolbox({ className }: ToolboxProps) {
               <div
                 key={`${typeof category.name === "string" ? category.name : JSON.stringify(category.name)}-${index}`}
               >
-                <div
-                  className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"
-                  onClick={() => setSelectedCategoryType(category.categoryType)}
-                  title={getText(category.name)}
+                <Tooltip
+                  content={getText(category.name)}
+                  side="right"
+                  sideOffset={10}
                 >
-                  {typeof category.icon === "string" &&
-                  category.icon.startsWith("data:image/svg") ? (
-                    <img
-                      src={category.icon}
-                      alt={getText(category.name) as string}
-                      className="w-4.5 h-4.5"
-                    />
-                  ) : (
-                    category.icon
-                  )}
-                </div>
+                  <div
+                    className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"
+                    onClick={() =>
+                      setSelectedCategoryType(category.categoryType)
+                    }
+                  >
+                    {typeof category.icon === "string" &&
+                    category.icon.startsWith("data:image/svg") ? (
+                      <img
+                        src={category.icon}
+                        alt={getText(category.name) as string}
+                        className="w-4.5 h-4.5"
+                      />
+                    ) : (
+                      category.icon
+                    )}
+                  </div>
+                </Tooltip>
                 {/* Render separator if configured */}
                 {category.separator &&
                   category.separator.show &&

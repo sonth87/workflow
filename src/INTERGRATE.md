@@ -123,6 +123,11 @@ var bpm = new BPM({
             type: "textarea",
             required: true,
           },
+          {
+            id: "onSuccess",
+            label: { en: "On Success Logic", vi: "Logic khi thành công" },
+            type: "logic",
+          },
         ],
       },
     ],
@@ -259,6 +264,12 @@ options: {
           type: "json",
           defaultValue: { "Content-Type": "application/json" },
         },
+          {
+            id: "condition",
+            label: { en: "Condition", vi: "Điều kiện" },
+            type: "expression",
+            placeholder: "status === 'active'",
+          },
       ],
       contextMenuItems: [
         {

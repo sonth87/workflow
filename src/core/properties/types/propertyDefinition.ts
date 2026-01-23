@@ -22,6 +22,8 @@ export type PropertyFieldType =
   | "json"
   | "date"
   | "slider"
+  | "logic"
+  | "expression"
   | "custom";
 
 /**
@@ -33,13 +35,27 @@ export type PropertyEntity = BaseNodeConfig | BaseEdgeConfig;
  * Điều kiện để hiển thị/disable field
  */
 export type PropertyCondition =
+  | boolean
   | ((entity: PropertyEntity) => boolean)
   | {
       field: string;
-      operator: "equals" | "notEquals" | "includes" | "notIncludes" | "custom";
-      value: unknown;
+      operator?:
+        | "equals"
+        | "notEquals"
+        | "includes"
+        | "notIncludes"
+        | "custom"
+        | "==="
+        | "!=="
+        | "contains"
+        | "regex"
+        | "in"
+        | "notIn";
+      value?: unknown;
       customCheck?: (fieldValue: unknown, entity: PropertyEntity) => boolean;
-    };
+    }
+  | { or: PropertyCondition[] }
+  | { and: PropertyCondition[] };
 
 /**
  * Options cho select, multiselect, radio

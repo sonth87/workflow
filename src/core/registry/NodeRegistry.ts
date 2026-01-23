@@ -12,6 +12,144 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
   }
 
   /**
+   * Get node item (với inheritance)
+   */
+  get(id: string): RegistryItem<BaseNodeConfig> | undefined {
+    return this.getWithInheritance(id);
+  }
+
+  /**
+   * Internal get với circular check
+   */
+  private getWithInheritance(
+    id: string,
+    visited: Set<string> = new Set()
+  ): RegistryItem<BaseNodeConfig> | undefined {
+    const item = super.get(id);
+    if (!item || !item.extends) {
+      return item;
+    }
+
+    if (visited.has(id)) {
+      console.error(`Circular inheritance detected for node type "${id}"`);
+      return item;
+    }
+
+    visited.add(id);
+
+    // Resolve inheritance
+    const parentItem = this.getWithInheritance(item.extends, visited);
+    if (!parentItem) {
+      console.warn(`Parent node type "${item.extends}" not found for "${id}"`);
+      return item;
+    }
+
+    // Merge parent config with current config
+    const mergedConfig = this.mergeConfigs(parentItem.config, item.config);
+
+    // Important: Ensure nodeType matches the child item type, not the inherited one
+    mergedConfig.nodeType = item.type;
+
+    return {
+      ...parentItem,
+      ...item,
+      category: item.category || parentItem.category,
+      icon: this.mergeIcons(parentItem.icon, item.icon),
+      config: mergedConfig,
+      metadata: { ...parentItem.metadata, ...item.metadata },
+    };
+  }
+
+  /**
+   * Override getAll to support inheritance for all items
+   */
+  getAll(): RegistryItem<BaseNodeConfig>[] {
+    return super.getAll().map(item => this.get(item.id)!);
+  }
+
+  /**
+   * Merge two node configurations
+   */
+  private mergeConfigs(
+    parent: BaseNodeConfig,
+    child: BaseNodeConfig
+  ): BaseNodeConfig {
+    return {
+      ...parent,
+      ...child,
+      category: child.category || parent.category,
+      icon: this.mergeIcons(parent.icon, child.icon),
+      visualConfig: {
+        ...(parent.visualConfig || {}),
+        ...(child.visualConfig || {}),
+      },
+      metadata: {
+        ...(parent.metadata || {}),
+        ...(child.metadata || {}),
+      },
+      data: {
+        ...(parent.data || {}),
+        ...(child.data || {}),
+      },
+      properties: {
+        ...(parent.properties || {}),
+        ...(child.properties || {}),
+      },
+      propertyDefinitions: this.mergePropertyDefinitions(
+        parent.propertyDefinitions,
+        child.propertyDefinitions
+      ),
+      connectionRules: this.mergeConnectionRules(
+        parent.connectionRules,
+        child.connectionRules
+      ),
+    };
+  }
+
+  /**
+   * Merge two icons
+   */
+  private mergeIcons(parent?: any, child?: any): any {
+    if (!parent) return child;
+    if (!child) return parent;
+
+    return {
+      ...parent,
+      ...child,
+    };
+  }
+
+  private mergePropertyDefinitions(
+    parent?: any[],
+    child?: any[]
+  ): any[] | undefined {
+    if (!parent) return child;
+    if (!child) return parent;
+
+    const merged = [...parent];
+    child.forEach(childProp => {
+      const index = merged.findIndex(p => p.id === childProp.id);
+      if (index > -1) {
+        merged[index] = { ...merged[index], ...childProp };
+      } else {
+        merged.push(childProp);
+      }
+    });
+    return merged;
+  }
+
+  private mergeConnectionRules(
+    parent?: any[],
+    child?: any[]
+  ): any[] | undefined {
+    if (!parent) return child;
+    if (!child) return parent;
+    // For connection rules, we might want to combine them or override.
+    // Usually, we combine them.
+    return [...parent, ...child];
+  }
+
+  /**
    * Get node renderer component
    */
   getRenderer(nodeType: string): React.ComponentType<any> | undefined {

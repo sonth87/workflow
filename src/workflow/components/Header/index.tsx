@@ -14,6 +14,7 @@ import {
   OutputViewer,
   ThemeSwitcher,
   ViewModeSwitcher,
+  SimulationControls,
 } from "../Behavior";
 import { LanguageSwitcher } from "../LanguageSwitcher";
 
@@ -37,7 +38,9 @@ export function Header({ onSave }: HeaderProps) {
   return (
     <header className="w-full bg-primaryA-100 p-3">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3"></div>
+        <div className="flex items-center gap-3">
+          <SimulationControls />
+        </div>
 
         <div className="flex items-center gap-2">
           <LanguageSwitcher />

@@ -49,7 +49,6 @@ export function DateControl({
       </label>
 
       <DatePicker
-        type="date"
         value={dateValue}
         onChange={(_, value) => handleChange(value)}
         disabled={disabled || definition.readonly}

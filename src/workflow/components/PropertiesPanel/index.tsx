@@ -5,8 +5,9 @@
 
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { X } from "lucide-react";
-import { memo } from "react";
+import { memo, useState } from "react";
 import IconConfig from "../IconConfig";
+import { ResizeHandle } from "../ResizeHandle";
 import type { NodeType } from "@/enum/workflow.enum";
 import { PropertyTabs } from "./PropertyTabs";
 import { usePropertyGroups, useVisibleGroups } from "./hooks";
@@ -16,6 +17,8 @@ import { useLanguage } from "@/workflow/hooks/useLanguage";
 export const PropertiesPanel = memo(function PropertiesPanel() {
   const { nodes, edges, selectedNodeId, selectedEdgeId, clearSelection } =
     useWorkflowStore();
+
+  const [width, setWidth] = useState(320);
 
   const { getText } = useLanguage();
 
@@ -41,7 +44,14 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
   }
 
   return (
-    <aside className="w-80 h-full border border-border/50 bg-card/95 backdrop-blur-sm overflow-y-auto rounded-xl shadow-xl flex flex-col animate-in slide-in-from-right duration-200 absolute right-0 z-10">
+    <aside
+      className="h-full border border-border/50 bg-card/95 backdrop-blur-sm overflow-y-auto rounded-xl shadow-xl flex flex-col animate-in slide-in-from-right duration-200 absolute right-0 z-10"
+      style={{ width: `${width}px` }}
+    >
+      <ResizeHandle
+        direction="left"
+        onResize={delta => setWidth(prev => Math.max(320, Math.min(600, prev + delta)))}
+      />
       {/* Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">

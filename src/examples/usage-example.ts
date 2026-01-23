@@ -14,7 +14,7 @@ import { pluginManager } from "@/core/plugins/PluginManager";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { ruleRegistry } from "@/core/registry/RuleRegistry";
 import { useWorkflowStore } from "@/core/store/workflowStore";
-import { defaultBpmPlugin } from "@/plugins/defaultBpmPlugin";
+import { defaultBpmPlugin } from "@/plugins/default-bpm";
 
 // ============================================
 // 1. Initialize Core System
