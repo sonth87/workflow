@@ -10,7 +10,7 @@ import { X, PanelLeft, PanelRight } from "lucide-react";
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { type NodeCategory, NODES_BY_CATEGORIES } from "../../data/toolboxData";
 import IconConfig from "../IconConfig";
-import { cn } from "@sth87/shadcn-design-system";
+import { cn, Tooltip } from "@sth87/shadcn-design-system";
 import { useLanguage } from "@/workflow/hooks/useLanguage";
 import { ResizeHandle } from "../ResizeHandle";
 
@@ -241,22 +241,29 @@ export function Toolbox({ className }: ToolboxProps) {
               <div
                 key={`${typeof category.name === "string" ? category.name : JSON.stringify(category.name)}-${index}`}
               >
-                <div
-                  className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"
-                  onClick={() => setSelectedCategoryType(category.categoryType)}
-                  title={getText(category.name)}
+                <Tooltip
+                  content={getText(category.name)}
+                  side="right"
+                  sideOffset={10}
                 >
-                  {typeof category.icon === "string" &&
-                  category.icon.startsWith("data:image/svg") ? (
-                    <img
-                      src={category.icon}
-                      alt={getText(category.name) as string}
-                      className="w-4.5 h-4.5"
-                    />
-                  ) : (
-                    category.icon
-                  )}
-                </div>
+                  <div
+                    className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"
+                    onClick={() =>
+                      setSelectedCategoryType(category.categoryType)
+                    }
+                  >
+                    {typeof category.icon === "string" &&
+                    category.icon.startsWith("data:image/svg") ? (
+                      <img
+                        src={category.icon}
+                        alt={getText(category.name) as string}
+                        className="w-4.5 h-4.5"
+                      />
+                    ) : (
+                      category.icon
+                    )}
+                  </div>
+                </Tooltip>
                 {/* Render separator if configured */}
                 {category.separator &&
                   category.separator.show &&

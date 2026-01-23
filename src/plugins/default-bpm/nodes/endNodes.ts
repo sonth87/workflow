@@ -52,8 +52,8 @@ export const endNodes = [
     name: "Error End Event",
     config: {
       metadata: {
-        title: "plugin.default.boundaryError.title",
-        description: "plugin.default.boundaryError.description",
+        title: "plugin.default.endEventError.title",
+        description: "plugin.default.endEventError.description",
       },
       propertyDefinitions: [
         {

@@ -346,11 +346,13 @@ export class PluginManager {
     if (config.nodes) {
       nodeRegistry.registerMany(config.nodes as any);
 
-      // Register property configurations for nodes that have propertyDefinitions
+      // Register property configurations for nodes
       config.nodes.forEach(node => {
-        if (node.config.propertyDefinitions) {
+        // Use resolved config from registry to support inheritance
+        const resolvedNode = nodeRegistry.get(node.type);
+        if (resolvedNode?.config.propertyDefinitions) {
           const propertyGroups = convertPropertyDefinitionsToGroups(
-            node.config.propertyDefinitions
+            resolvedNode.config.propertyDefinitions as any
           );
           propertyRegistry.registerNodeConfig({
             nodeType: node.type,

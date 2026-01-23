@@ -51,6 +51,8 @@
   "plugin.default.endEventDefault.description": "Workflow end point",
   "plugin.default.endEventSendSignal.title": "Send Signal End Event",
   "plugin.default.endEventSendSignal.description": "End workflow and send signal",
+  "plugin.default.endEventError.title": "Error End Event",
+  "plugin.default.endEventError.description": "End workflow with an error",
   "plugin.default.note.title": "Note",
   "plugin.default.note.description": "Annotation note",
   "plugin.default.annotation.title": "Annotation",

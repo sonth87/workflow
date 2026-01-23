@@ -51,6 +51,8 @@
   "plugin.default.endEventDefault.description": "Điểm kết thúc của workflow",
   "plugin.default.endEventSendSignal.title": "Sự kiện kết thúc gửi tín hiệu",
   "plugin.default.endEventSendSignal.description": "Kết thúc workflow và gửi tín hiệu",
+  "plugin.default.endEventError.title": "Sự kiện kết thúc lỗi",
+  "plugin.default.endEventError.description": "Kết thúc workflow với một lỗi",
   "plugin.default.note.title": "Ghi chú",
   "plugin.default.note.description": "Ghi chú chú thích",
   "plugin.default.annotation.title": "Chú thích",
