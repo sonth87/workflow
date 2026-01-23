@@ -1,4 +1,4 @@
-import {
+import type {
   BaseEdgeConfig,
 } from "@/core/types/base.types";
 import {

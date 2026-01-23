@@ -46,10 +46,15 @@ export type PropertyCondition =
         | "custom"
         | "==="
         | "!=="
-        | "contains";
+        | "contains"
+        | "regex"
+        | "in"
+        | "notIn";
       value?: unknown;
       customCheck?: (fieldValue: unknown, entity: PropertyEntity) => boolean;
-    };
+    }
+  | { or: PropertyCondition[] }
+  | { and: PropertyCondition[] };
 
 /**
  * Options cho select, multiselect, radio

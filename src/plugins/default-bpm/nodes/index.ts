@@ -6,7 +6,7 @@ import { immediateNodes } from "./immediateNodes";
 import { boundaryNodes } from "./boundaryNodes";
 import { otherNodes } from "./otherNodes";
 
-export const defaultNodes = [
+export const defaultNodes: any[] = [
   ...startNodes,
   ...taskNodes,
   ...gatewayNodes,

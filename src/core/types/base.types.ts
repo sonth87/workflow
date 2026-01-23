@@ -304,6 +304,8 @@ export interface PropertyDefinition {
     | "color"
     | "date"
     | "json"
+    | "logic"
+    | "expression"
     | "custom";
   label: MultilingualText;
   description?: MultilingualText;
@@ -485,6 +487,7 @@ export interface BaseRuleConfig {
 export interface RegistryItem<T = unknown> {
   id: string;
   type: string;
+  extends?: string;
   name: MultilingualText | string;
   description?: MultilingualText | string;
   category?: string;

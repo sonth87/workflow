@@ -305,6 +305,69 @@ export class PropertySyncEngine {
   }
 
   /**
+   * Kiểm tra một điều kiện
+   */
+  private checkCondition(
+    condition: any,
+    entity: PropertyEntity,
+    allValues?: Record<string, unknown>
+  ): boolean {
+    if (typeof condition === "function") {
+      return condition(entity);
+    }
+
+    if ("or" in condition) {
+      return condition.or.some((c: any) =>
+        this.checkCondition(c, entity, allValues)
+      );
+    }
+
+    if ("and" in condition) {
+      return condition.and.every((c: any) =>
+        this.checkCondition(c, entity, allValues)
+      );
+    }
+
+    const { field, operator = "equals", value, customCheck } = condition;
+    const fieldValue = allValues?.[field] ?? entity.properties?.[field];
+
+    if (operator === "custom" && customCheck) {
+      return customCheck(fieldValue, entity);
+    }
+
+    switch (operator) {
+      case "equals":
+      case "===":
+        return fieldValue === value;
+      case "notEquals":
+      case "!==":
+        return fieldValue !== value;
+      case "includes":
+      case "contains":
+        return (
+          (Array.isArray(fieldValue) && fieldValue.includes(value)) ||
+          (typeof fieldValue === "string" && fieldValue.includes(String(value)))
+        );
+      case "notIncludes":
+        return !(Array.isArray(fieldValue) && fieldValue.includes(value));
+      case "regex":
+        if (typeof fieldValue === "string" && typeof value === "string") {
+          return new RegExp(value).test(fieldValue);
+        }
+        return false;
+      case "in":
+        return Array.isArray(value) && value.includes(fieldValue);
+      case "notIn":
+        return Array.isArray(value) && !value.includes(fieldValue);
+      default:
+        if (customCheck) {
+          return customCheck(fieldValue, entity);
+        }
+        return true;
+    }
+  }
+
+  /**
    * Check xem field có visible không dựa trên condition
    */
   isFieldVisible(
@@ -316,42 +379,7 @@ export class PropertySyncEngine {
       return true; // Mặc định là visible
     }
 
-    if (typeof field.visible === "function") {
-      return field.visible(entity);
-    }
-
-    // Evaluate condition object
-    const condition = field.visible;
-    const fieldValue =
-      allValues?.[condition.field] ?? entity.properties?.[condition.field];
-
-    switch (condition.operator) {
-      case "equals":
-      case "===":
-        return fieldValue === condition.value;
-      case "notEquals":
-      case "!==":
-        return fieldValue !== condition.value;
-      case "includes":
-      case "contains":
-        return (
-          Array.isArray(fieldValue) && fieldValue.includes(condition.value)
-        );
-      case "notIncludes":
-        return (
-          Array.isArray(fieldValue) && !fieldValue.includes(condition.value)
-        );
-      case "custom":
-        return condition.customCheck
-          ? condition.customCheck(fieldValue, entity)
-          : true;
-      default:
-        // Nếu có customCheck mà không có operator hoặc operator là custom
-        if (condition.customCheck) {
-          return condition.customCheck(fieldValue, entity);
-        }
-        return true;
-    }
+    return this.checkCondition(field.visible, entity, allValues);
   }
 
   /**
@@ -370,41 +398,7 @@ export class PropertySyncEngine {
       return false;
     }
 
-    if (typeof field.disabled === "function") {
-      return field.disabled(entity);
-    }
-
-    // Evaluate condition object (giống logic visible)
-    const condition = field.disabled;
-    const fieldValue =
-      allValues?.[condition.field] ?? entity.properties?.[condition.field];
-
-    switch (condition.operator) {
-      case "equals":
-      case "===":
-        return fieldValue === condition.value;
-      case "notEquals":
-      case "!==":
-        return fieldValue !== condition.value;
-      case "includes":
-      case "contains":
-        return (
-          Array.isArray(fieldValue) && fieldValue.includes(condition.value)
-        );
-      case "notIncludes":
-        return (
-          Array.isArray(fieldValue) && !fieldValue.includes(condition.value)
-        );
-      case "custom":
-        return condition.customCheck
-          ? condition.customCheck(fieldValue, entity)
-          : false;
-      default:
-        if (condition.customCheck) {
-          return condition.customCheck(fieldValue, entity);
-        }
-        return false;
-    }
+    return this.checkCondition(field.disabled, entity, allValues);
   }
 
   /**
@@ -419,41 +413,7 @@ export class PropertySyncEngine {
       return true;
     }
 
-    if (typeof group.visible === "function") {
-      return group.visible(entity);
-    }
-
-    // Evaluate condition object
-    const condition = group.visible;
-    const fieldValue =
-      allValues?.[condition.field] ?? entity.properties?.[condition.field];
-
-    switch (condition.operator) {
-      case "equals":
-      case "===":
-        return fieldValue === condition.value;
-      case "notEquals":
-      case "!==":
-        return fieldValue !== condition.value;
-      case "includes":
-      case "contains":
-        return (
-          Array.isArray(fieldValue) && fieldValue.includes(condition.value)
-        );
-      case "notIncludes":
-        return (
-          Array.isArray(fieldValue) && !fieldValue.includes(condition.value)
-        );
-      case "custom":
-        return condition.customCheck
-          ? condition.customCheck(fieldValue, entity)
-          : true;
-      default:
-        if (condition.customCheck) {
-          return condition.customCheck(fieldValue, entity);
-        }
-        return true;
-    }
+    return this.checkCondition(group.visible, entity, allValues);
   }
 
   /**

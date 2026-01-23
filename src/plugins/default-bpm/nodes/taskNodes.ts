@@ -23,12 +23,13 @@ export const taskNodes = [
   {
     id: NodeType.TASK_USER,
     type: NodeType.TASK_USER,
+    extends: NodeType.TASK_DEFAULT,
     name: "User Task",
     config: {
-      ...createDefaultNodeConfig(NodeType.TASK_USER, CategoryType.TASK, {
+      metadata: {
         title: "plugin.default.taskUser.title",
         description: "plugin.default.taskUser.description",
-      }),
+      },
       propertyDefinitions: [
         {
           id: "assignee",
@@ -73,21 +74,25 @@ export const taskNodes = [
   {
     id: NodeType.TASK_SYSTEM,
     type: NodeType.TASK_SYSTEM,
+    extends: NodeType.TASK_DEFAULT,
     name: "System Task",
-    config: createDefaultNodeConfig(NodeType.TASK_SYSTEM, CategoryType.TASK, {
-      title: "plugin.default.taskSystem.title",
-      description: "plugin.default.taskSystem.description",
-    }),
+    config: {
+      metadata: {
+        title: "plugin.default.taskSystem.title",
+        description: "plugin.default.taskSystem.description",
+      },
+    },
   },
   {
     id: NodeType.TASK_SCRIPT,
     type: NodeType.TASK_SCRIPT,
+    extends: NodeType.TASK_DEFAULT,
     name: "Script Task",
     config: {
-      ...createDefaultNodeConfig(NodeType.TASK_SCRIPT, CategoryType.TASK, {
+      metadata: {
         title: "plugin.default.taskScript.title",
         description: "plugin.default.taskScript.description",
-      }),
+      },
       propertyDefinitions: [
         {
           id: "scriptFormat",
@@ -124,12 +129,13 @@ export const taskNodes = [
   {
     id: NodeType.SERVICE_TASK,
     type: NodeType.SERVICE_TASK,
+    extends: NodeType.TASK_DEFAULT,
     name: "Service Task",
     config: {
-      ...createDefaultNodeConfig(NodeType.SERVICE_TASK, CategoryType.TASK, {
+      metadata: {
         title: "plugin.default.serviceTask.title",
         description: "plugin.default.serviceTask.description",
-      }),
+      },
       propertyDefinitions: [
         {
           id: "apiUrl",

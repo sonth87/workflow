@@ -26,26 +26,13 @@ export const endNodes = [
   {
     id: NodeType.END_EVENT_SEND_SIGNAL,
     type: NodeType.END_EVENT_SEND_SIGNAL,
+    extends: NodeType.END_EVENT_DEFAULT,
     name: "Send Signal End Event",
     config: {
-      ...createDefaultNodeConfig(
-        NodeType.END_EVENT_SEND_SIGNAL,
-        CategoryType.END,
-        {
-          title: "plugin.default.endEventSendSignal.title",
-          description: "plugin.default.endEventSendSignal.description",
-        }
-      ),
-      connectionRules: [
-        {
-          id: "end-event-send-signal-connection-rule",
-          name: "End Event Send Signal Connection Rule",
-          description: "Allow multiple inputs, no outputs",
-          maxInputConnections: undefined,
-          maxOutputConnections: 0,
-          requiresConnection: true,
-        },
-      ],
+      metadata: {
+        title: "plugin.default.endEventSendSignal.title",
+        description: "plugin.default.endEventSendSignal.description",
+      },
       propertyDefinitions: [
         {
           id: "signalName",
@@ -61,16 +48,13 @@ export const endNodes = [
   {
     id: NodeType.END_EVENT_ERROR,
     type: NodeType.END_EVENT_ERROR,
+    extends: NodeType.END_EVENT_DEFAULT,
     name: "Error End Event",
     config: {
-      ...createDefaultNodeConfig(
-        NodeType.END_EVENT_ERROR,
-        CategoryType.END,
-        {
-          title: "plugin.default.endEventError.title",
-          description: "plugin.default.endEventError.description",
-        }
-      ),
+      metadata: {
+        title: "plugin.default.boundaryError.title",
+        description: "plugin.default.boundaryError.description",
+      },
       propertyDefinitions: [
         {
           id: "errorCode",

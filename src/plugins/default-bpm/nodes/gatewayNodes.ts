@@ -37,27 +37,26 @@ export const gatewayNodes = [
   {
     id: NodeType.PARALLEL_GATEWAY,
     type: NodeType.PARALLEL_GATEWAY,
+    extends: NodeType.EXCLUSIVE_GATEWAY,
     name: "Parallel Gateway",
-    config: createDefaultNodeConfig(
-      NodeType.PARALLEL_GATEWAY,
-      CategoryType.GATEWAY,
-      {
+    config: {
+      metadata: {
         title: "plugin.default.parallelGateway.title",
         description: "plugin.default.parallelGateway.description",
-      }
-    ),
+      },
+      propertyDefinitions: [], // Parallel gateway typically doesn't have the same logic as Exclusive
+    },
   },
   {
     id: NodeType.EVENT_BASED_GATEWAY,
     type: NodeType.EVENT_BASED_GATEWAY,
+    extends: NodeType.EXCLUSIVE_GATEWAY,
     name: "Event Based Gateway",
-    config: createDefaultNodeConfig(
-      NodeType.EVENT_BASED_GATEWAY,
-      CategoryType.GATEWAY,
-      {
+    config: {
+      metadata: {
         title: "plugin.default.eventBasedGateway.title",
         description: "plugin.default.eventBasedGateway.description",
-      }
-    ),
+      },
+    },
   },
 ];

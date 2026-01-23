@@ -1,5 +1,5 @@
 import { NodeType, CategoryType } from "@/enum/workflow.enum";
-import { Circle } from "lucide-react";
+import { Circle, Clock, MessageSquare, Globe, Radio } from "lucide-react";
 import { createDefaultNodeConfig } from "../constants/nodeDefaults";
 
 export const startNodes = [
@@ -27,22 +27,23 @@ export const startNodes = [
   {
     id: NodeType.START_EVENT_TIMER,
     type: NodeType.START_EVENT_TIMER,
+    extends: NodeType.START_EVENT_DEFAULT,
     name: "Timer Start Event",
     config: {
-      ...createDefaultNodeConfig(
-        NodeType.START_EVENT_TIMER,
-        CategoryType.START,
-        {
-          title: "plugin.default.startEventTimer.title",
-          description: "plugin.default.startEventTimer.description",
-        }
-      ),
+      metadata: {
+        title: "plugin.default.startEventTimer.title",
+        description: "plugin.default.startEventTimer.description",
+      },
+      icon: {
+        type: "lucide",
+        value: Clock,
+      },
       propertyDefinitions: [
         {
           id: "timerType",
           name: "timerType",
           type: "select",
-          label: "Timer Type",
+          label: "ui.properties.timerType",
           group: "config",
           defaultValue: "once",
           options: [
@@ -71,8 +72,8 @@ export const startNodes = [
           group: "config",
           visible: {
             field: "timerType",
-            operator: "custom",
-            customCheck: (val: any) => ["hourly", "daily", "monthly", "interval"].includes(val as string),
+            operator: "in",
+            value: ["hourly", "daily", "monthly", "interval"],
           },
         },
         {
@@ -83,8 +84,8 @@ export const startNodes = [
           group: "config",
           visible: {
             field: "timerType",
-            operator: "custom",
-            customCheck: (val: any) => ["hourly", "daily", "monthly", "interval"].includes(val as string),
+            operator: "in",
+            value: ["hourly", "daily", "monthly", "interval"],
           },
         },
         // Hourly / Daily / Monthly minute
@@ -92,12 +93,12 @@ export const startNodes = [
           id: "minute",
           name: "minute",
           type: "number",
-          label: "Minute (0-59)",
+          label: "ui.properties.minute",
           group: "config",
           visible: {
             field: "timerType",
-            operator: "custom",
-            customCheck: (val: any) => ["hourly", "daily", "monthly"].includes(val as string),
+            operator: "in",
+            value: ["hourly", "daily", "monthly"],
           },
           options: { min: 0, max: 59 },
         },
@@ -106,21 +107,40 @@ export const startNodes = [
           id: "hour",
           name: "hour",
           type: "number",
-          label: "Hour (0-23)",
+          label: "ui.properties.hour",
           group: "config",
           visible: {
             field: "timerType",
-            operator: "custom",
-            customCheck: (val: any) => ["daily", "monthly"].includes(val as string),
+            operator: "in",
+            value: ["daily", "monthly"],
           },
           options: { min: 0, max: 23 },
+        },
+        // Daily days of week
+        {
+          id: "daysOfWeek",
+          name: "daysOfWeek",
+          type: "multiselect",
+          label: "ui.properties.daysOfWeek",
+          group: "config",
+          visible: { field: "timerType", operator: "equals", value: "daily" },
+          options: [
+            { label: "Monday", value: "MON" },
+            { label: "Tuesday", value: "TUE" },
+            { label: "Wednesday", value: "WED" },
+            { label: "Thursday", value: "THU" },
+            { label: "Friday", value: "FRI" },
+            { label: "Saturday", value: "SAT" },
+            { label: "Sunday", value: "SUN" },
+          ],
+          defaultValue: ["MON", "TUE", "WED", "THU", "FRI"],
         },
         // Monthly
         {
           id: "dayOfMonth",
           name: "dayOfMonth",
           type: "number",
-          label: "Day of Month (1-31)",
+          label: "ui.properties.dayOfMonth",
           group: "config",
           visible: { field: "timerType", operator: "equals", value: "monthly" },
           options: { min: 1, max: 31 },
@@ -130,7 +150,7 @@ export const startNodes = [
           id: "intervalValue",
           name: "intervalValue",
           type: "number",
-          label: "Interval Value",
+          label: "ui.properties.intervalValue",
           group: "config",
           visible: { field: "timerType", operator: "equals", value: "interval" },
         },
@@ -138,7 +158,7 @@ export const startNodes = [
           id: "intervalUnit",
           name: "intervalUnit",
           type: "select",
-          label: "Interval Unit",
+          label: "ui.properties.intervalUnit",
           group: "config",
           visible: { field: "timerType", operator: "equals", value: "interval" },
           options: [
@@ -155,16 +175,17 @@ export const startNodes = [
   {
     id: NodeType.START_EVENT_MESSAGE,
     type: NodeType.START_EVENT_MESSAGE,
+    extends: NodeType.START_EVENT_DEFAULT,
     name: "Message Start Event",
     config: {
-      ...createDefaultNodeConfig(
-        NodeType.START_EVENT_MESSAGE,
-        CategoryType.START,
-        {
-          title: "Message Start",
-          description: "Start process when a message is received",
-        }
-      ),
+      metadata: {
+        title: "plugin.default.boundaryMessage.title",
+        description: "Start process when a message is received",
+      },
+      icon: {
+        type: "lucide",
+        value: MessageSquare,
+      },
       propertyDefinitions: [
         {
           id: "messageName",
@@ -180,16 +201,17 @@ export const startNodes = [
   {
     id: NodeType.START_EVENT_API,
     type: NodeType.START_EVENT_API,
+    extends: NodeType.START_EVENT_DEFAULT,
     name: "API Start Event",
     config: {
-      ...createDefaultNodeConfig(
-        NodeType.START_EVENT_API,
-        CategoryType.START,
-        {
-          title: "plugin.default.startEventApi.title",
-          description: "plugin.default.startEventApi.description",
-        }
-      ),
+      metadata: {
+        title: "plugin.default.startEventApi.title",
+        description: "plugin.default.startEventApi.description",
+      },
+      icon: {
+        type: "lucide",
+        value: Globe,
+      },
       propertyDefinitions: [
         {
           id: "endpoint",
@@ -218,16 +240,13 @@ export const startNodes = [
   {
     id: NodeType.START_EVENT_WEB,
     type: NodeType.START_EVENT_WEB,
+    extends: NodeType.START_EVENT_DEFAULT,
     name: "Web Start Event",
     config: {
-      ...createDefaultNodeConfig(
-        NodeType.START_EVENT_WEB,
-        CategoryType.START,
-        {
-          title: "plugin.default.startEventWeb.title",
-          description: "plugin.default.startEventWeb.description",
-        }
-      ),
+      metadata: {
+        title: "plugin.default.startEventWeb.title",
+        description: "plugin.default.startEventWeb.description",
+      },
       propertyDefinitions: [
         {
           id: "formId",
@@ -243,16 +262,17 @@ export const startNodes = [
   {
     id: NodeType.START_EVENT_RECEIVE_SIGNAL,
     type: NodeType.START_EVENT_RECEIVE_SIGNAL,
+    extends: NodeType.START_EVENT_DEFAULT,
     name: "Receive Signal Start Event",
     config: {
-      ...createDefaultNodeConfig(
-        NodeType.START_EVENT_RECEIVE_SIGNAL,
-        CategoryType.START,
-        {
-          title: "plugin.default.startEventReceiveSignal.title",
-          description: "plugin.default.startEventReceiveSignal.description",
-        }
-      ),
+      metadata: {
+        title: "plugin.default.startEventReceiveSignal.title",
+        description: "plugin.default.startEventReceiveSignal.description",
+      },
+      icon: {
+        type: "lucide",
+        value: Radio,
+      },
       propertyDefinitions: [
         {
           id: "signalName",

@@ -12,8 +12,8 @@ export const boundaryNodes = [
         NodeType.BOUNDARY_MESSAGE,
         CategoryType.BOUNDARY,
         {
-          title: "Message Boundary",
-          description: "Catch a message while a task is active",
+          title: "plugin.default.boundaryMessage.title",
+          description: "plugin.default.boundaryMessage.description",
         }
       ),
       icon: {
@@ -51,8 +51,8 @@ export const boundaryNodes = [
         NodeType.BOUNDARY_ERROR,
         CategoryType.BOUNDARY,
         {
-          title: "Error Boundary",
-          description: "Catch errors from a task or sub-process",
+          title: "plugin.default.boundaryError.title",
+          description: "plugin.default.boundaryError.description",
         }
       ),
       icon: {
@@ -88,8 +88,8 @@ export const boundaryNodes = [
         NodeType.BOUNDARY_TIMER,
         CategoryType.BOUNDARY,
         {
-          title: "Timer Boundary",
-          description: "Timeout for a task",
+          title: "plugin.default.boundaryTimer.title",
+          description: "plugin.default.boundaryTimer.description",
         }
       ),
       icon: {
