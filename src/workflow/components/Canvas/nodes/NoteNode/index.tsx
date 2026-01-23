@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { type NodeProps, useReactFlow } from "@xyflow/react";
 import { Palette, Type } from "lucide-react";
 import { cn, Popover } from "@sth87/shadcn-design-system";
@@ -50,6 +50,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showFontPicker, setShowFontPicker] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Sync state with data prop
   useEffect(() => {
@@ -90,22 +91,43 @@ export function NoteNode({ id, data, selected }: NodeProps) {
     [id, color, fontSize, setNodes]
   );
 
+  // Handle click outside to save
+  useEffect(() => {
+    if (!isEditing) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      // Check if click is outside the node container
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        // Also check if click is on any popover content (which are often portals)
+        const isPopoverContent = (event.target as HTMLElement).closest(
+          '[role="dialog"], [role="menu"]'
+        );
+        if (!isPopoverContent) {
+          setIsEditing(false);
+          updateNodeData(content, color, fontSize);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isEditing, content, color, fontSize, updateNodeData]);
+
   const handleDoubleClick = useCallback(() => {
     setIsEditing(true);
   }, []);
-
-  const handleBlur = useCallback(() => {
-    setIsEditing(false);
-    updateNodeData(content, color, fontSize);
-  }, [content, color, fontSize, updateNodeData]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsEditing(false);
-        setContent(noteData.content || "Double click to edit note...");
+        setContent(noteData.content || defaultContent);
       }
-      // Allow Enter for new lines in textarea
     },
     [noteData.content]
   );
@@ -139,6 +161,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
   return (
     <>
       <NodeResizer
+        ref={containerRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         selected={selected}
@@ -238,7 +261,6 @@ export function NoteNode({ id, data, selected }: NodeProps) {
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 autoFocus
                 className={cn(

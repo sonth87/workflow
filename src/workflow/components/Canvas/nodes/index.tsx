@@ -92,6 +92,10 @@ export const nodeTypes = {
     EndEventNode,
     NodeType.END_EVENT_SEND_SIGNAL
   ),
+  [NodeType.END_EVENT_ERROR]: wrapWithBaseNode(
+    EndEventNode,
+    NodeType.END_EVENT_ERROR
+  ),
   //tasks
   [NodeType.TASK_DEFAULT]: wrapWithBaseNode(TaskNode, NodeType.TASK_DEFAULT),
   [NodeType.TASK_USER]: wrapWithBaseNode(TaskNode, NodeType.TASK_USER),

@@ -8,5 +8,6 @@ export { JsonControl } from "./JsonInput";
 export { SliderControl } from "./SliderInput";
 export * from "./LogicInput";
 export * from "./ExpressionInput";
+export * from "./GatewayFlowsInput";
 export { MultiSelectControl } from "./MultiSelectInput";
 export { DateControl } from "./DateInput";

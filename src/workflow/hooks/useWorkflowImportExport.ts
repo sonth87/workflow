@@ -8,6 +8,7 @@ import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
 import type { Node, Edge } from "@xyflow/react";
 import { nodeRegistry } from "@/core/registry/NodeRegistry";
 import { edgeRegistry } from "@/core/registry/EdgeRegistry";
+import { useLanguage } from "./useLanguage";
 
 export interface WorkflowData {
   nodes: Node[];
@@ -19,75 +20,108 @@ export interface WorkflowData {
   };
 }
 
-/**
- * Sanitize node data for export
- */
-const sanitizeNode = (node: any) => {
-  const {
-    id,
-    type,
-    nodeType,
-    position,
-    data,
-    properties,
-    parentId,
-    width,
-    height,
-    zIndex,
-    extent,
-    expandParent,
-  } = node;
-
-  return {
-    id,
-    type,
-    nodeType,
-    position,
-    data: {
-      label: data?.label,
-    },
-    properties,
-    parentId,
-    width,
-    height,
-    zIndex,
-    extent,
-    expandParent,
-  };
-};
-
-/**
- * Sanitize edge data for export
- */
-const sanitizeEdge = (edge: any) => {
-  const {
-    id,
-    source,
-    target,
-    type,
-    data,
-    properties,
-    sourceHandle,
-    targetHandle,
-    animated,
-    label,
-  } = edge;
-
-  return {
-    id,
-    source,
-    target,
-    type,
-    data,
-    properties,
-    sourceHandle,
-    targetHandle,
-    animated,
-    label,
-  };
-};
-
 export function useWorkflowImportExport() {
+  const { getText } = useLanguage();
+
+  /**
+   * Sanitize node data for export
+   */
+  const sanitizeNode = useCallback(
+    (node: any) => {
+      const {
+        id,
+        type,
+        nodeType,
+        position,
+        data,
+        properties,
+        parentId,
+        width,
+        height,
+        zIndex,
+        extent,
+        expandParent,
+      } = node;
+
+      // Destructure to remove redundant data while keeping custom data
+      const {
+        metadata,
+        icon,
+        visualConfig,
+        propertyDefinitions,
+        label: dataLabel,
+        ...remainingData
+      } = data || {};
+
+      return {
+        id,
+        type,
+        nodeType,
+        position,
+        data: {
+          ...remainingData,
+          label: getText(data?.label),
+          title: getText(data?.metadata?.title || data?.title),
+          description: getText(data?.metadata?.description || data?.description),
+        },
+        properties: {
+          ...properties,
+          label: getText(properties?.label),
+          description: getText(properties?.description),
+        },
+        parentId,
+        width,
+        height,
+        zIndex,
+        extent,
+        expandParent,
+      };
+    },
+    [getText]
+  );
+
+  /**
+   * Sanitize edge data for export
+   */
+  const sanitizeEdge = useCallback(
+    (edge: any) => {
+      const {
+        id,
+        source,
+        target,
+        type,
+        data,
+        properties,
+        sourceHandle,
+        targetHandle,
+        animated,
+        label,
+      } = edge;
+
+      // For edges, we also want to minimize data
+      const {
+        metadata: edgeMetadata,
+        visualConfig: edgeVisualConfig,
+        propertyDefinitions: edgePropDefs,
+        ...remainingEdgeData
+      } = data || {};
+
+      return {
+        id,
+        source,
+        target,
+        type,
+        data: remainingEdgeData,
+        properties,
+        sourceHandle,
+        targetHandle,
+        animated,
+        label: getText(label),
+      };
+    },
+    [getText]
+  );
+
   const {
     nodes,
     edges,
@@ -103,12 +137,12 @@ export function useWorkflowImportExport() {
    */
   const viewWorkflow = useCallback(() => {
     return {
-      nodes,
-      edges,
+      nodes: nodes.map(node => sanitizeNode(node)),
+      edges: edges.map(edge => sanitizeEdge(edge)),
       workflowName,
       workflowDescription,
     };
-  }, [nodes, edges, workflowName, workflowDescription]);
+  }, [nodes, edges, workflowName, workflowDescription, sanitizeNode, sanitizeEdge]);
 
   /**
    * Export workflow data as JSON
@@ -116,8 +150,8 @@ export function useWorkflowImportExport() {
   const exportWorkflow = useCallback(
     (includeMetadata = true): WorkflowData => {
       const data: WorkflowData = {
-        nodes: nodes.map(sanitizeNode) as any,
-        edges: edges.map(sanitizeEdge) as any,
+        nodes: nodes.map(node => sanitizeNode(node)) as any,
+        edges: edges.map(edge => sanitizeEdge(edge)) as any,
       };
 
       if (includeMetadata) {

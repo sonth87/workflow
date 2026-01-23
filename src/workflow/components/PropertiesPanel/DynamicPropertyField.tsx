@@ -16,6 +16,7 @@ import {
   DateControl,
   LogicControl,
   ExpressionControl,
+  GatewayFlowsControl,
 } from "./ControlType";
 import { useLanguage } from "@/workflow/hooks/useLanguage";
 
@@ -185,6 +186,9 @@ export function DynamicPropertyField({
           errors={errors}
         />
       );
+
+    case "gateway-flows":
+      return <GatewayFlowsControl entity={entity} />;
 
     default:
       return (
