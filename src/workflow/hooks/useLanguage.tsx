@@ -113,5 +113,5 @@ export const useLanguage = () => {
     [language]
   );
 
-  return { getText, getUIText, setLanguage };
+  return { getText, getUIText, setLanguage, currentLanguage: language };
 };

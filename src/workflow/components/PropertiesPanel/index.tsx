@@ -50,7 +50,7 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
     >
       <ResizeHandle
         direction="left"
-        onResize={delta => setWidth(prev => Math.max(320, Math.min(600, prev + delta)))}
+        onResize={delta => setWidth(prev => Math.max(250, Math.min(600, prev + delta)))}
       />
       {/* Header */}
       <div className="p-4 border-b border-border">

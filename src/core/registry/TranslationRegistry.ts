@@ -53,6 +53,13 @@ class TranslationRegistryClass {
   }
 
   /**
+   * Helper to translate or return original key
+   */
+  translate(key: string, language: string): string {
+    return this.get(key, language) || key;
+  }
+
+  /**
    * Get all translations for a specific language
    * @param language - Language code
    * @returns All translations for that language

@@ -5,11 +5,15 @@
 import { useCallback } from "react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
-import type { Node, Edge } from "@xyflow/react";
+import {
+  WorkflowTransformer,
+  type MinimalWorkflowData,
+} from "@/core/utils/WorkflowTransformer";
+import { useLanguage } from "./useLanguage";
 
 export interface WorkflowData {
-  nodes: Node[];
-  edges: Edge[];
+  nodes: Partial<BaseNodeConfig>[];
+  edges: Partial<BaseEdgeConfig>[];
   metadata?: {
     version?: string;
     timestamp?: string;
@@ -28,38 +32,47 @@ export function useWorkflowImportExport() {
     workflowDescription,
   } = useWorkflowStore();
 
+  const { currentLanguage } = useLanguage();
+
   /**
-   * View current workflow data
+   * View current workflow data (Transformed)
    */
   const viewWorkflow = useCallback(() => {
-    return {
+    const transformed = WorkflowTransformer.exportMinimal(
       nodes,
       edges,
+      currentLanguage
+    );
+    return {
+      ...transformed,
       workflowName,
       workflowDescription,
     };
-  }, [nodes, edges, workflowName, workflowDescription]);
+  }, [nodes, edges, workflowName, workflowDescription, currentLanguage]);
 
   /**
-   * Export workflow data as JSON
+   * Export workflow data as JSON (Transformed)
    */
   const exportWorkflow = useCallback(
     (includeMetadata = true): WorkflowData => {
-      const data: WorkflowData = {
+      const data = WorkflowTransformer.exportMinimal(
         nodes,
         edges,
-      };
+        currentLanguage
+      );
 
       if (includeMetadata) {
         data.metadata = {
-          version: "1.0.0",
+          version: "1.1.0",
           timestamp: new Date().toISOString(),
+          workflowName,
+          workflowDescription,
         };
       }
 
-      return data;
+      return data as unknown as WorkflowData;
     },
-    [nodes, edges]
+    [nodes, edges, currentLanguage, workflowName, workflowDescription]
   );
 
   /**
@@ -84,7 +97,7 @@ export function useWorkflowImportExport() {
   );
 
   /**
-   * Import workflow data
+   * Import workflow data (Hydrated)
    */
   const importWorkflow = useCallback(
     (data: WorkflowData, clearExisting = true) => {
@@ -92,12 +105,15 @@ export function useWorkflowImportExport() {
         clearWorkflow();
       }
 
-      if (data.nodes) {
-        setNodes(data.nodes as BaseNodeConfig[]);
+      const { nodes: fullNodes, edges: fullEdges } =
+        WorkflowTransformer.importFull(data);
+
+      if (fullNodes) {
+        setNodes(fullNodes);
       }
 
-      if (data.edges) {
-        setEdges(data.edges as BaseEdgeConfig[]);
+      if (fullEdges) {
+        setEdges(fullEdges);
       }
 
       return true;

@@ -208,7 +208,7 @@ export function Toolbox({ className }: ToolboxProps) {
       {toolboxState === "expanded" && (
         <ResizeHandle
           direction="right"
-          onResize={delta => setWidth(prev => Math.max(320, Math.min(600, prev + delta)))}
+          onResize={delta => setWidth(prev => Math.max(200, Math.min(600, prev + delta)))}
         />
       )}
       {/* {toolboxState === "minimize" && (
