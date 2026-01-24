@@ -6,6 +6,9 @@ import { useCallback } from "react";
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
 import type { Node, Edge } from "@xyflow/react";
+import { nodeRegistry } from "@/core/registry/NodeRegistry";
+import { edgeRegistry } from "@/core/registry/EdgeRegistry";
+import { useLanguage } from "./useLanguage";
 
 export interface WorkflowData {
   nodes: Node[];
@@ -18,6 +21,107 @@ export interface WorkflowData {
 }
 
 export function useWorkflowImportExport() {
+  const { getText } = useLanguage();
+
+  /**
+   * Sanitize node data for export
+   */
+  const sanitizeNode = useCallback(
+    (node: any) => {
+      const {
+        id,
+        type,
+        nodeType,
+        position,
+        data,
+        properties,
+        parentId,
+        width,
+        height,
+        zIndex,
+        extent,
+        expandParent,
+      } = node;
+
+      // Destructure to remove redundant data while keeping custom data
+      const {
+        metadata,
+        icon,
+        visualConfig,
+        propertyDefinitions,
+        label: dataLabel,
+        ...remainingData
+      } = data || {};
+
+      return {
+        id,
+        type,
+        nodeType,
+        position,
+        data: {
+          ...remainingData,
+          label: getText(data?.label),
+          title: getText(data?.metadata?.title || data?.title),
+          description: getText(data?.metadata?.description || data?.description),
+        },
+        properties: {
+          ...properties,
+          label: getText(properties?.label),
+          description: getText(properties?.description),
+        },
+        parentId,
+        width,
+        height,
+        zIndex,
+        extent,
+        expandParent,
+      };
+    },
+    [getText]
+  );
+
+  /**
+   * Sanitize edge data for export
+   */
+  const sanitizeEdge = useCallback(
+    (edge: any) => {
+      const {
+        id,
+        source,
+        target,
+        type,
+        data,
+        properties,
+        sourceHandle,
+        targetHandle,
+        animated,
+        label,
+      } = edge;
+
+      // For edges, we also want to minimize data
+      const {
+        metadata: edgeMetadata,
+        visualConfig: edgeVisualConfig,
+        propertyDefinitions: edgePropDefs,
+        ...remainingEdgeData
+      } = data || {};
+
+      return {
+        id,
+        source,
+        target,
+        type,
+        data: remainingEdgeData,
+        properties,
+        sourceHandle,
+        targetHandle,
+        animated,
+        label: getText(label),
+      };
+    },
+    [getText]
+  );
+
   const {
     nodes,
     edges,
@@ -33,12 +137,12 @@ export function useWorkflowImportExport() {
    */
   const viewWorkflow = useCallback(() => {
     return {
-      nodes,
-      edges,
+      nodes: nodes.map(node => sanitizeNode(node)),
+      edges: edges.map(edge => sanitizeEdge(edge)),
       workflowName,
       workflowDescription,
     };
-  }, [nodes, edges, workflowName, workflowDescription]);
+  }, [nodes, edges, workflowName, workflowDescription, sanitizeNode, sanitizeEdge]);
 
   /**
    * Export workflow data as JSON
@@ -46,8 +150,8 @@ export function useWorkflowImportExport() {
   const exportWorkflow = useCallback(
     (includeMetadata = true): WorkflowData => {
       const data: WorkflowData = {
-        nodes,
-        edges,
+        nodes: nodes.map(node => sanitizeNode(node)) as any,
+        edges: edges.map(edge => sanitizeEdge(edge)) as any,
       };
 
       if (includeMetadata) {
@@ -93,11 +197,30 @@ export function useWorkflowImportExport() {
       }
 
       if (data.nodes) {
-        setNodes(data.nodes as BaseNodeConfig[]);
+        const rehydratedNodes = data.nodes
+          .map(node => {
+            const nodeType = (node as any).nodeType || node.type;
+            return nodeRegistry.createNode(nodeType, node as any);
+          })
+          .filter(Boolean) as BaseNodeConfig[];
+
+        setNodes(rehydratedNodes);
       }
 
       if (data.edges) {
-        setEdges(data.edges as BaseEdgeConfig[]);
+        const rehydratedEdges = data.edges
+          .map(edge => {
+            const edgeType = (edge as any).type || "default";
+            return edgeRegistry.createEdge(
+              edgeType,
+              edge.source,
+              edge.target,
+              edge as any
+            );
+          })
+          .filter(Boolean) as BaseEdgeConfig[];
+
+        setEdges(rehydratedEdges);
       }
 
       return true;

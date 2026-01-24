@@ -196,7 +196,14 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
       set(state => ({
         nodes: state.nodes.map(node => {
           if (node.id === nodeId) {
-            const updatedNode = { ...node, ...updates };
+            const updatedNode = {
+              ...node,
+              ...updates,
+              data: updates.data ? { ...node.data, ...updates.data } : node.data,
+              properties: updates.properties
+                ? { ...node.properties, ...updates.properties }
+                : node.properties,
+            };
             if (updatedNode.type === "note") {
               updatedNode.zIndex = -1;
             }
@@ -254,14 +261,14 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
         edges: state.edges.map(edge => {
           if (edge.id !== edgeId) return edge;
 
-          // Deep merge data object to ensure nested properties are preserved
+          // Deep merge data and properties to ensure nested properties are preserved
           const updatedEdge = {
             ...edge,
             ...updates,
-            data: {
-              ...edge.data,
-              ...updates.data,
-            },
+            data: updates.data ? { ...edge.data, ...updates.data } : edge.data,
+            properties: updates.properties
+              ? { ...edge.properties, ...updates.properties }
+              : edge.properties,
           };
 
           return updatedEdge;

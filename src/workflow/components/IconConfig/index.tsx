@@ -75,6 +75,18 @@ export default function IconConfig(props: Props) {
 
   if (!Icon) return null;
 
+  // Validate Icon to prevent "Element type is invalid" error
+  // If Icon is an object but has no keys (and isn't a special React object),
+  // it's likely a serialized component which is invalid to render.
+  if (
+    typeof Icon === "object" &&
+    Icon !== null &&
+    Object.keys(Icon).length === 0 &&
+    !(Icon as any).$$typeof
+  ) {
+    return null;
+  }
+
   return (
     <>
       {typeof Icon === "string" ? (

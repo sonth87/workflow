@@ -31,6 +31,13 @@ export const gatewayNodes = [
           group: "gateway",
           helpText: "The ID of the sequence flow to use if no conditions are met",
         },
+        {
+          id: "outgoingFlows",
+          name: "outgoingFlows",
+          type: "gateway-flows" as any,
+          label: "Outgoing Flows",
+          group: "gateway",
+        },
       ],
     },
   },

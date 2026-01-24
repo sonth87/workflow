@@ -4,9 +4,9 @@ import { CustomHandle } from "../../handle";
 import { DEFAULT_LAYOUT_DIRECTION } from "@/workflow/constants/common";
 
 const sPos =
-  DEFAULT_LAYOUT_DIRECTION === "horizontal" ? Position.Right : Position.Bottom;
+  DEFAULT_LAYOUT_DIRECTION !== "horizontal" ? Position.Bottom : Position.Right;
 const tPos =
-  DEFAULT_LAYOUT_DIRECTION === "horizontal" ? Position.Left : Position.Top;
+  DEFAULT_LAYOUT_DIRECTION !== "horizontal" ? Position.Top : Position.Left;
 
 export function ImmediateNode({
   isConnecting,

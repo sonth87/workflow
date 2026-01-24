@@ -4,12 +4,12 @@ import { CustomHandle } from "../../handle";
 
 export function ExclusiveGatewayNode({
   isConnecting,
-  sourcePosition = Position.Bottom,
-  targetPosition = Position.Top,
+  sourcePosition = Position.Right,
+  targetPosition = Position.Left,
 }: CustomNodeProps) {
   const isHorizontal = targetPosition === Position.Left;
-  const out1Position = isHorizontal ? Position.Right : Position.Bottom;
-  const out2Position = isHorizontal ? Position.Bottom : Position.Right;
+  const out1Position = !isHorizontal ? Position.Bottom : Position.Right;
+  const out2Position = !isHorizontal ? Position.Right : Position.Bottom;
 
   return (
     <>
@@ -37,8 +37,8 @@ export function ExclusiveGatewayNode({
 
 export function ParallelGatewayNode({
   isConnecting,
-  sourcePosition = Position.Bottom,
-  targetPosition = Position.Top,
+  sourcePosition = Position.Right,
+  targetPosition = Position.Left,
 }: CustomNodeProps) {
   return (
     <>
@@ -60,8 +60,8 @@ export function ParallelGatewayNode({
 
 export function ParallelGatewayJoinNode({
   isConnecting,
-  sourcePosition = Position.Bottom,
-  targetPosition = Position.Top,
+  sourcePosition = Position.Right,
+  targetPosition = Position.Left,
 }: CustomNodeProps) {
   const isHorizontal = targetPosition === Position.Left;
   const in2Position = isHorizontal ? Position.Top : Position.Left;
