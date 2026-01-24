@@ -17,8 +17,8 @@ import { nodeRegistry } from "@/core/registry/NodeRegistry";
  */
 function CustomNodeContent({
   isConnecting,
-  sourcePosition = Position.Bottom,
-  targetPosition = Position.Top,
+  sourcePosition = Position.Right,
+  targetPosition = Position.Left,
   type,
 }: CustomNodeProps) {
   // Get connection rules from node config

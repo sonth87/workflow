@@ -27,8 +27,8 @@ export function useNodeOperations() {
       const layoutHorizontal = layoutDirection === "horizontal";
       const node = nodeRegistry.createNode(nodeType, {
         position,
-        targetPosition: layoutHorizontal ? Position.Left : Position.Top,
-        sourcePosition: layoutHorizontal ? Position.Right : Position.Bottom,
+        targetPosition: !layoutHorizontal ? Position.Top : Position.Left,
+        sourcePosition: !layoutHorizontal ? Position.Bottom : Position.Right,
         properties: properties || {},
       });
 

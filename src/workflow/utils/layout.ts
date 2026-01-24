@@ -42,8 +42,8 @@ export const getLayoutedElements = (
 
     return {
       ...node,
-      targetPosition: layoutHorizontal ? Position.Top : Position.Left,
-      sourcePosition: layoutHorizontal ? Position.Bottom : Position.Right,
+      targetPosition: !layoutHorizontal ? Position.Top : Position.Left,
+      sourcePosition: !layoutHorizontal ? Position.Bottom : Position.Right,
       position: {
         x: nodeWithPosition.x - width / 2,
         y: nodeWithPosition.y - height / 2,
