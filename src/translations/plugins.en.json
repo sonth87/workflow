@@ -281,5 +281,16 @@
   "ui.import.importWorkflow": "Import Workflow",
   "ui.export.exportWorkflow": "Export Workflow",
   "ui.canvas.cannotCreateConnection": "Cannot create connection: {message}",
-  "ui.canvas.circularLoopError": "❌ Cannot create connection: This would create a circular loop in the workflow!"
+  "ui.canvas.circularLoopError": "❌ Cannot create connection: This would create a circular loop in the workflow!",
+  "ui.gatewayFlows.outgoingFlows": "Outgoing Flows",
+  "ui.gatewayFlows.conditionExpression": "Condition Expression",
+  "ui.gatewayFlows.noOutgoingConnections": "No outgoing connections found",
+  "ui.gatewayFlows.deleteConnection": "Delete connection",
+  "ui.import.import": "Import",
+  "ui.export.export": "Export",
+  "ui.viewMode.compact": "Compact",
+  "ui.viewMode.expand": "Expand",
+  "ui.viewMode.compactView": "Compact View",
+  "ui.viewMode.expandView": "Expand View",
+  "ui.poolNode.clickToAddLanes": "Press + to add lanes"
 }

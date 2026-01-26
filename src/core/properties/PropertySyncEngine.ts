@@ -424,7 +424,9 @@ export class PropertySyncEngine {
     entity: PropertyEntity,
     allValues?: Record<string, unknown>
   ): PropertyGroupDefinition[] {
-    return groups.filter(group => this.isGroupVisible(group, entity, allValues));
+    return groups.filter(group =>
+      this.isGroupVisible(group, entity, allValues)
+    );
   }
 
   /**
@@ -435,7 +437,9 @@ export class PropertySyncEngine {
     entity: PropertyEntity,
     allValues?: Record<string, unknown>
   ): PropertyFieldDefinition[] {
-    return fields.filter(field => this.isFieldVisible(field, entity, allValues));
+    return fields.filter(field =>
+      this.isFieldVisible(field, entity, allValues)
+    );
   }
 
   /**

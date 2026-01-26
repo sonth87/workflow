@@ -4,10 +4,10 @@
 
 BPM Core hỗ trợ 2 phương thức tích hợp:
 
-| Phương thức       | Sử dụng                           | Tùy chỉnh     | Độ phức tạp |
-| ----------------- | --------------------------------- | ------------- | ----------- |
-| **SDK**           | Tích hợp nhanh vào bất kỳ web app | Cấu hình JSON | Dễ          |
-| **React Library** | Kiểm soát đầy đủ UI/logic         | Hoàn toàn     | Trung bình  |
+| Phương thức       | Sử dụng                           | Tùy chỉnh     |
+| ----------------- | --------------------------------- | ------------- |
+| **SDK**           | Tích hợp nhanh vào bất kỳ web app | Cấu hình JSON |
+| **React Library** | Kiểm soát đầy đủ UI/logic         | Hoàn toàn     |
 
 ---
 
@@ -264,12 +264,12 @@ options: {
           type: "json",
           defaultValue: { "Content-Type": "application/json" },
         },
-          {
-            id: "condition",
-            label: { en: "Condition", vi: "Điều kiện" },
-            type: "expression",
-            placeholder: "status === 'active'",
-          },
+        {
+          id: "condition",
+          label: { en: "Condition", vi: "Điều kiện" },
+          type: "expression",
+          placeholder: "status === 'active'",
+        },
       ],
       contextMenuItems: [
         {

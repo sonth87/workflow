@@ -20,9 +20,10 @@ The simulation engine uses the `variables` object to store state.
 Use Script Tasks to manipulate data. Scripts have access to the `variables` object.
 
 **Example Script:**
+
 ```javascript
 variables.requestAmount = 1500;
-variables.priority = variables.requestAmount > 1000 ? 'high' : 'low';
+variables.priority = variables.requestAmount > 1000 ? "high" : "low";
 ```
 
 ### 2. Exclusive Gateways (Expression Editor)
@@ -30,13 +31,15 @@ variables.priority = variables.requestAmount > 1000 ? 'high' : 'low';
 Gateways use expressions on their outgoing `Sequence Flow` edges to decide which path to take.
 
 **Edge 1 Condition:**
+
 ```javascript
-variables.priority === 'high'
+variables.priority === "high";
 ```
 
 **Edge 2 Condition:**
+
 ```javascript
-variables.priority === 'low'
+variables.priority === "low";
 ```
 
 ### 3. Default Flows
@@ -46,6 +49,7 @@ If no conditions are met at a gateway, the engine will look for an edge marked a
 ## 🔍 Under the hood
 
 The `ExpressionEvaluator` runs your code in a isolated function:
+
 ```javascript
 const fn = new Function("variables", ..., script_body);
 fn(current_variables, ...);

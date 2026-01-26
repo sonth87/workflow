@@ -1,88 +1,93 @@
-# JSON Configuration Guide for BPM Workflow
+# Hướng Dẫn Cấu Hình JSON cho BPM Workflow
 
-This guide explains how to configure nodes, edges, and properties in this workflow library. The system is designed to be highly dynamic, allowing you to define new behaviors and UI elements entirely through configuration.
+Hướng dẫn này giải thích cách cấu hình nodes, edges và properties trong thư viện workflow này. Hệ thống được thiết kế để có tính động cao, cho phép bạn định nghĩa các hành vi và giao diện mới hoàn toàn thông qua cấu hình.
 
-## Table of Contents
-1. [Node Configuration](#node-configuration)
-2. [Inheritance System](#inheritance-system)
-3. [Property Definitions](#property-definitions)
-4. [Conditional Visibility](#conditional-visibility)
-5. [Localization](#localization)
+## Mục Lục
+
+1. [Cấu Hình Node](#cấu-hình-node)
+2. [Hệ Thống Kế Thừa](#hệ-thống-kế-thừa)
+3. [Định Nghĩa Properties](#định-nghĩa-properties)
+4. [Hiển Thị Có Điều Kiện](#hiển-thị-có-điều-kiện)
+5. [Đa Ngôn Ngữ](#đa-ngôn-ngữ)
 
 ---
 
-## Node Configuration
+## Cấu Hình Node
 
-A node is defined by a `NodeType` and a configuration object.
+Một node được định nghĩa bởi `NodeType` và một object cấu hình.
 
 ```typescript
 {
   id: "my-custom-node",
   type: "custom-node",
   name: "My Custom Node",
-  extends: "base-node", // Optional: Inherit from another node
+  extends: "base-node", // Tùy chọn: Kế thừa từ node khác
   config: {
     category: "task",
     metadata: {
-      title: "My Node Title",
-      description: "Description of what this node does"
+      title: "Tiêu Đề Node Của Tôi",
+      description: "Mô tả về chức năng của node này"
     },
     icon: {
       type: "lucide",
-      value: "Activity", // Lucide icon name or component
+      value: "Activity", // Tên icon Lucide hoặc component
       backgroundColor: "#3b82f6",
       color: "#ffffff"
     },
     propertyDefinitions: [
-      // ... field definitions
+      // ... định nghĩa các trường
     ]
   }
 }
 ```
 
-## Inheritance System
+## Hệ Thống Kế Thừa
 
-The `extends` property allows you to create specialized nodes based on existing ones.
+Thuộc tính `extends` cho phép bạn tạo các node chuyên biệt dựa trên node đã có.
 
-- **Deep Merging**: The system merges `propertyDefinitions`, `visualConfig`, and `metadata`.
-- **Overrides**: Properties defined in the child node override those in the parent.
-- **Example**: `Timer Start Event` extends `Start Event`. It inherits the green circle icon but adds timer-specific fields.
+- **Deep Merging**: Hệ thống gộp `propertyDefinitions`, `visualConfig`, và `metadata`.
+- **Ghi Đè**: Các thuộc tính định nghĩa trong node con sẽ ghi đè lên node cha.
+- **Ví Dụ**: `Timer Start Event` kế thừa từ `Start Event`. Nó kế thừa icon hình tròn màu xanh lá nhưng thêm các trường đặc biệt cho timer.
 
-## Property Definitions
+## Định Nghĩa Properties
 
-Each field in the Properties Panel is defined in the `propertyDefinitions` array.
+Mỗi trường trong Properties Panel được định nghĩa trong mảng `propertyDefinitions`.
 
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `id` | `string` | Unique ID of the field (used in data storage). |
-| `type` | `string` | UI component: `text`, `number`, `select`, `multiselect`, `switch`, `date`, `logic`, `expression`. |
-| `label` | `string` | Translation key or static string. |
-| `group` | `string` | Grouping in UI: `basic`, `config`, `advanced`, `appearance`. |
-| `defaultValue` | `any` | Initial value. |
-| `options` | `array` | For `select` or `multiselect` (e.g., `[{label: 'A', value: 'a'}]`). |
-| `validation` | `ZodSchema` | Optional Zod schema for validation. |
+| Thuộc Tính     | Kiểu        | Mô Tả                                                                                                    |
+| :------------- | :---------- | :------------------------------------------------------------------------------------------------------- |
+| `id`           | `string`    | ID duy nhất của trường (dùng để lưu trữ dữ liệu).                                                        |
+| `type`         | `string`    | Component giao diện: `text`, `number`, `select`, `multiselect`, `switch`, `date`, `logic`, `expression`. |
+| `label`        | `string`    | Khóa dịch hoặc chuỗi tĩnh.                                                                               |
+| `group`        | `string`    | Nhóm trong giao diện: `basic`, `config`, `advanced`, `appearance`.                                       |
+| `defaultValue` | `any`       | Giá trị khởi tạo.                                                                                        |
+| `options`      | `array`     | Cho `select` hoặc `multiselect` (ví dụ: `[{label: 'A', value: 'a'}]`).                                   |
+| `validation`   | `ZodSchema` | Schema Zod tùy chọn để validation.                                                                       |
 
-### Special Field Types
-- **`logic`**: Monospaced text area for boolean logic.
-- **`expression`**: Monospaced text area for data transformations.
+### Các Kiểu Trường Đặc Biệt
 
-## Conditional Visibility
+- **`logic`**: Textarea với font monospace cho logic boolean.
+- **`expression`**: Textarea với font monospace cho biến đổi dữ liệu.
 
-You can hide or show fields based on the values of other fields using the `visible` property.
+## Hiển Thị Có Điều Kiện
 
-### Simple Condition
+Bạn có thể ẩn hoặc hiện các trường dựa trên giá trị của các trường khác bằng thuộc tính `visible`.
+
+### Điều Kiện Đơn Giản
+
 ```json
 "visible": { "field": "timerType", "operator": "equals", "value": "once" }
 ```
 
-### Advanced Operators
+### Các Toán Tử Nâng Cao
+
 - `equals` / `===`
 - `notEquals` / `!==`
 - `includes` / `contains`
-- `regex` (value is a string pattern)
-- `in` / `notIn` (value is an array)
+- `regex` (value là chuỗi pattern)
+- `in` / `notIn` (value là một mảng)
 
-### Logical Operators (AND/OR)
+### Toán Tử Logic (AND/OR)
+
 ```json
 "visible": {
   "or": [
@@ -92,15 +97,16 @@ You can hide or show fields based on the values of other fields using the `visib
 }
 ```
 
-## Localization
+## Đa Ngôn Ngữ
 
-Always use translation keys for labels and descriptions.
+Luôn sử dụng khóa dịch (translation keys) cho labels và descriptions.
 
-- Keys starting with `ui.` are general UI elements.
-- Keys starting with `plugin.default.` are specific to the BPM plugin.
-- New keys should be added to `src/translations/plugins.vi.json` and `src/translations/plugins.en.json`.
+- Các khóa bắt đầu bằng `ui.` là các phần tử giao diện chung.
+- Các khóa bắt đầu bằng `plugin.default.` đặc biệt cho BPM plugin.
+- Các khóa mới nên được thêm vào `src/translations/plugins.vi.json` và `src/translations/plugins.en.json`.
 
-Example:
+Ví dụ:
+
 ```json
 "label": "ui.properties.timerType"
 ```

@@ -199,7 +199,9 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
             const updatedNode = {
               ...node,
               ...updates,
-              data: updates.data ? { ...node.data, ...updates.data } : node.data,
+              data: updates.data
+                ? { ...node.data, ...updates.data }
+                : node.data,
               properties: updates.properties
                 ? { ...node.properties, ...updates.properties }
                 : node.properties,
@@ -437,7 +439,9 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
           history: [startNode.id],
         },
       });
-      globalEventBus.emit(WorkflowEventTypes.WORKFLOW_LOADED, { simulation: true });
+      globalEventBus.emit(WorkflowEventTypes.WORKFLOW_LOADED, {
+        simulation: true,
+      });
     },
 
     stopSimulation: () => {
@@ -484,7 +488,7 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
             ...state.simulation,
             currentNodeId: null,
             variables: nodeVariables,
-          }
+          },
         }));
         return;
       }
@@ -514,7 +518,9 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
 
         // If no condition met, look for default flow
         if (!nextNodeId) {
-          const defaultEdge = outgoingEdges.find(e => e.properties?.isDefault || e.data?.isDefault);
+          const defaultEdge = outgoingEdges.find(
+            e => e.properties?.isDefault || e.data?.isDefault
+          );
           if (defaultEdge) nextNodeId = defaultEdge.target;
         }
       } else {
@@ -529,7 +535,7 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
             currentNodeId: nextNodeId,
             variables: nodeVariables,
             history: [...state.simulation.history, nextNodeId as string],
-          }
+          },
         }));
       } else {
         // Stuck or end
@@ -538,7 +544,7 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
             ...state.simulation,
             currentNodeId: null,
             variables: nodeVariables,
-          }
+          },
         }));
       }
     },
@@ -550,8 +556,8 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
           variables: {
             ...state.simulation.variables,
             [name]: value,
-          }
-        }
+          },
+        },
       }));
     },
 

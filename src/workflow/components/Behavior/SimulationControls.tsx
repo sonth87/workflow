@@ -3,12 +3,8 @@ import { Play, Square, SkipForward, Variable } from "lucide-react";
 import { cn } from "@sth87/shadcn-design-system";
 
 export function SimulationControls() {
-  const {
-    simulation,
-    startSimulation,
-    stopSimulation,
-    stepSimulation
-  } = useWorkflowStore();
+  const { simulation, startSimulation, stopSimulation, stepSimulation } =
+    useWorkflowStore();
 
   if (!simulation.active) {
     return (

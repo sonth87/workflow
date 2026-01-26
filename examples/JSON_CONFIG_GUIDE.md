@@ -138,6 +138,7 @@ CustomNodeFactory.registerFromConfig(nodeConfig);
 ```
 
 #### New Property Types:
+
 - **`logic`**: Multi-line JavaScript code editor. Used for `Script Task`.
 - **`expression`**: Single-line JavaScript formula bar. Used for `Sequence Flow` conditions.
 

@@ -1,7 +1,7 @@
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { useLanguage } from "@/workflow/hooks/useLanguage";
 import { Trash2, ArrowRight } from "lucide-react";
-import { Input, Button } from "@sth87/shadcn-design-system";
+import { Input } from "@sth87/shadcn-design-system";
 import type { PropertyEntity } from "@/core/properties";
 
 interface GatewayFlowsControlProps {
@@ -15,10 +15,10 @@ export function GatewayFlowsControl({ entity }: GatewayFlowsControlProps) {
   // Only handle nodes (gateways)
   if (!("nodeType" in entity)) return null;
 
-  const outgoingEdges = edges.filter((edge) => edge.source === entity.id);
+  const outgoingEdges = edges.filter(edge => edge.source === entity.id);
 
   const handleConditionChange = (edgeId: string, condition: string) => {
-    const edge = edges.find((e) => e.id === edgeId);
+    const edge = edges.find(e => e.id === edgeId);
     if (!edge) return;
 
     updateEdge(edgeId, {
@@ -33,15 +33,17 @@ export function GatewayFlowsControl({ entity }: GatewayFlowsControlProps) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          Outgoing Flows
+          {getText("ui.gatewayFlows.outgoingFlows")}
         </label>
       </div>
 
       <div className="space-y-3">
-        {outgoingEdges.map((edge) => {
-          const targetNode = nodes.find((n) => n.id === edge.target);
+        {outgoingEdges.map(edge => {
+          const targetNode = nodes.find(n => n.id === edge.target);
           const targetLabel = targetNode
-            ? getText(targetNode.data?.label || targetNode.metadata?.title)
+            ? getText(
+                (targetNode.data?.label || targetNode.metadata?.title) as any
+              )
             : edge.target;
 
           return (
@@ -61,7 +63,7 @@ export function GatewayFlowsControl({ entity }: GatewayFlowsControlProps) {
                 <button
                   onClick={() => deleteEdge(edge.id)}
                   className="p-1.5 rounded-md text-ink400 hover:text-destructive hover:bg-destructive/10 transition-colors"
-                  title="Delete connection"
+                  title={getText("ui.gatewayFlows.deleteConnection")}
                 >
                   <Trash2 size={14} />
                 </button>
@@ -69,18 +71,16 @@ export function GatewayFlowsControl({ entity }: GatewayFlowsControlProps) {
 
               <div className="space-y-1">
                 <Input
-                  label="Condition Expression"
+                  label={getText("ui.gatewayFlows.conditionExpression")}
                   value={(edge.properties?.condition as string) || ""}
-                  onChange={(e) =>
-                    handleConditionChange(edge.id, e.target.value)
-                  }
+                  onChange={e => handleConditionChange(edge.id, e.target.value)}
                   placeholder="e.g. amount > 1000"
-                  className="h-8 text-xs"
+                  className="text-xs"
                 />
               </div>
-              <div className="text-[10px] text-ink400 font-mono truncate">
+              {/* <div className="text-[10px] text-ink400 font-mono truncate">
                 ID: {edge.id}
-              </div>
+              </div> */}
             </div>
           );
         })}
@@ -88,7 +88,7 @@ export function GatewayFlowsControl({ entity }: GatewayFlowsControlProps) {
         {outgoingEdges.length === 0 && (
           <div className="text-center py-6 border border-dashed rounded-lg bg-muted/20">
             <p className="text-xs text-muted-foreground italic">
-              No outgoing connections found
+              {getText("ui.gatewayFlows.noOutgoingConnections")}
             </p>
           </div>
         )}

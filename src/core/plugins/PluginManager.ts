@@ -112,7 +112,9 @@ function convertPropertyDefinitionsToGroups(
 
     groups.push({
       id: groupId,
-      label: commonGroup ? commonGroup.label : groupId.charAt(0).toUpperCase() + groupId.slice(1),
+      label: commonGroup
+        ? commonGroup.label
+        : groupId.charAt(0).toUpperCase() + groupId.slice(1),
       icon: commonGroup ? commonGroup.icon : undefined,
       order: groupOrder,
       fields,

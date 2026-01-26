@@ -24,6 +24,7 @@ export type PropertyFieldType =
   | "slider"
   | "logic"
   | "expression"
+  | "gateway-flows"
   | "custom";
 
 /**

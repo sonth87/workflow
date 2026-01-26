@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState } from "react";
 import { type NodeProps } from "@xyflow/react";
-import { cn, Label, Popover } from "@sth87/shadcn-design-system";
+import { cn, Popover } from "@sth87/shadcn-design-system";
 import type { PoolNodeData, LaneConfig } from "@/core/types/base.types";
 import {
   Lock,
@@ -96,7 +96,7 @@ export interface PoolNodeProps extends NodeProps {
 
 function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
   const { updateNode, nodes } = useWorkflowStore();
-  const { getUIText } = useLanguage();
+  const { getUIText, getText } = useLanguage();
 
   const isHorizontal = data.orientation === "horizontal" || !data.orientation;
   const isLocked = data.isLocked ?? false;
@@ -361,13 +361,12 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
   const handleTitleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      const currentTitle = String(
-        data.metadata?.title || data.data?.label || "Pool"
-      );
+      const currentTitle =
+        getText((data.metadata?.title || data.data?.label) as any) || "Pool";
       setIsEditingTitle(true);
       setEditingTitle(currentTitle);
     },
-    [data]
+    [data, getText]
   );
 
   const handleTitleChange = useCallback(
@@ -697,7 +696,8 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
                 : {}
             }
           >
-            {String(data.metadata?.title || data.data?.label || "Pool")}
+            {getText((data.metadata?.title || data.data?.label) as any) ||
+              "Pool"}
           </span>
         )}
       </div>
@@ -806,19 +806,20 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
                 )}
               </div>
             ))
-          : /* Empty state hint - only show if no lanes AND no children */
+          : /* Empty state hint - show when no lanes AND no children */
+            laneLayout.length === 0 &&
             !hasChildNodes && (
               <div
                 className={cn(
-                  "flex items-center justify-center h-full text-sm",
-                  colorScheme.text
+                  "flex items-center justify-center h-full text-sm gap-2",
+                  colorScheme.text,
+                  {
+                    "flex-row": isHorizontal,
+                    "flex-col": !isHorizontal,
+                  }
                 )}
               >
-                Nhấn
-                <Label className="mx-2 text-lg bg-muted rounded w-5 h-5 leading-0 flex items-center justify-center">
-                  +
-                </Label>
-                để thêm lanes
+                <span>{getUIText("ui.poolNode.clickToAddLanes")}</span>
               </div>
             )}
       </div>

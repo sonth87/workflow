@@ -1,4 +1,5 @@
 import { useWorkflowImportExport } from "@/workflow/hooks";
+import { useLanguage } from "@/workflow/hooks/useLanguage";
 import { Button } from "@sth87/shadcn-design-system";
 import { Upload } from "lucide-react";
 import React from "react";
@@ -7,6 +8,7 @@ type ImportWorkflowProps = { className?: string };
 
 const ImportWorkflow = ({ className }: ImportWorkflowProps) => {
   const { uploadWorkflow } = useWorkflowImportExport();
+  const { getUIText } = useLanguage();
 
   const handleImport = () => {
     uploadWorkflow().catch(error => {
@@ -17,12 +19,12 @@ const ImportWorkflow = ({ className }: ImportWorkflowProps) => {
   return (
     <div className={className}>
       <Button
-        title="Import Workflow"
+        title={getUIText("import.importWorkflow")}
         onClick={handleImport}
         className="flex items-center gap-2 rounded border border-border bg-card px-3 py-2 hover:bg-muted"
       >
         <Upload size={16} />
-        Import
+        {getUIText("import.import")}
       </Button>
     </div>
   );

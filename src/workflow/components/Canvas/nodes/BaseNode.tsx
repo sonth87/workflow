@@ -52,8 +52,10 @@ export default function BaseNode(props: Props) {
   const isExpanded = !collapsed;
 
   // Simulation highlight
-  const isSimulationActive = simulation.active && simulation.currentNodeId === props.id;
-  const isSimulationVisited = simulation.active && simulation.history.includes(props.id);
+  const isSimulationActive =
+    simulation.active && simulation.currentNodeId === props.id;
+  const isSimulationVisited =
+    simulation.active && simulation.history.includes(props.id);
 
   // Check if node has configurable properties
   const hasProperties = type
@@ -123,8 +125,10 @@ export default function BaseNode(props: Props) {
           "ring-4": props.selected && finalVisualConfig.ringColor,
           "rounded p-0.5": compactView,
           [ringClasses]: props.selected && !finalVisualConfig.ringColor,
-          "ring-8 ring-orange-500/50 border-orange-500 scale-105 transition-all duration-300": isSimulationActive,
-          "border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.3)]": isSimulationVisited && !isSimulationActive,
+          "ring-8 ring-orange-500/50 border-orange-500 scale-105 transition-all duration-300":
+            isSimulationActive,
+          "border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.3)]":
+            isSimulationVisited && !isSimulationActive,
         }
       )}
       style={{

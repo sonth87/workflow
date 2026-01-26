@@ -21,8 +21,12 @@ export function useVisibleGroups(
     // Lấy default values để evaluate conditions chính xác hơn nếu field chưa có value
     const isNode = "nodeType" in entity;
     const defaults = isNode
-      ? propertyRegistry.getDefaultNodeProperties((entity as BaseNodeConfig).nodeType)
-      : propertyRegistry.getDefaultEdgeProperties((entity as BaseEdgeConfig).type || "default");
+      ? propertyRegistry.getDefaultNodeProperties(
+          (entity as BaseNodeConfig).nodeType
+        )
+      : propertyRegistry.getDefaultEdgeProperties(
+          (entity as BaseEdgeConfig).type || "default"
+        );
 
     const allValues = { ...defaults, ...entity.properties };
 
@@ -36,7 +40,11 @@ export function useVisibleGroups(
     // Filter visible fields trong mỗi group
     return visibleGroups.map(group => ({
       ...group,
-      fields: propertySyncEngine.getVisibleFields(group.fields, entity, allValues),
+      fields: propertySyncEngine.getVisibleFields(
+        group.fields,
+        entity,
+        allValues
+      ),
     }));
   }, [propertyGroups, entity]);
 }

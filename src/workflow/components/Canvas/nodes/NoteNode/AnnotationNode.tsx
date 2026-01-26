@@ -326,6 +326,7 @@ export function AnnotationNode({ id, data, selected }: NodeProps) {
         isEditing={isEditing}
         className="border-none"
         ref={containerRef}
+        allowScroll={true}
       >
         {/* Toolbar */}
         {selected && (
@@ -447,13 +448,20 @@ export function AnnotationNode({ id, data, selected }: NodeProps) {
         </div>
 
         {/* Content */}
-        <div className="w-full h-full p-3 overflow-hidden">
+        <div
+          className="w-full h-full p-3 overflow-hidden"
+          onClick={e => isEditing && e.stopPropagation()}
+          onWheel={e => e.stopPropagation()}
+        >
           {isEditing ? (
             <textarea
               value={content}
               onChange={e => setContent(e.target.value)}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
+              onMouseDown={e => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
+              onWheel={e => e.stopPropagation()}
               autoFocus
               className={cn(
                 "w-full h-full min-h-25 bg-transparent border-none resize-none focus:outline-none custom-scrollbar px-1",
@@ -465,6 +473,7 @@ export function AnnotationNode({ id, data, selected }: NodeProps) {
           ) : (
             <div
               onDoubleClick={handleDoubleClick}
+              onWheel={e => e.stopPropagation()}
               className={cn(
                 "markdown prose w-full h-full min-h-25 cursor-text overflow-auto custom-scrollbar px-1",
                 textColorClasses[textColor || "black"],

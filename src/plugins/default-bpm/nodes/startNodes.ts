@@ -50,7 +50,10 @@ export const startNodes = [
             { label: "ui.properties.timerType.option.once", value: "once" },
             { label: "ui.properties.timerType.option.hourly", value: "hourly" },
             { label: "ui.properties.timerType.option.daily", value: "daily" },
-            { label: "ui.properties.timerType.option.monthly", value: "monthly" },
+            {
+              label: "ui.properties.timerType.option.monthly",
+              value: "monthly",
+            },
             {
               label: "ui.properties.timerType.option.interval",
               value: "interval",
@@ -155,7 +158,11 @@ export const startNodes = [
           type: "number",
           label: "ui.properties.intervalValue",
           group: "config",
-          visible: { field: "timerType", operator: "equals", value: "interval" },
+          visible: {
+            field: "timerType",
+            operator: "equals",
+            value: "interval",
+          },
         },
         {
           id: "intervalUnit",
@@ -163,7 +170,11 @@ export const startNodes = [
           type: "select",
           label: "ui.properties.intervalUnit",
           group: "config",
-          visible: { field: "timerType", operator: "equals", value: "interval" },
+          visible: {
+            field: "timerType",
+            operator: "equals",
+            value: "interval",
+          },
           options: [
             { label: "Seconds", value: "seconds" },
             { label: "Minutes", value: "minutes" },
@@ -232,7 +243,10 @@ export const startNodes = [
           group: "config",
           defaultValue: "none",
           options: [
-            { label: "ui.properties.authentication.option.none", value: "none" },
+            {
+              label: "ui.properties.authentication.option.none",
+              value: "none",
+            },
             {
               label: "ui.properties.authentication.option.apiKey",
               value: "apiKey",

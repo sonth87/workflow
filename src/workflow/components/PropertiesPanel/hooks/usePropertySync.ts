@@ -40,7 +40,9 @@ export function usePropertySync(
     if (!entity) return {};
     const isNode = "nodeType" in entity;
     const defaults = isNode
-      ? propertyRegistry.getDefaultNodeProperties((entity as BaseNodeConfig).nodeType)
+      ? propertyRegistry.getDefaultNodeProperties(
+          (entity as BaseNodeConfig).nodeType
+        )
       : propertyRegistry.getDefaultEdgeProperties(
           (entity as BaseEdgeConfig).type || "default"
         );

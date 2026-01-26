@@ -167,6 +167,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
         selected={selected}
         className={colorClasses[color || "yellow"]}
         isEditing={isEditing}
+        allowScroll={true}
       >
         {/* Toolbar */}
         {selected && (
@@ -255,13 +256,20 @@ export function NoteNode({ id, data, selected }: NodeProps) {
         )}
 
         {/* Content */}
-        <div className="w-full h-full p-3 overflow-hidden relative">
+        <div
+          className="w-full h-full p-3 overflow-hidden relative"
+          onClick={e => isEditing && e.stopPropagation()}
+          onWheel={e => e.stopPropagation()}
+        >
           {isEditing ? (
             <>
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onMouseDown={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
+                onWheel={e => e.stopPropagation()}
                 autoFocus
                 className={cn(
                   "w-full h-full min-h-25 bg-transparent border-none resize-none focus:outline-none custom-scrollbar px-1",
@@ -277,6 +285,7 @@ export function NoteNode({ id, data, selected }: NodeProps) {
           ) : (
             <div
               onDoubleClick={handleDoubleClick}
+              onWheel={e => e.stopPropagation()}
               className={cn(
                 "markdown prose w-full h-full min-h-25 cursor-text overflow-auto custom-scrollbar px-1",
                 {

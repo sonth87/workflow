@@ -208,7 +208,9 @@ export function Toolbox({ className }: ToolboxProps) {
       {toolboxState === "expanded" && (
         <ResizeHandle
           direction="right"
-          onResize={delta => setWidth(prev => Math.max(320, Math.min(600, prev + delta)))}
+          onResize={delta =>
+            setWidth(prev => Math.max(320, Math.min(600, prev + delta)))
+          }
         />
       )}
       {/* {toolboxState === "minimize" && (
@@ -243,8 +245,9 @@ export function Toolbox({ className }: ToolboxProps) {
               >
                 <Tooltip
                   content={getText(category.name)}
-                  side="right"
+                  position="right"
                   sideOffset={10}
+                  color="glass"
                 >
                   <div
                     className="p-2 rounded-lg hover:bg-foreground/10 cursor-pointer flex items-center justify-center"

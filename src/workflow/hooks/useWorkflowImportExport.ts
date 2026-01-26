@@ -62,7 +62,9 @@ export function useWorkflowImportExport() {
           ...remainingData,
           label: getText(data?.label),
           title: getText(data?.metadata?.title || data?.title),
-          description: getText(data?.metadata?.description || data?.description),
+          description: getText(
+            data?.metadata?.description || data?.description
+          ),
         },
         properties: {
           ...properties,
@@ -142,7 +144,14 @@ export function useWorkflowImportExport() {
       workflowName,
       workflowDescription,
     };
-  }, [nodes, edges, workflowName, workflowDescription, sanitizeNode, sanitizeEdge]);
+  }, [
+    nodes,
+    edges,
+    workflowName,
+    workflowDescription,
+    sanitizeNode,
+    sanitizeEdge,
+  ]);
 
   /**
    * Export workflow data as JSON

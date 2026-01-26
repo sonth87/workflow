@@ -281,5 +281,16 @@
   "ui.import.importWorkflow": "Nhập quy trình",
   "ui.export.exportWorkflow": "Xuất quy trình",
   "ui.canvas.cannotCreateConnection": "Không thể tạo kết nối: {message}",
-  "ui.canvas.circularLoopError": "❌ Không thể tạo kết nối: Điều này sẽ tạo một vòng lặp trong quy trình!"
+  "ui.canvas.circularLoopError": "❌ Không thể tạo kết nối: Điều này sẽ tạo một vòng lặp trong quy trình!",
+  "ui.gatewayFlows.outgoingFlows": "Luồng đi ra",
+  "ui.gatewayFlows.conditionExpression": "Biểu thức điều kiện",
+  "ui.gatewayFlows.noOutgoingConnections": "Không tìm thấy kết nối đi ra",
+  "ui.gatewayFlows.deleteConnection": "Xóa kết nối",
+  "ui.import.import": "Nhập",
+  "ui.export.export": "Xuất",
+  "ui.viewMode.compact": "Thu gọn",
+  "ui.viewMode.expand": "Mở rộng",
+  "ui.viewMode.compactView": "Chế độ thu gọn",
+  "ui.viewMode.expandView": "Chế độ mở rộng",
+  "ui.poolNode.clickToAddLanes": "Nhấn + để thêm làn đường"
 }

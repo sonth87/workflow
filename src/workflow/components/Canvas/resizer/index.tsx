@@ -10,6 +10,7 @@ type Props = {
   className?: string;
   minWidth?: number;
   minHeight?: number;
+  allowScroll?: boolean; // For notes/annotations that need scrolling
 };
 
 const NodeResizer = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
@@ -20,6 +21,7 @@ const NodeResizer = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       selected,
       className,
       isEditing,
+      allowScroll = false,
       minWidth = 150,
       minHeight = 100,
     } = props;
@@ -47,10 +49,12 @@ const NodeResizer = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
           className={cn(
             "relative rounded-lg transition-all border",
             isEditing ? "nodrag shadow-lg" : "",
+            allowScroll ? "nowheel" : "",
             className
           )}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
+          onWheel={e => allowScroll && e.stopPropagation()}
           style={{
             width: "100%",
             height: "100%",

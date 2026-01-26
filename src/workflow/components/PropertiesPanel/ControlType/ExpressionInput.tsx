@@ -42,7 +42,10 @@ export function ExpressionControl({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             onChange(e.target.value);
           }}
-          placeholder={(getText(definition.placeholder as any) || "e.g. status === 'approved'") as string}
+          placeholder={
+            (getText(definition.placeholder as any) ||
+              "e.g. status === 'approved'") as string
+          }
           required={definition.required}
           disabled={disabled || !!definition.readonly}
           className={cn(

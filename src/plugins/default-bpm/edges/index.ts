@@ -1,10 +1,5 @@
-import type {
-  BaseEdgeConfig,
-} from "@/core/types/base.types";
-import {
-  EdgePathType,
-  EdgePathStyle,
-} from "@/enum/workflow.enum";
+import type { BaseEdgeConfig } from "@/core/types/base.types";
+import { EdgePathType, EdgePathStyle } from "@/enum/workflow.enum";
 
 export const defaultEdges: Array<{
   id: string;

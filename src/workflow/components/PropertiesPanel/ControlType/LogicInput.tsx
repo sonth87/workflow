@@ -47,7 +47,9 @@ export function LogicControl({
       <div className="relative group">
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-muted/30 border-r border-border rounded-l-lg flex flex-col items-center pt-2 text-[10px] text-muted-foreground/50 font-mono select-none pointer-events-none">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-[1.25rem] leading-[1.25rem]">{i + 1}</div>
+            <div key={i} className="h-[1.25rem] leading-[1.25rem]">
+              {i + 1}
+            </div>
           ))}
         </div>
         <Textarea
@@ -55,7 +57,10 @@ export function LogicControl({
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
             onChange(e.target.value);
           }}
-          placeholder={(getText(definition.placeholder as any) || "// Enter your logic here...") as string}
+          placeholder={
+            (getText(definition.placeholder as any) ||
+              "// Enter your logic here...") as string
+          }
           required={definition.required}
           disabled={disabled || !!definition.readonly}
           rows={8}
