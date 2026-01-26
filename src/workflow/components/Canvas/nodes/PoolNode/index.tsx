@@ -646,24 +646,28 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
         colorScheme.bg,
         "border",
         colorScheme.border,
-        "rounded-lg overflow-visible"
+        "rounded-lg overflow-visible flex",
+        {
+          // Horizontal: Header on left, content on right (flex-row)
+          "flex-row": isHorizontal,
+          // Vertical: Header on top, content below (flex-col)
+          "flex-col": !isHorizontal,
+        }
       )}
     >
       {/* Pool Header - Vertical label bar */}
       <div
         className={cn(
-          "absolute",
           colorScheme.header,
           colorScheme.headerBorder,
           "flex items-center justify-center font-semibold",
           colorScheme.text,
-          "text-md z-10",
+          "text-md z-10 shrink-0",
           {
             // Horizontal: Label on left side (vertical bar)
-            "top-0 left-0 h-full w-10 border-r writing-mode-vertical rounded-l-lg":
-              isHorizontal,
+            "w-10 border-r writing-mode-vertical rounded-l-lg": isHorizontal,
             // Vertical: Label on top (horizontal bar)
-            "top-0 left-0 w-full h-10 border-b rounded-t-lg": !isHorizontal,
+            "h-10 border-b rounded-t-lg": !isHorizontal,
           }
         )}
         onDoubleClick={handleTitleDoubleClick}
@@ -704,11 +708,11 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
 
       {/* Pool Content Area */}
       <div
-        className={cn("absolute flex", {
-          // Horizontal: content starts after left label, lanes stack vertically
-          "left-10 top-0 right-0 bottom-0 flex-col": isHorizontal,
-          // Vertical: content starts after top label, lanes stack horizontally
-          "left-0 top-10 right-0 bottom-0 flex-row": !isHorizontal,
+        className={cn("flex flex-1", {
+          // Horizontal: lanes stack vertically
+          "flex-col": isHorizontal,
+          // Vertical: lanes stack horizontally
+          "flex-row": !isHorizontal,
         })}
       >
         {/* Render lanes */}
@@ -811,7 +815,7 @@ function PoolNodeComponent({ data, selected, id }: PoolNodeProps) {
             !hasChildNodes && (
               <div
                 className={cn(
-                  "flex items-center justify-center h-full text-sm gap-2",
+                  "flex items-center justify-center h-full w-full text-sm gap-2",
                   colorScheme.text,
                   {
                     "flex-row": isHorizontal,

@@ -16,6 +16,10 @@ import {
 import type { ContextMenuConfig } from "@/core/registry/ContextMenuRegistry";
 import type { ContextMenuContext } from "@/core/types/base.types";
 
+function generateSeparatorId(): string {
+  return `separator-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+}
+
 export const defaultContextMenus: Array<{
   id: string;
   type: string;
@@ -222,6 +226,11 @@ export const defaultContextMenus: Array<{
           },
         },
         {
+          id: generateSeparatorId(),
+          label: "",
+          separator: true,
+        },
+        {
           id: "appearance",
           label: "common.contextMenu.appearance",
           icon: { type: "lucide", value: Highlighter },
@@ -247,6 +256,11 @@ export const defaultContextMenus: Array<{
           ],
           visible: (context: ContextMenuContext) =>
             context.node?.type === "pool",
+        },
+        {
+          id: generateSeparatorId(),
+          label: "",
+          separator: true,
         },
         {
           id: "delete-pool-lane",
