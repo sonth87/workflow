@@ -20,3 +20,4 @@ export * from "./useLanguage";
 export * from "./useAvailableLanguages";
 export * from "./useClipboard";
 export * from "./useWorkflowImportExport";
+export * from "./useWorkflowAI";

@@ -31,7 +31,7 @@ import type {
 } from "@/core/types/base.types";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useClipboard } from "@/workflow/hooks/useClipboard";
-import { globalEventBus } from "@/core/events/EventBus";
+import { globalEventBus, WorkflowEventTypes } from "@/core/events/EventBus";
 import {
   findTargetContainer,
   toRelativePosition,
@@ -80,7 +80,7 @@ function CanvasInner({
   } | null>(null);
 
   // Dynamically build nodeTypes from registry (includes plugin nodes)
-  const nodeTypes = useMemo(() => {
+  const buildNodeTypes = useCallback(() => {
     const customNodeTypes: Record<string, React.ComponentType<any>> = {};
     const allNodes = nodeRegistry.getAll();
 
@@ -93,6 +93,32 @@ function CanvasInner({
 
     return { ...builtInNodeTypes, ...customNodeTypes };
   }, []);
+
+  const [nodeTypes, setNodeTypes] = useState(buildNodeTypes());
+
+  useEffect(() => {
+    const handleRegistryChange = () => {
+      setNodeTypes(buildNodeTypes());
+    };
+
+    // Subscribe to both register and unregister events
+    const sub1 = globalEventBus.on(
+      WorkflowEventTypes.REGISTRY_ITEM_REGISTERED,
+      handleRegistryChange
+    );
+    const sub2 = globalEventBus.on(
+      WorkflowEventTypes.REGISTRY_ITEM_UNREGISTERED,
+      handleRegistryChange
+    );
+
+    // Also initial build in case registry was populated before effect ran
+    setNodeTypes(buildNodeTypes());
+
+    return () => {
+      sub1.unsubscribe();
+      sub2.unsubscribe();
+    };
+  }, [buildNodeTypes]);
 
   const [isDragging, setIsDragging] = useState(false);
   const [disableZoomOnScroll, setDisableZoomOnScroll] = useState(false);

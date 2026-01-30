@@ -8,3 +8,4 @@ export * from "./Run";
 export * from "./Theme";
 export * from "./Shortcuts";
 export * from "./SimulationControls";
+export * from "./AI";

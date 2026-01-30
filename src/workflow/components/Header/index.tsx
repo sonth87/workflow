@@ -3,19 +3,19 @@
  * Giống với header của workflow cũ
  */
 
-import { useWorkflowStore } from "@/core/store/workflowStore";
 import { useWorkflowEvents } from "@/workflow/hooks/useWorkflow";
-import { Save } from "lucide-react";
 import {
   ExportWorkflow,
   ImportWorkflow,
   Shortcuts,
-  LayoutSwitcher,
+  // LayoutSwitcher,
   OutputViewer,
   ThemeSwitcher,
   ViewModeSwitcher,
   SimulationControls,
+  AIWorkflow,
 } from "../Behavior";
+import { Save } from "lucide-react";
 import { LanguageSwitcher } from "../LanguageSwitcher";
 
 export type LayoutDirection = "vertical" | "horizontal";
@@ -25,8 +25,6 @@ interface HeaderProps {
 }
 
 export function Header({ onSave }: HeaderProps) {
-  const { workflowName, setWorkflowName } = useWorkflowStore();
-
   useWorkflowEvents("node:added", event => {
     console.log("Node được thêm:", event.payload);
   });
@@ -64,6 +62,8 @@ export function Header({ onSave }: HeaderProps) {
           <ExportWorkflow />
 
           <div className="mx-1 h-6 w-px bg-border" />
+
+          <AIWorkflow />
 
           <button
             title="Save"
