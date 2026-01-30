@@ -49,7 +49,7 @@ To generate a workflow, the AI must produce a JSON object with the following str
 
 1.  **IDs:** Must be unique strings. Using UUIDs or simple `node_${index}` is acceptable.
 2.  **Types:** Must match a key in the `NodeRegistry` (e.g., `start-event`, `user-task`, `exclusive-gateway`).
-3.  **Position:** Required `x` and `y`. If unknown, generate logic structure first and use an auto-layout utility.
+3.  **Position:** Required `x` and `y`. Incremental positioning (e.g., x + 200) is a good baseline strategy.
 4.  **Properties:** Specific to the `type`. Refer to the **Capabilities Schema** to know which properties are valid for each node type.
 
 ## 3. Capabilities Schema (Context for AI)
@@ -76,15 +76,36 @@ Before generating, the AI should be provided with the "Capabilities Schema". Thi
 }
 ```
 
-## 4. Integration Steps
+## 4. Real AI Integration (LLM)
+
+The system now supports real-time generation using LLMs (OpenAI, Gemini).
+
+### Configuration
+Users must configure their API Key in the UI (Settings in AI Modal). This key is stored in `localStorage`.
+
+### Prompt Engineering
+The `AIService` constructs a prompt that includes:
+1.  **System Prompt:** Defines the role, rules, and includes the `Capabilities Schema` (Context).
+2.  **User Prompt:** The specific request (e.g., "Leave request process").
+
+### Validation
+The output from the LLM is parsed and validated by `validateGeneratedWorkflow`:
+- Checks if node types exist in registry.
+- Checks if edges connect existing nodes.
+- Checks for basic BPMN rules (e.g., presence of Start Event).
+
+## 5. Integration Steps
 
 1.  **User Prompt:** "Create a leave request process where a manager approves."
 2.  **Context Loading:** Fetch the *Capabilities Schema*.
-3.  **LLM Generation:** Send [Prompt + Schema] to LLM. Request JSON output.
-4.  **Parsing & Validation:** Parse the JSON. Ensure `source` and `target` in edges refer to existing `id`s in nodes.
+3.  **LLM Generation:** Send [System Prompt + User Prompt] to LLM. Request JSON output.
+4.  **Parsing & Validation:**
+    - Parse JSON.
+    - Run `validateGeneratedWorkflow`.
+    - If invalid, throw error (or retry).
 5.  **State Update:** Call `workflowStore.getState().setNodes(nodes)` and `setEdges(edges)`.
 
-## 5. Common Pitfalls
+## 6. Common Pitfalls
 
 - **Gateways:** Exclusive Gateways (XOR) usually split the flow. Ensure the edges coming out of a gateway have `properties.condition` set (except for the default path).
 - **Start/End:** Most valid BPMN processes need at least one `start-event` and one `end-event`.

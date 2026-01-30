@@ -5,10 +5,30 @@
 
 import type { BaseNodeConfig, RegistryItem } from "../types/base.types";
 import { BaseRegistry } from "./BaseRegistry";
+import { registryItemSchema } from "../validation/configSchemas";
 
 export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
   constructor() {
     super("NodeRegistry");
+  }
+
+  /**
+   * Override register to include schema validation
+   */
+  register(item: RegistryItem<BaseNodeConfig>): void {
+    // Validate schema
+    const result = registryItemSchema.safeParse(item);
+    if (!result.success) {
+      console.error(
+        `[NodeRegistry] Invalid node configuration for "${item.id}":`,
+        result.error.format()
+      );
+      // We warn but might still allow registration depending on strictness policy.
+      // For now, let's log error but proceed, or we could throw.
+      // throw new Error(`Invalid node configuration: ${result.error.message}`);
+    }
+
+    super.register(item);
   }
 
   /**

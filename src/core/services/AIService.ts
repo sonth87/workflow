@@ -1,6 +1,6 @@
 import type { BaseNodeConfig, BaseEdgeConfig } from "../types/base.types";
 import { getRegistryCapabilities } from "../utils/aiUtils";
-import { NodeType } from "../../enum/workflow.enum";
+import { GeminiProvider, type LLMProvider, OpenAIProvider } from "./llm/LLMProvider";
 
 // Mock response interface
 interface AIWorkflowResponse {
@@ -8,202 +8,94 @@ interface AIWorkflowResponse {
   edges: BaseEdgeConfig[];
 }
 
+export interface AIConfig {
+  apiKey: string;
+  provider: "openai" | "gemini";
+}
+
 export class AIService {
-  /**
-   * Generates a workflow based on the user prompt.
-   * This is a mocked implementation that simulates an AI response.
-   */
-  static async generateWorkflow(prompt: string): Promise<AIWorkflowResponse> {
-    // 1. Get capabilities (context for AI)
-    const capabilities = getRegistryCapabilities();
+  private static config: AIConfig | null = null;
+  private static provider: LLMProvider | null = null;
 
-    // In a real implementation, you would send:
-    // { prompt, capabilities } to an LLM API.
-
-    // Simulating API latency
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    console.log("Generating workflow for prompt:", prompt);
-    console.log("Using capabilities:", capabilities);
-
-    // simple keyword matching for demo purposes
-    const lowerPrompt = prompt.toLowerCase();
-
-    if (lowerPrompt.includes("leave") || lowerPrompt.includes("holiday")) {
-      return this.generateLeaveRequestWorkflow();
-    } else if (lowerPrompt.includes("order") || lowerPrompt.includes("purchase")) {
-      return this.generateOrderWorkflow();
+  static configure(config: AIConfig) {
+    this.config = config;
+    if (config.provider === "openai") {
+      this.provider = new OpenAIProvider(config.apiKey);
     } else {
-      return this.generateDefaultWorkflow();
+      this.provider = new GeminiProvider(config.apiKey);
     }
   }
 
-  private static generateLeaveRequestWorkflow(): AIWorkflowResponse {
-    const nodes: any[] = [
-      {
-        id: "start",
-        type: NodeType.START_EVENT,
-        position: { x: 100, y: 100 },
-        data: { label: "Start" },
-        properties: {}
-      },
-      {
-        id: "submit-request",
-        type: NodeType.TASK_USER,
-        position: { x: 300, y: 100 },
-        data: { label: "Submit Leave Request" },
-        properties: { assignee: "employee" }
-      },
-      {
-        id: "approve-request",
-        type: NodeType.TASK_USER,
-        position: { x: 500, y: 100 },
-        data: { label: "Approve Request" },
-        properties: { assignee: "manager" }
-      },
-      {
-        id: "check-approval",
-        type: NodeType.EXCLUSIVE_GATEWAY,
-        position: { x: 700, y: 100 },
-        data: { label: "Approved?" },
-        properties: {}
-      },
-      {
-        id: "send-confirmation",
-        type: NodeType.SERVICE_TASK,
-        position: { x: 900, y: 0 },
-        data: { label: "Send Confirmation Email" },
-        properties: {}
-      },
-      {
-        id: "reject-notification",
-        type: NodeType.TASK_USER,
-        position: { x: 900, y: 200 },
-        data: { label: "Notify Rejection" },
-        properties: {}
-      },
-      {
-        id: "end-approved",
-        type: NodeType.END_EVENT_DEFAULT,
-        position: { x: 1100, y: 0 },
-        data: { label: "End (Approved)" },
-        properties: {}
-      },
-      {
-        id: "end-rejected",
-        type: NodeType.END_EVENT_DEFAULT,
-        position: { x: 1100, y: 200 },
-        data: { label: "End (Rejected)" },
-        properties: {}
-      }
-    ];
+  /**
+   * Generates a workflow based on the user prompt.
+   */
+  static async generateWorkflow(prompt: string): Promise<AIWorkflowResponse> {
+    if (!this.provider) {
+      throw new Error("AI Service not configured. Please set API Key.");
+    }
 
-    const edges: any[] = [
-      { id: "e1", source: "start", target: "submit-request", type: "sequence-flow" },
-      { id: "e2", source: "submit-request", target: "approve-request", type: "sequence-flow" },
-      { id: "e3", source: "approve-request", target: "check-approval", type: "sequence-flow" },
-      {
-        id: "e4",
-        source: "check-approval",
-        target: "send-confirmation",
-        type: "sequence-flow",
-        label: "Yes",
-        properties: { condition: "approved == true" }
-      },
-      {
-        id: "e5",
-        source: "check-approval",
-        target: "reject-notification",
-        type: "sequence-flow",
-        label: "No",
-        properties: { condition: "approved == false" }
-      },
-      { id: "e6", source: "send-confirmation", target: "end-approved", type: "sequence-flow" },
-      { id: "e7", source: "reject-notification", target: "end-rejected", type: "sequence-flow" }
-    ];
+    // 1. Get capabilities (context for AI)
+    const capabilities = getRegistryCapabilities();
 
-    return { nodes, edges };
-  }
+    // 2. Construct System Prompt
+    const systemPrompt = `
+You are a BPMN Workflow Generator Expert.
+Your task is to generate a valid BPMN 2.0 workflow JSON based on the user's request.
 
-  private static generateOrderWorkflow(): AIWorkflowResponse {
-    const nodes: any[] = [
-      {
-        id: "order-received",
-        type: NodeType.START_EVENT,
-        position: { x: 100, y: 100 },
-        data: { label: "Order Received" },
-        properties: {}
-      },
-      {
-        id: "validate-order",
-        type: NodeType.TASK_SCRIPT,
-        position: { x: 300, y: 100 },
-        data: { label: "Validate Order" },
-        properties: {}
-      },
-      {
-        id: "check-stock",
-        type: NodeType.SERVICE_TASK,
-        position: { x: 500, y: 100 },
-        data: { label: "Check Stock" },
-        properties: {}
-      },
-      {
-        id: "ship-order",
-        type: NodeType.TASK_USER,
-        position: { x: 700, y: 100 },
-        data: { label: "Ship Order" },
-        properties: { assignee: "warehouse" }
-      },
-      {
-        id: "end-order",
-        type: NodeType.END_EVENT_DEFAULT,
-        position: { x: 900, y: 100 },
-        data: { label: "Order Completed" },
-        properties: {}
-      }
-    ];
+# CAPABILITIES (Available Nodes)
+The following nodes are registered in the system. YOU MUST ONLY USE THESE NODE TYPES.
+${JSON.stringify(capabilities.nodes, null, 2)}
 
-    const edges: any[] = [
-      { id: "e1", source: "order-received", target: "validate-order", type: "sequence-flow" },
-      { id: "e2", source: "validate-order", target: "check-stock", type: "sequence-flow" },
-      { id: "e3", source: "check-stock", target: "ship-order", type: "sequence-flow" },
-      { id: "e4", source: "ship-order", target: "end-order", type: "sequence-flow" }
-    ];
+# RULES
+1.  Output MUST be a valid JSON object with "nodes" and "edges" arrays.
+2.  Each Node MUST have: "id", "type" (from CAPABILITIES), "position" ({x, y}), "data" ({label}), and "properties".
+3.  Each Edge MUST have: "id", "source", "target", "type" (usually "sequence-flow").
+4.  Ensure logical flow: Start Event -> Tasks/Gateways -> End Event.
+5.  Positioning: Arrange nodes logically from Left to Right. Incremement X by 200 for each step.
+6.  Gateways: Exclusive Gateways should have multiple outgoing edges with "condition" property in properties.
+7.  Do NOT wrap the output in Markdown code blocks (like \`\`\`json). Return raw JSON.
 
-    return { nodes, edges };
-  }
+# RESPONSE FORMAT
+{
+  "nodes": [ ... ],
+  "edges": [ ... ]
+}
+`;
 
-  private static generateDefaultWorkflow(): AIWorkflowResponse {
-    const nodes: any[] = [
-      {
-        id: "start",
-        type: NodeType.START_EVENT,
-        position: { x: 100, y: 100 },
-        data: { label: "Start" },
-        properties: {}
-      },
-      {
-        id: "task-1",
-        type: NodeType.TASK_USER,
-        position: { x: 300, y: 100 },
-        data: { label: "Do something" },
-        properties: {}
-      },
-      {
-        id: "end",
-        type: NodeType.END_EVENT_DEFAULT,
-        position: { x: 500, y: 100 },
-        data: { label: "End" },
-        properties: {}
-      }
-    ];
+    // 3. Call LLM
+    try {
+        console.log("Sending prompt to AI:", prompt);
+        const response = await this.provider.generate(prompt, systemPrompt);
 
-    const edges: any[] = [
-      { id: "e1", source: "start", target: "task-1", type: "sequence-flow" },
-      { id: "e2", source: "task-1", target: "end", type: "sequence-flow" }
-    ];
+        // 4. Clean and Parse JSON
+        let content = response.content.trim();
+        // Remove markdown formatting if present
+        if (content.startsWith("```json")) {
+            content = content.replace(/^```json/, "").replace(/```$/, "");
+        } else if (content.startsWith("```")) {
+            content = content.replace(/^```/, "").replace(/```$/, "");
+        }
 
-    return { nodes, edges };
+        const json = JSON.parse(content);
+
+        // Basic structure check
+        if (!Array.isArray(json.nodes) || !Array.isArray(json.edges)) {
+            throw new Error("Invalid response structure: Missing nodes or edges array.");
+        }
+
+        // 5. Semantic Validation
+        const { validateGeneratedWorkflow } = await import("../utils/aiUtils");
+        const validation = validateGeneratedWorkflow(json.nodes, json.edges);
+
+        if (!validation.valid) {
+             throw new Error("Generated workflow failed validation:\n" + validation.errors.join("\n"));
+        }
+
+        return json as AIWorkflowResponse;
+
+    } catch (error: any) {
+        console.error("AI Generation Error:", error);
+        throw new Error("Failed to generate workflow: " + error.message);
+    }
   }
 }

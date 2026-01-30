@@ -13,10 +13,11 @@ Project được xây dựng theo kiến trúc **Plugin-based** rất rõ ràng 
 3.  **Dynamic Configuration:** Giao diện Properties Panel được sinh động từ cấu hình JSON, cho phép thay đổi UI mà không cần code lại component React.
 4.  **Localization:** Hỗ trợ đa ngôn ngữ ngay từ đầu.
 
-### Điểm Yếu / Cần Cải Thiện
-1.  **Store Complexity:** `workflowStore.ts` khá lớn, chứa cả logic UI, selection, history, và simulation. Nên tách nhỏ thành các slice (e.g., `selectionSlice`, `simulationSlice`).
-2.  **Testing:** Chưa thấy nhiều unit test cho các logic phức tạp như `NodeRegistry` (đặc biệt là logic kế thừa circular) hay `SimulationEngine`.
-3.  **Type Safety cho Config:** Mặc dù có TypeScript, nhưng cấu hình Node phần lớn là JSON object lỏng lẻo. Nên sử dụng Zod schema chặt chẽ hơn để validate cấu hình plugin ngay lúc runtime/startup.
+### Cải Thiện & Nâng Cấp (Status Update)
+
+1.  **Store Complexity:** [Đã Xử Lý] `workflowStore.ts` đã được chia nhỏ thành các slices (`selection`, `simulation`, `history`, `ui`) giúp dễ bảo trì hơn.
+2.  **Testing:** [Đã Xử Lý] Đã bổ sung Unit Test cho `NodeRegistry` (kiểm tra inheritance và circular dependency) và `aiUtils` (validate workflow).
+3.  **Type Safety cho Config:** [Đã Xử Lý] Đã tích hợp `Zod` schema validation để kiểm tra cấu hình node ngay khi đăng ký (runtime).
 
 ## 2. Đánh Giá Khả Năng Tích Hợp AI (AI Readiness)
 
@@ -27,21 +28,20 @@ Với mục tiêu để AI Agent có thể đọc hiểu và generate workflow, 
 - **Metadata:** Các node có metadata (title, description) giúp AI hiểu ngữ nghĩa của node.
 - **Registry:** Có thể dễ dàng dump toàn bộ danh sách node khả dụng để làm "Context" cho AI.
 
-### Thách Thức
+### Thách Thức & Giải Pháp
 - **Logic Phức Tạp:** Các trường `logic` và `expression` trong Properties yêu cầu AI phải hiểu cú pháp script riêng (nếu có) hoặc JavaScript sandbox context.
-- **Positioning:** AI thường gặp khó khăn trong việc tính toán tọa độ `x, y` hợp lý cho các node để không bị chồng chéo (cần thuật toán Auto-layout như Dagre hoặc Elk sau khi generate).
+- **Positioning:** AI thường gặp khó khăn trong việc tính toán tọa độ `x, y`. Hiện tại sử dụng chiến lược positioning tịnh tiến đơn giản, cần cải thiện bằng thuật toán auto-layout trong tương lai.
 
-## 3. Đề Xuất Cải Thiện Cho AI Integration
+## 3. Kiến Trúc AI Integration (Mới)
 
-Để AI Agent dễ dàng làm việc với thư viện này, cần bổ sung:
+Hệ thống AI Integration đã được nâng cấp đáng kể:
 
-1.  **AI Integration Guide (`AI_INTEGRATION_GUIDE.md`):** Tài liệu đặc tả cấu trúc JSON mà AI cần sinh ra.
-2.  **Capabilities Export API:** Một utility function trả về schema rút gọn của tất cả các Node/Edge đã đăng ký.
-    - *Ví dụ:* AI không cần biết React Component nào render node, chỉ cần biết `type: "user-task"` có các properties `assignee`, `dueDate`.
-3.  **Auto-Layout Helper:** Khi AI sinh ra workflow, tọa độ thường là giả định. Cần tích hợp sẵn một hàm `autoLayout(nodes, edges)` để sắp xếp lại vị trí sau khi AI generate.
-4.  **Validation Helper:** Một hàm `validateWorkflow(json)` để kiểm tra output của AI có hợp lệ về mặt logic BPMN không (ví dụ: Flow phải liền mạch, Gateway phải có điều kiện).
+1.  **Real LLM Support:** Hỗ trợ tích hợp OpenAI và Google Gemini thông qua cấu hình API Key.
+2.  **Capabilities Context:** Sử dụng `aiUtils.getRegistryCapabilities()` để cung cấp schema động cho AI, giúp AI "biết" được các node hiện có trong hệ thống.
+3.  **Prompt Engineering:** Prompt hệ thống được thiết kế để hướng dẫn AI sinh ra JSON đúng chuẩn BPMN và cấu trúc dữ liệu của thư viện.
+4.  **Validation:** Có lớp kiểm tra (`validateGeneratedWorkflow`) để đảm bảo output của AI hợp lệ (đúng node type, liên kết edges hợp lệ) trước khi render lên canvas.
 
 ---
 
 ## Kết Luận
-Project này có chất lượng code tốt và kiến trúc phù hợp để phát triển thành thư viện độc lập. Việc tích hợp AI là hoàn toàn khả thi và có thể tận dụng tốt cơ chế Registry hiện có.
+Project này có chất lượng code tốt và kiến trúc phù hợp để phát triển thành thư viện độc lập. Việc tích hợp AI đã hoàn tất ở mức độ cơ bản (Generation) với kiến trúc mở, dễ dàng mở rộng thêm các tính năng nâng cao (như AI Assistant sửa luồng, AI Chatbot giải thích luồng).
