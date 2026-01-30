@@ -1,6 +1,11 @@
 import type { BaseNodeConfig, BaseEdgeConfig } from "../types/base.types";
 import { getRegistryCapabilities } from "../utils/aiUtils";
-import { GeminiProvider, type LLMProvider, OpenAIProvider } from "./llm/LLMProvider";
+import {
+  GeminiProvider,
+  type LLMProvider,
+  OpenAIProvider,
+} from "./llm/LLMProvider";
+import { AIValidationService } from "./AIValidationService";
 
 // Mock response interface
 interface AIWorkflowResponse {
@@ -42,18 +47,39 @@ export class AIService {
 You are a BPMN Workflow Generator Expert.
 Your task is to generate a valid BPMN 2.0 workflow JSON based on the user's request.
 
-# CAPABILITIES (Available Nodes)
-The following nodes are registered in the system. YOU MUST ONLY USE THESE NODE TYPES.
+# CAPABILITIES (Available Building Blocks)
+## NODES
+The following nodes are registered and allowed. YOU MUST ONLY USE THESE NODE TYPES:
 ${JSON.stringify(capabilities.nodes, null, 2)}
 
+## EDGES
+Supported Edge Types: ${JSON.stringify(capabilities.edges, null, 2)}
+(Default: "sequence-flow")
+
 # RULES
-1.  Output MUST be a valid JSON object with "nodes" and "edges" arrays.
-2.  Each Node MUST have: "id", "type" (from CAPABILITIES), "position" ({x, y}), "data" ({label}), and "properties".
-3.  Each Edge MUST have: "id", "source", "target", "type" (usually "sequence-flow").
-4.  Ensure logical flow: Start Event -> Tasks/Gateways -> End Event.
-5.  Positioning: Arrange nodes logically from Left to Right. Incremement X by 200 for each step.
-6.  Gateways: Exclusive Gateways should have multiple outgoing edges with "condition" property in properties.
-7.  Do NOT wrap the output in Markdown code blocks (like \`\`\`json). Return raw JSON.
+1.  **Output Format**: Must be a valid JSON object with "nodes" and "edges" arrays.
+2.  **Node Structure**:
+    - "id": Must be unique. Use format "node_{type}_{random_suffix}" (e.g., "node_task_user_a1b2").
+    - "type": Must be one of the CAPABILITIES NODES.
+    - "data": { "label": "Human readable name" }.
+    - "properties": Key-value pairs matching the node's property definitions.
+3.  **Edge Structure**:
+    - "id": Unique string (e.g., "edge_1").
+    - "source": ID of the source node.
+    - "target": ID of the target node.
+    - "type": Use "sequence-flow" unless specified otherwise.
+4.  **Logical Flow**:
+    - Always start with a Start Event.
+    - Always end with an End Event.
+    - Ensure all nodes are connected.
+5.  **Gateways & Conditions**:
+    - Exclusive Gateways MUST have outgoing edges with "condition" property.
+    - Condition Syntax: Simple JavaScript-like expression (e.g., \`amount > 1000\`, \`status == 'approved'\`).
+    - One outgoing edge should be default (no condition or \`true\`).
+6.  **Positions**:
+    - Ignore layouting. Return { "x": 0, "y": 0 } for all nodes. The system will auto-layout.
+7.  **No Markdown**:
+    - Return RAW JSON only. Do not wrap in \`\`\`json blocks.
 
 # RESPONSE FORMAT
 {
@@ -64,38 +90,47 @@ ${JSON.stringify(capabilities.nodes, null, 2)}
 
     // 3. Call LLM
     try {
-        console.log("Sending prompt to AI:", prompt);
-        const response = await this.provider.generate(prompt, systemPrompt);
+      console.log("Sending prompt to AI:", prompt);
+      const response = await this.provider.generate(prompt, systemPrompt);
 
-        // 4. Clean and Parse JSON
-        let content = response.content.trim();
-        // Remove markdown formatting if present
-        if (content.startsWith("```json")) {
-            content = content.replace(/^```json/, "").replace(/```$/, "");
-        } else if (content.startsWith("```")) {
-            content = content.replace(/^```/, "").replace(/```$/, "");
-        }
+      // 4. Clean and Parse JSON
+      let content = response.content.trim();
+      // Remove markdown formatting if present
+      if (content.startsWith("```json")) {
+        content = content.replace(/^```json/, "").replace(/```$/, "");
+      } else if (content.startsWith("```")) {
+        content = content.replace(/^```/, "").replace(/```$/, "");
+      }
 
-        const json = JSON.parse(content);
+      const json = JSON.parse(content);
 
-        // Basic structure check
-        if (!Array.isArray(json.nodes) || !Array.isArray(json.edges)) {
-            throw new Error("Invalid response structure: Missing nodes or edges array.");
-        }
+      // Basic structure check
+      if (!Array.isArray(json.nodes) || !Array.isArray(json.edges)) {
+        throw new Error(
+          "Invalid response structure: Missing nodes or edges array."
+        );
+      }
 
-        // 5. Semantic Validation
-        const { validateGeneratedWorkflow } = await import("../utils/aiUtils");
-        const validation = validateGeneratedWorkflow(json.nodes, json.edges);
+      // 5. Validation, Sanitization & Auto-Layout
+      const validation = AIValidationService.validateAndEnhanceWorkflow(
+        json.nodes,
+        json.edges
+      );
 
-        if (!validation.valid) {
-             throw new Error("Generated workflow failed validation:\n" + validation.errors.join("\n"));
-        }
+      if (!validation.valid) {
+        throw new Error(
+          "Generated workflow failed validation:\n" +
+            validation.errors.join("\n")
+        );
+      }
 
-        return json as AIWorkflowResponse;
-
+      return {
+        nodes: validation.sanitizedNodes || [],
+        edges: validation.sanitizedEdges || [],
+      } as AIWorkflowResponse;
     } catch (error: any) {
-        console.error("AI Generation Error:", error);
-        throw new Error("Failed to generate workflow: " + error.message);
+      console.error("AI Generation Error:", error);
+      throw new Error("Failed to generate workflow: " + error.message);
     }
   }
 }

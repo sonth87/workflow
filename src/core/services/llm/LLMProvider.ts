@@ -58,7 +58,7 @@ export class GeminiProvider implements LLMProvider {
   private apiKey: string;
   private model: string;
 
-  constructor(apiKey: string, model: string = "gemini-1.5-flash") {
+  constructor(apiKey: string, model: string = "gemini-3-flash-preview") {
     this.apiKey = apiKey;
     this.model = model;
   }
@@ -69,12 +69,11 @@ export class GeminiProvider implements LLMProvider {
     // Gemini API format
     // System instructions are a separate field in newer API versions or can be prepended to prompt
     // For simplicity with v1beta, we'll prepend system prompt or use systemInstruction if available
-    const contents = [];
 
     // Simple prepending strategy for broader compatibility
     let finalPrompt = prompt;
     if (systemPrompt) {
-        finalPrompt = `${systemPrompt}\n\nUser Request: ${prompt}`;
+      finalPrompt = `${systemPrompt}\n\nUser Request: ${prompt}`;
     }
 
     const response = await fetch(url, {
@@ -89,16 +88,16 @@ export class GeminiProvider implements LLMProvider {
           },
         ],
         generationConfig: {
-            temperature: 0.7
-        }
+          temperature: 0.7,
+        },
       }),
     });
 
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `Gemini API Error: ${response.status} - ${JSON.stringify(errorData)}`
-        );
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `Gemini API Error: ${response.status} - ${JSON.stringify(errorData)}`
+      );
     }
 
     const data = await response.json();
