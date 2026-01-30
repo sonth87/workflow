@@ -5,7 +5,9 @@
 
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { useWorkflowEvents } from "@/workflow/hooks/useWorkflow";
-import { Save } from "lucide-react";
+import { Save, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { AIGeneratorModal } from "../AI/AIGeneratorModal";
 import {
   ExportWorkflow,
   ImportWorkflow,
@@ -25,6 +27,7 @@ interface HeaderProps {
 }
 
 export function Header({ onSave }: HeaderProps) {
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const { workflowName, setWorkflowName } = useWorkflowStore();
 
   useWorkflowEvents("node:added", event => {
@@ -66,6 +69,15 @@ export function Header({ onSave }: HeaderProps) {
           <div className="mx-1 h-6 w-px bg-border" />
 
           <button
+            title="AI Agent"
+            onClick={() => setIsAIModalOpen(true)}
+            className="flex items-center gap-2 rounded bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-2 text-white hover:from-violet-700 hover:to-indigo-700 shadow-sm transition-all"
+          >
+            <Sparkles size={16} />
+            AI Agent
+          </button>
+
+          <button
             title="Save"
             onClick={onSave}
             className="flex items-center gap-2 rounded bg-primary px-3 py-2 text-primary-foreground hover:opacity-90"
@@ -75,6 +87,11 @@ export function Header({ onSave }: HeaderProps) {
           </button>
         </div>
       </div>
+
+      <AIGeneratorModal
+        isOpen={isAIModalOpen}
+        onClose={() => setIsAIModalOpen(false)}
+      />
     </header>
   );
 }
