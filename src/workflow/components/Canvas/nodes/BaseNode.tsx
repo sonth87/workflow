@@ -67,6 +67,7 @@ export default function BaseNode(props: Props) {
   // Access metadata
   const metadata = data?.metadata as BaseMetadata;
   const iconConfig = data?.icon as IconConfig | undefined;
+  const description = metadata?.description || (data?.description as any);
 
   // Merge colorConfig (deprecated) with visualConfig (new)
   const finalVisualConfig: NodeVisualConfig = visualConfig || {
@@ -116,7 +117,7 @@ export default function BaseNode(props: Props) {
     <div
       className={cn(
         compactView ? "group" : nodeStyle,
-        compactView ? "" : "min-w-52 max-w-72",
+        compactView ? "" : "min-w-52 max-w-60",
         {
           "border-primary ring-4":
             props.selected &&
@@ -161,11 +162,11 @@ export default function BaseNode(props: Props) {
             })}
           >
             <div className="truncate w-full">
-              {getText(metadata.title || data?.label)}
+              {getText(metadata?.title || data?.label)}
             </div>
-            {metadata?.description && (
+            {description && (
               <div className="text-muted-foreground line-clamp-3 mt-1 text-xs font-normal w-40">
-                {getText(metadata.description)}
+                {getText(description)}
               </div>
             )}
           </div>
@@ -209,14 +210,14 @@ export default function BaseNode(props: Props) {
           )}
 
           {/* Description - toggleable, but Handles always render */}
-          {isExpanded && metadata?.description && (
+          {isExpanded && description && (
             <div
               className="text-xs mt-2"
               style={{
                 color: finalVisualConfig.descriptionColor,
               }}
             >
-              {getText(metadata.description)}
+              {getText(description)}
             </div>
           )}
 

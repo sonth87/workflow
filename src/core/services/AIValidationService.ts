@@ -114,7 +114,7 @@ export class AIValidationService {
     edges: BaseEdgeConfig[]
   ): BaseNodeConfig[] {
     const g = new dagre.graphlib.Graph();
-    g.setGraph({ rankdir: "LR", nodesep: 150, ranksep: 180, align: "DL" }); // Left-to-Right layout with more spacing
+    g.setGraph({ rankdir: "LR", nodesep: 170, ranksep: 200, align: "DL" }); // Balanced spacing
     g.setDefaultEdgeLabel(() => ({}));
 
     // Add nodes to graph

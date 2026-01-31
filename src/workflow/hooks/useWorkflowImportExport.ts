@@ -158,21 +158,31 @@ export function useWorkflowImportExport() {
    */
   const exportWorkflow = useCallback(
     (includeMetadata = true): WorkflowData => {
-      const data: WorkflowData = {
-        nodes: nodes.map(node => sanitizeNode(node)) as any,
-        edges: edges.map(edge => sanitizeEdge(edge)) as any,
+      const data: any = {
+        workflowName,
+        workflowDescription,
+        nodes: nodes.map(node => sanitizeNode(node)),
+        edges: edges.map(edge => sanitizeEdge(edge)),
       };
 
       if (includeMetadata) {
         data.metadata = {
           version: "1.0.0",
+          schemaVersion: "1.0.0", // Schema format version for migration
           timestamp: new Date().toISOString(),
         };
       }
 
       return data;
     },
-    [nodes, edges]
+    [
+      nodes,
+      edges,
+      workflowName,
+      workflowDescription,
+      sanitizeNode,
+      sanitizeEdge,
+    ]
   );
 
   /**

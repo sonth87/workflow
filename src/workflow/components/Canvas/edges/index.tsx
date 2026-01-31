@@ -114,21 +114,21 @@ export function DynamicEdge({
 
   // Determine colors and styles
   const strokeColor = selected
-    ? visualConfig?.selectedStrokeColor || "#3b82f6"
-    : visualConfig?.strokeColor;
+    ? visualConfig?.selectedStrokeColor || "var(--color-primary)"
+    : visualConfig?.strokeColor || "#b1b1b7";
   const strokeWidth = selected
-    ? visualConfig?.selectedStrokeWidth || 3
+    ? visualConfig?.selectedStrokeWidth || 2.5
     : visualConfig?.strokeWidth || 2;
   const strokeDashArray = getStrokeDashArray(pathStyle as any);
-  const markerColor = visualConfig?.markerColor || strokeColor || "#3b82f6";
+  const markerColor = visualConfig?.markerColor || strokeColor || "#b1b1b7";
 
   return (
     <>
       <defs>
         <marker
           id={`arrow-${id}`}
-          markerWidth="12.5"
-          markerHeight="12.5"
+          markerWidth="10"
+          markerHeight="10"
           viewBox="-10 -10 20 20"
           orient="auto"
           refX="0"
