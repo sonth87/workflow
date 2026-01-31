@@ -42,12 +42,25 @@ export default function IconConfig(props: Props) {
     iconColor: colorConfig?.iconColor,
   };
 
-  // Priority: node icon > type icon
+  // Priority: type icon (iconConfig.ts) > node icon (plugin config)
+  // This allows specific SVG icons to override generic plugin icons
+  // while still supporting inheritance for custom nodes
   let Icon: any = null;
   let iconBgColor: string | undefined;
   let iconColor: string | undefined;
 
-  if (nodeIcon) {
+  // First, try type-based icon from iconConfig.ts
+  if (type) {
+    const iconConfig = getIconConfig(type);
+    if (iconConfig?.icon) {
+      Icon = iconConfig.icon;
+      iconBgColor = finalVisualConfig.iconBackgroundColor || iconConfig.bgColor;
+      iconColor = finalVisualConfig.iconColor || iconConfig.color;
+    }
+  }
+
+  // Fallback to node icon from plugin config (for inheritance & custom nodes)
+  if (!Icon && nodeIcon) {
     if (typeof nodeIcon === "string") {
       // Handle base64 string icon
       Icon = nodeIcon;
@@ -65,12 +78,6 @@ export default function IconConfig(props: Props) {
         nodeIcon.backgroundColor || finalVisualConfig.iconBackgroundColor;
       iconColor = nodeIcon.color || finalVisualConfig.iconColor;
     }
-  } else if (type) {
-    // Fallback to type-based icon
-    const iconConfig = getIconConfig(type);
-    Icon = iconConfig?.icon;
-    iconBgColor = finalVisualConfig.iconBackgroundColor || iconConfig?.bgColor;
-    iconColor = finalVisualConfig.iconColor || iconConfig?.color;
   }
 
   if (!Icon) return null;

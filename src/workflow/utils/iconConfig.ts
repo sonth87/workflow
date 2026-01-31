@@ -131,6 +131,12 @@ const NODE_ICON_CONFIG: Record<NodeType | string, IconConfig> = {
     bgColor: "#E8F8EF",
     label: "Start",
   },
+  [NodeType.START_EVENT_MESSAGE]: {
+    icon: Mail,
+    color: "#39CC7E",
+    bgColor: "#E8F8EF",
+    label: "Start Message",
+  },
   [NodeType.END_EVENT_DEFAULT]: {
     icon: END_EVENT_ICONS.default,
     color: "#FF6262",
