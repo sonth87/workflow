@@ -22,7 +22,7 @@ import TaskSystem from "@/assets/workflow/task-system.svg";
 import TaskUser from "@/assets/workflow/task-user.svg";
 
 // Import gateway icons
-import EventBasedGateway from "@/assets/workflow/gateway-eventbased.svg";
+import InclusiveGateway from "@/assets/workflow/gateway-eventbased.svg";
 import ExclusiveGateway from "@/assets/workflow/gateway-exclusive.svg";
 import ParallelGateway from "@/assets/workflow/gateway-parallel.svg";
 
@@ -217,11 +217,11 @@ const NODE_ICON_CONFIG: Record<NodeType | string, IconConfig> = {
     bgColor: "#D1FAE5",
     label: "Parallel Gateway",
   },
-  [NodeType.EVENT_BASED_GATEWAY]: {
-    icon: EventBasedGateway,
+  [NodeType.INCLUSIVE_GATEWAY]: {
+    icon: InclusiveGateway,
     color: "#14B8A6",
     bgColor: "#CCFBF1",
-    label: "Event Based Gateway",
+    label: "Inclusive Gateway",
   },
   [NodeType.PARALLEL_GATEWAY_JOIN]: {
     icon: GitPullRequest,

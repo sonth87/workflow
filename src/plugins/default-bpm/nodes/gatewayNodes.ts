@@ -47,14 +47,14 @@ export const gatewayNodes = [
     },
   },
   {
-    id: NodeType.EVENT_BASED_GATEWAY,
-    type: NodeType.EVENT_BASED_GATEWAY,
+    id: NodeType.INCLUSIVE_GATEWAY,
+    type: NodeType.INCLUSIVE_GATEWAY,
     extends: NodeType.EXCLUSIVE_GATEWAY,
-    name: "Event Based Gateway",
+    name: "Inclusive Gateway",
     config: {
       metadata: {
-        title: "plugin.default.eventBasedGateway.title",
-        description: "plugin.default.eventBasedGateway.description",
+        title: "plugin.default.inclusiveGateway.title",
+        description: "plugin.default.inclusiveGateway.description",
       },
     },
   },

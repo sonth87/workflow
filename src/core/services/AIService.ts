@@ -140,6 +140,145 @@ CRITICAL for nodes:
 - properties object MUST COPY values from data object: set properties.title = data.title, properties.description = data.description, etc.
 - type MUST equal nodeType (both must be exactly the same value)
 
+## SPECIAL NODE STRUCTURES
+
+### NOTE NODE
+Notes are used to document and explain the workflow. They are standalone (no edge connections required).
+
+Structure:
+{
+  "id": "note-timestamp",
+  "type": "note",
+  "nodeType": "note",
+  "position": { "x": 0, "y": 0 },
+  "data": {
+    "label": "string (brief label)",
+    "title": "string (note title)",
+    "description": "string (brief description)",
+    "content": "string (MARKDOWN formatted content - this is the main note text)",
+    "color": "string (OPTIONAL - background color: 'blue', 'green', 'yellow', 'red', 'purple', 'gray')",
+    "fontSize": "string (OPTIONAL - text size: 'xs', 'sm', 'base', 'lg', 'xl')"
+  },
+  "properties": {
+    "label": "string (COPY from data.label)",
+    "description": "string (COPY from data.description)"
+  },
+  "width": 300,
+  "height": 200,
+  "zIndex": -1
+}
+
+**When to use Notes:**
+- ALWAYS include at least one note at the beginning describing the overall workflow purpose
+- Add notes to explain complex gateway conditions or business rules
+- Use markdown formatting in content field for rich documentation
+- Set appropriate color to categorize notes (e.g., blue for info, yellow for warnings)
+
+Example Note:
+{
+  "id": "note-1234567890",
+  "type": "note",
+  "nodeType": "note",
+  "position": { "x": 0, "y": 0 },
+  "data": {
+    "label": "Workflow Overview",
+    "title": "Workflow Description",
+    "description": "Overview of the parking lot entry workflow",
+    "content": "## Parking Lot Entry Workflow\\n\\nThis workflow handles:\\n- Vehicle entry validation\\n- Available spot checking\\n- Gate control automation\\n\\n**Key Logic:**\\n- System checks availableSpots > 0\\n- Valid tickets open the gate\\n- Invalid tickets are logged",
+    "color": "blue",
+    "fontSize": "sm"
+  },
+  "properties": {
+    "label": "Workflow Overview",
+    "description": "Overview of the parking lot entry workflow"
+  },
+  "width": 400,
+  "height": 300,
+  "zIndex": -1
+}
+
+### ANNOTATION NODE
+Annotations are small callouts with arrows pointing to specific elements. They have no background, only text with an arrow.
+
+Structure:
+{
+  "id": "annotation-timestamp",
+  "type": "annotation",
+  "nodeType": "annotation",
+  "position": { "x": 0, "y": 0 },
+  "data": {
+    "label": "string (brief label)",
+    "title": "string (annotation title)",
+    "description": "string (brief description)",
+    "content": "string (MARKDOWN formatted annotation text)",
+    "textColor": "string (OPTIONAL - text color: 'red', 'green', 'blue', 'yellow', 'purple', 'gray')",
+    "fontSize": "string (OPTIONAL - 'xs', 'sm', 'base', 'lg', 'xl')",
+    "arrowPosition": { "x": 50, "y": 50 },
+    "arrowRotation": 0,
+    "arrowFlip": false
+  },
+  "properties": {
+    "label": "string (COPY from data.label)",
+    "description": "string (COPY from data.description)"
+  }
+}
+
+**When to use Annotations:**
+- Point out important details on specific nodes
+- Add quick reminders or warnings
+- Highlight critical decision points
+
+### POOL NODE
+Pools organize workflows into swimlanes representing different participants, roles, or systems. Pools can contain lanes.
+
+Structure:
+{
+  "id": "pool-timestamp",
+  "type": "pool",
+  "nodeType": "pool",
+  "position": { "x": 0, "y": 0 },
+  "data": {
+    "label": "string (pool name)",
+    "title": "string (pool title)",
+    "description": "string (pool description)",
+    "lanes": [
+      {
+        "id": "lane-timestamp1",
+        "label": "string (lane name, e.g., 'Customer', 'System', 'Admin')",
+        "sizeRatio": 0.5
+      },
+      {
+        "id": "lane-timestamp2",
+        "label": "string (lane name)",
+        "sizeRatio": 0.5
+      }
+    ],
+    "isLocked": false,
+    "orientation": "string ('vertical' or 'horizontal')",
+    "minWidth": 300,
+    "minHeight": 400,
+    "color": "string (OPTIONAL - 'blue', 'green', 'yellow', 'red', 'purple', 'gray')"
+  },
+  "properties": {
+    "label": "string (COPY from data.label)",
+    "description": "string (COPY from data.description)",
+    "isLocked": false
+  }
+}
+
+**When to use Pools:**
+- Workflow involves multiple participants/roles (e.g., Customer, Admin, System)
+- Need to separate responsibilities across departments
+- Want to visualize cross-functional processes
+- Each lane represents a different actor/system
+
+**Pool Guidelines:**
+- Use descriptive lane labels (e.g., "Customer Actions", "Backend System", "Admin Review")
+- Vertical orientation is most common for BPMN
+- Nodes inside pool should have parentId set to the pool's id (or lane's id if targeting specific lane)
+- sizeRatio for lanes should sum to 1.0 (e.g., two lanes = 0.5 each, three lanes = 0.33 each)
+
+
 ## EDGE STRUCTURE
 
 Each edge in the "edges" array MUST have this exact structure:
@@ -281,21 +420,28 @@ ${JSON.stringify(capabilities.edges)}
        "label": ""
      }
 
-5. **Flow Requirements**:
+5. **Special Node Types**:
+   - **Notes are RECOMMENDED**: Always include at least one note describing the overall workflow purpose
+   - See "SPECIAL NODE STRUCTURES" section above for detailed Note, Annotation, and Pool node formats
+   - Notes use markdown in data.content field and support color/fontSize customization
+   - Annotations are lightweight callouts with arrows (no background)
+   - Pools organize workflow by participants/roles with lanes
+   - Notes and Annotations do NOT need edge connections (standalone)
+
+6. **Flow Requirements**:
    - Workflows MUST start with a Start Event node (e.g., startEventDefault)
    - Workflows MUST end with at least one End Event node (e.g., endEventDefault, endEventError)
-   - All nodes must be connected via edges (no orphaned nodes)
-   - Ensure logical flow from start to end
+   - All nodes (except notes/annotations) must be connected via edges (no orphaned nodes)
 
-6. **Edge References**: 
+7. **Edge References**: 
    - edge.source MUST be an id from the nodes array
    - edge.target MUST be an id from the nodes array
 
-7. **Position Field**: 
+8. **Position Field**: 
    - Always set position to { "x": 0, "y": 0 }
    - System will automatically layout nodes
 
-8. **No Markdown Formatting**: 
+9. **No Markdown Formatting**: 
    - Return ONLY raw JSON
    - Do NOT wrap in \`\`\`json code blocks
    - Do NOT include any explanatory text before or after JSON

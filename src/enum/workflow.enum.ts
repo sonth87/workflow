@@ -34,7 +34,7 @@ export enum NodeType {
   EXCLUSIVE_GATEWAY = "exclusiveGateway",
   PARALLEL_GATEWAY = "parallelGateway",
   PARALLEL_GATEWAY_JOIN = "parallelGatewayJoin",
-  EVENT_BASED_GATEWAY = "eventBasedGateway",
+  INCLUSIVE_GATEWAY = "inclusiveGateway",
 
   END_EVENT_DEFAULT = "endEventDefault",
   END_EVENT_SEND_SIGNAL = "endEventSendSignal",
