@@ -28,12 +28,16 @@ import ParallelGateway from "@/assets/workflow/gateway-parallel.svg";
 
 // Lucide icons for nodes without custom SVG
 import {
+  AlarmClock,
   Bell,
   Clock,
   Cog,
   GitPullRequest,
   LayoutGrid,
+  ListCheck,
+  Mail,
   MessageSquareText,
+  Radio,
   StickyNote,
   Workflow,
   type LucideIcon,
@@ -252,6 +256,37 @@ const NODE_ICON_CONFIG: Record<NodeType | string, IconConfig> = {
     color: "#FBBF24",
     bgColor: "#FEF9C3",
     label: "Annotation",
+  },
+  // Immediate nodes
+  [NodeType.IMMEDIATE_EMAIL]: {
+    icon: Mail,
+    color: "#FFFFFF",
+    bgColor: "#FFD67A",
+    label: "Immediate Email",
+  },
+  [NodeType.IMMEDIATE_RECEIVE_MESSAGE]: {
+    icon: Mail,
+    color: "#FFFFFF",
+    bgColor: "#FFD67A",
+    label: "Immediate Receive Message",
+  },
+  [NodeType.IMMEDIATE_TIMER]: {
+    icon: AlarmClock,
+    color: "#FFFFFF",
+    bgColor: "#FFD67A",
+    label: "Immediate Timer",
+  },
+  [NodeType.IMMEDIATE_SIGNAL]: {
+    icon: Radio,
+    color: "#FFFFFF",
+    bgColor: "#FFD67A",
+    label: "Immediate Signal",
+  },
+  [NodeType.IMMEDIATE_CONDITION]: {
+    icon: ListCheck,
+    color: "#FFFFFF",
+    bgColor: "#FFD67A",
+    label: "Immediate Condition",
   },
 };
 

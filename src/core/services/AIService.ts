@@ -6,6 +6,7 @@ import {
   OpenAIProvider,
 } from "./llm/LLMProvider";
 import { AIValidationService } from "./AIValidationService";
+import { generateComprehensiveDocumentation } from "../utils/generateAIDocumentation";
 
 // Mock response interface
 interface AIWorkflowResponse {
@@ -321,7 +322,7 @@ CRITICAL for edges:
 
 ## AVAILABLE NODE TYPES
 
-${JSON.stringify(capabilities.nodes, null, 2)}
+${this.formatNodeDocumentation()}
 
 ## AVAILABLE EDGE TYPES
 
@@ -438,8 +439,9 @@ ${JSON.stringify(capabilities.edges)}
    - edge.target MUST be an id from the nodes array
 
 8. **Position Field**: 
-   - Always set position to { "x": 0, "y": 0 }
-   - System will automatically layout nodes
+   - For REGULAR nodes: Set position to { "x": 0, "y": 0 } (System will auto-layout)
+   - For NOTE/ANNOTATION nodes: Set explicit position to separate them from the main workflow (e.g., { "x": -400, "y": 0 })
+   - **CRITICAL**: Always place Notes to the left (negative x) or top (negative y) of the Start Event to avoid overlapping with the auto-layout
 
 9. **No Markdown Formatting**: 
    - Return ONLY raw JSON
@@ -449,5 +451,41 @@ ${JSON.stringify(capabilities.edges)}
 NOW GENERATE THE WORKFLOW BASED ON THE USER'S REQUEST.
 REMEMBER: Return ONLY the JSON object, no markdown formatting, no explanations.
 `;
+  }
+
+  /**
+   * Format node documentation from auto-generated registry data
+   */
+  private static formatNodeDocumentation(): string {
+    const docs = generateComprehensiveDocumentation();
+    let output = "";
+
+    // Format each category
+    Object.entries(docs.categories).forEach(
+      ([category, categoryData]: [string, any]) => {
+        if (!categoryData.nodes || categoryData.nodes.length === 0) return;
+
+        output += "### " + category.toUpperCase() + "\\n";
+        output += categoryData.description + "\\n\\n";
+
+        categoryData.nodes.forEach((node: any) => {
+          output += "**" + node.type + "**\\n";
+          output += "  Title: " + node.title + "\\n";
+          if (node.description) {
+            output += "  Description: " + node.description + "\\n";
+          }
+          output += "  Connection: " + node.connectionRules + "\\n";
+          output += "  Example JSON:\\n";
+          output +=
+            "```json\\n" +
+            JSON.stringify(node.exampleJSON, null, 2) +
+            "\\n```\\n\\n";
+        });
+
+        output += "\\n";
+      }
+    );
+
+    return output;
   }
 }
