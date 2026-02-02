@@ -79,6 +79,8 @@ export class AIValidationService {
           ...edge,
           // Ensure type is sequence-flow if missing, or validate if needed.
           type: edge.type || "sequence-flow",
+          // Ensure animated is set to true by default (matches UI defaultEdgeOptions)
+          animated: edge.animated !== undefined ? edge.animated : true,
         });
       }
     });

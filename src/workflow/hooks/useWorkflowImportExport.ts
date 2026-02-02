@@ -117,7 +117,7 @@ export function useWorkflowImportExport() {
         properties,
         sourceHandle,
         targetHandle,
-        animated,
+        animated: animated !== undefined ? animated : true, // Default to true to match UI behavior
         label: getText(label),
       };
     },
@@ -213,6 +213,17 @@ export function useWorkflowImportExport() {
     (data: WorkflowData, clearExisting = true) => {
       if (clearExisting) {
         clearWorkflow();
+      }
+
+      // Import workflow metadata
+      const workflowData = data as any;
+      if (workflowData.workflowName) {
+        useWorkflowStore.getState().setWorkflowName(workflowData.workflowName);
+      }
+      if (workflowData.workflowDescription) {
+        useWorkflowStore
+          .getState()
+          .setWorkflowDescription(workflowData.workflowDescription);
       }
 
       if (data.nodes) {

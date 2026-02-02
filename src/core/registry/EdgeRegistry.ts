@@ -42,6 +42,11 @@ export class EdgeRegistry extends BaseRegistry<BaseEdgeConfig> {
       id: overrides?.id || `${source}-${target}-${Date.now()}`,
       source,
       target,
+      // Explicitly preserve animated property from overrides
+      animated:
+        overrides?.animated !== undefined
+          ? overrides.animated
+          : defaultConfig.animated,
       metadata: {
         ...defaultConfig.metadata,
         ...overrides?.metadata,

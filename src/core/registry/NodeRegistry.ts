@@ -199,12 +199,21 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
       data: {
         ...defaultConfig.data,
         ...overrides?.data,
-        // Use metadata.title (translation key) instead of item.name (English text)
+        // Prioritize imported/custom values over defaults
         label:
+          overrides?.data?.label ||
           defaultConfig.metadata?.title ||
           item.name ||
-          overrides?.data?.label ||
           "New Node",
+        title:
+          overrides?.data?.title ||
+          defaultConfig.metadata?.title ||
+          item.name ||
+          "New Node",
+        description:
+          overrides?.data?.description ||
+          defaultConfig.metadata?.description ||
+          "",
         // Pass metadata into data so it's accessible in React components
         metadata: {
           ...defaultConfig.metadata,
@@ -222,12 +231,16 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
       properties: {
         ...defaultConfig.properties,
         ...overrides?.properties,
-        // Use metadata.title (translation key) for properties label as well
+        // Prioritize imported/custom values over defaults
         label:
+          overrides?.properties?.label ||
           defaultConfig.metadata?.title ||
           item.name ||
-          overrides?.properties?.label ||
           "New Node",
+        description:
+          overrides?.properties?.description ||
+          defaultConfig.metadata?.description ||
+          "",
       },
     } as BaseNodeConfig;
   }

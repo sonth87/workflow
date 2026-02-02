@@ -186,7 +186,7 @@ Example Note:
     "title": "Workflow Description",
     "description": "Overview of the parking lot entry workflow",
     "content": "## Parking Lot Entry Workflow\\n\\nThis workflow handles:\\n- Vehicle entry validation\\n- Available spot checking\\n- Gate control automation\\n\\n**Key Logic:**\\n- System checks availableSpots > 0\\n- Valid tickets open the gate\\n- Invalid tickets are logged",
-    "color": "blue",
+    "color": "yellow",
     "fontSize": "sm"
   },
   "properties": {

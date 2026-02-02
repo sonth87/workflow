@@ -373,6 +373,7 @@ function CanvasInner({
         {
           sourceHandle: connection.sourceHandle || undefined,
           targetHandle: connection.targetHandle || undefined,
+          animated: true, // Match defaultEdgeOptions behavior
         }
       );
 
