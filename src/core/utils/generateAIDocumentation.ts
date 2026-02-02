@@ -62,7 +62,6 @@ export interface AIDocumentation {
   specialNodes: {
     note: SpecialNodeDoc;
     annotation: SpecialNodeDoc;
-    pool: SpecialNodeDoc;
   };
 }
 
@@ -290,7 +289,6 @@ export function generateComprehensiveDocumentation(): AIDocumentation {
     specialNodes: {
       note: generateNoteDocumentation(),
       annotation: generateAnnotationDocumentation(),
-      pool: generatePoolDocumentation(),
     },
   };
 }
@@ -304,7 +302,7 @@ function generateNoteDocumentation(): SpecialNodeDoc {
       id: "note-timestamp",
       type: "note",
       nodeType: "note",
-      position: { x: -400, y: 0 },
+      position: { x: 0, y: 0 },
       data: {
         label: "string",
         title: "string",
@@ -323,12 +321,12 @@ function generateNoteDocumentation(): SpecialNodeDoc {
       zIndex: -1,
     },
     usage:
-      "Notes document and explain the workflow. They are standalone (no edge connections required). IMPORTANT: Always set position to { x: -400, y: 0 } to separate it from the main workflow and avoid overlap. Use markdown in content field for rich documentation.",
+      "Notes document and explain the workflow. They are standalone (no edge connections required). Position will be automatically handled by the system (placed below workflow). Use markdown in content field for rich documentation.",
     example: {
       id: "note-1234567890",
       type: "note",
       nodeType: "note",
-      position: { x: -400, y: 0 },
+      position: { x: 0, y: 0 },
       data: {
         label: "Workflow Overview",
         title: "Workflow Description",
@@ -342,8 +340,8 @@ function generateNoteDocumentation(): SpecialNodeDoc {
         label: "Workflow Overview",
         description: "Overview of the workflow",
       },
-      width: 400,
-      height: 300,
+      width: 500,
+      height: 400,
       zIndex: -1,
     },
   };
@@ -397,88 +395,6 @@ function generateAnnotationDocumentation(): SpecialNodeDoc {
       properties: {
         label: "Important Note",
         description: "Pay attention to this condition",
-      },
-    },
-  };
-}
-
-/**
- * Generate documentation for Pool nodes
- */
-function generatePoolDocumentation(): SpecialNodeDoc {
-  return {
-    structure: {
-      id: "pool-timestamp",
-      type: "pool",
-      nodeType: "pool",
-      position: { x: 0, y: 0 },
-      data: {
-        label: "string",
-        title: "string",
-        description: "string",
-        lanes: [
-          {
-            id: "lane-timestamp1",
-            label: "string (e.g., 'Customer', 'System', 'Admin')",
-            sizeRatio: 0.5,
-          },
-          {
-            id: "lane-timestamp2",
-            label: "string",
-            sizeRatio: 0.5,
-          },
-        ],
-        isLocked: false,
-        orientation: "string ('vertical' or 'horizontal')",
-        minWidth: 300,
-        minHeight: 400,
-        color:
-          "string (OPTIONAL: 'blue', 'green', 'yellow', 'red', 'purple', 'gray')",
-      },
-      properties: {
-        label: "string (COPY from data.label)",
-        description: "string (COPY from data.description)",
-        isLocked: false,
-      },
-    },
-    usage:
-      "Pools organize workflows into swimlanes representing different participants, roles, or systems. Use when workflow involves multiple actors. Vertical orientation is most common. Nodes inside pool should have parentId set to pool's id. Lane sizeRatio values should sum to 1.0.",
-    example: {
-      id: "pool-1234567890",
-      type: "pool",
-      nodeType: "pool",
-      position: { x: 0, y: 0 },
-      data: {
-        label: "Process Pool",
-        title: "Multi-Actor Process",
-        description: "Process involving multiple participants",
-        lanes: [
-          {
-            id: "lane-customer",
-            label: "Customer",
-            sizeRatio: 0.33,
-          },
-          {
-            id: "lane-system",
-            label: "System",
-            sizeRatio: 0.33,
-          },
-          {
-            id: "lane-admin",
-            label: "Admin",
-            sizeRatio: 0.34,
-          },
-        ],
-        isLocked: false,
-        orientation: "vertical",
-        minWidth: 400,
-        minHeight: 600,
-        color: "blue",
-      },
-      properties: {
-        label: "Process Pool",
-        description: "Process involving multiple participants",
-        isLocked: false,
       },
     },
   };

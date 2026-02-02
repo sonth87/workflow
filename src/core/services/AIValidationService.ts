@@ -119,26 +119,50 @@ export class AIValidationService {
     g.setGraph({ rankdir: "LR", nodesep: 170, ranksep: 200, align: "DL" }); // Balanced spacing
     g.setDefaultEdgeLabel(() => ({}));
 
-    // Add nodes to graph
-    nodes.forEach(node => {
+    // Filter out special nodes (notes, annotations) for separate placement
+    const specialNodeTypes = ["note", "annotation"];
+
+    // Nodes to be auto-layouted by Dagre
+    const layoutNodes = nodes.filter(
+      n => !specialNodeTypes.includes(n.type as string)
+    );
+    // Special nodes to be placed manually
+    const specialNodes = nodes.filter(n =>
+      specialNodeTypes.includes(n.type as string)
+    );
+
+    // Add standard nodes to graph
+    layoutNodes.forEach(node => {
       // Assume a default width/height for layout calculation if not present
-      // Most BPMN nodes are around 100x80 or 40x40 (events)
       const width = node.type?.includes("Event") ? 50 : 150;
       const height = 80;
       g.setNode(node.id, { width, height });
     });
 
-    // Add edges to graph
+    // Add edges to graph (only if both source and target are in the layoutNodes)
+    const layoutNodeIds = new Set(layoutNodes.map(n => n.id));
     edges.forEach(edge => {
-      g.setEdge(edge.source, edge.target);
+      // Only add edge if both nodes are part of the dagre layout
+      if (layoutNodeIds.has(edge.source) && layoutNodeIds.has(edge.target)) {
+        g.setEdge(edge.source, edge.target);
+      }
     });
 
     // Calculate layout
     dagre.layout(g);
 
-    // Apply positions back to nodes
-    return nodes.map(node => {
+    // Get graph dimensions to place special nodes below
+    // Dagre graph usually has .graph() with width/height, but we can also find max Y from nodes.
+    let maxY = 0;
+
+    // Apply positions back to standard nodes and find bounds
+    const processedLayoutNodes = layoutNodes.map(node => {
       const nodeWithPos = g.node(node.id);
+
+      // Update max Y
+      const bottomY = nodeWithPos.y + nodeWithPos.height / 2;
+      if (bottomY > maxY) maxY = bottomY;
+
       return {
         ...node,
         position: {
@@ -147,5 +171,26 @@ export class AIValidationService {
         },
       };
     });
+
+    // Place special nodes below the layout
+    const startY = maxY + 50; // 50px padding below the graph
+    let currentX = 0;
+    const spacingX = 350; // Horizontal spacing between notes
+
+    const processedSpecialNodes = specialNodes.map(node => {
+      const x = currentX;
+      // Stagger them horizontally
+      currentX += spacingX;
+
+      return {
+        ...node,
+        position: {
+          x: x,
+          y: startY,
+        },
+      };
+    });
+
+    return [...processedLayoutNodes, ...processedSpecialNodes];
   }
 }

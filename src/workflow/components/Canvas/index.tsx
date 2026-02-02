@@ -310,60 +310,10 @@ function CanvasInner({
         return;
       }
 
-      // Cycle Detection - kiểm tra xem connection mới có tạo vòng lặp không
-      const tempEdges = [
-        ...edges,
-        { source: connection.source, target: connection.target },
-      ];
-
-      // Build adjacency list
-      const graph = new Map<string, string[]>();
-      nodes.forEach(node => {
-        graph.set(node.id, []);
-      });
-      tempEdges.forEach(edge => {
-        const neighbors = graph.get(edge.source) || [];
-        neighbors.push(edge.target);
-        graph.set(edge.source, neighbors);
-      });
-
-      // DFS để phát hiện cycle
-      const hasCycle = (
-        nodeId: string,
-        visited: Set<string>,
-        recStack: Set<string>
-      ): boolean => {
-        if (!visited.has(nodeId)) {
-          visited.add(nodeId);
-          recStack.add(nodeId);
-
-          const neighbors = graph.get(nodeId) || [];
-          for (const neighbor of neighbors) {
-            if (
-              !visited.has(neighbor) &&
-              hasCycle(neighbor, visited, recStack)
-            ) {
-              return true;
-            } else if (recStack.has(neighbor)) {
-              return true; // Cycle detected!
-            }
-          }
-        }
-        recStack.delete(nodeId);
-        return false;
-      };
-
-      // Kiểm tra từ tất cả các nodes
-      const visited = new Set<string>();
-      const recStack = new Set<string>();
-
-      for (const node of nodes) {
-        if (hasCycle(node.id, visited, recStack)) {
-          alert(
-            "❌ Cannot create connection: This would create a circular loop in the workflow!"
-          );
-          return;
-        }
+      // Self-loop Validation - Prevent connecting a node to itself
+      if (connection.source === connection.target) {
+        alert("❌ Cannot create connection: Self-loops are not allowed!");
+        return;
       }
 
       const edge = edgeRegistry.createEdge(

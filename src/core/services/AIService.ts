@@ -229,7 +229,7 @@ Structure:
 - Add quick reminders or warnings
 - Highlight critical decision points
 
-### POOL NODE
+### POOL NODE (NOT RECOMMENDED)
 Pools organize workflows into swimlanes representing different participants, roles, or systems. Pools can contain lanes.
 
 Structure:
@@ -423,10 +423,7 @@ ${JSON.stringify(capabilities.edges)}
 
 5. **Special Node Types**:
    - **Notes are RECOMMENDED**: Always include at least one note describing the overall workflow purpose
-   - See "SPECIAL NODE STRUCTURES" section above for detailed Note, Annotation, and Pool node formats
-   - Notes use markdown in data.content field and support color/fontSize customization
-   - Annotations are lightweight callouts with arrows (no background)
-   - Pools organize workflow by participants/roles with lanes
+   - See "SPECIAL NODE STRUCTURES" section above for detailed Note and Annotation node formats
    - Notes and Annotations do NOT need edge connections (standalone)
 
 6. **Flow Requirements**:
@@ -439,9 +436,9 @@ ${JSON.stringify(capabilities.edges)}
    - edge.target MUST be an id from the nodes array
 
 8. **Position Field**: 
-   - For REGULAR nodes: Set position to { "x": 0, "y": 0 } (System will auto-layout)
-   - For NOTE/ANNOTATION nodes: Set explicit position to separate them from the main workflow (e.g., { "x": -400, "y": 0 })
-   - **CRITICAL**: Always place Notes to the left (negative x) or top (negative y) of the Start Event to avoid overlapping with the auto-layout
+   - Set position to { "x": 0, "y": 0 } for ALL nodes (System will auto-layout)
+   - Note and Annotation nodes will be automatically positioned BELOW the workflow graph
+
 
 9. **No Markdown Formatting**: 
    - Return ONLY raw JSON
