@@ -9,3 +9,4 @@ export * from "./Theme";
 export * from "./Shortcuts";
 export * from "./SimulationControls";
 export * from "./AI";
+export * from "./TidyUp";

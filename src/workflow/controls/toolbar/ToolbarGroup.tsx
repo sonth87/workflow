@@ -6,15 +6,18 @@ import { PanModeToggle, type PanModeToggleProps } from "./PanModeToggle";
 import { MinimapToggle, type MinimapToggleProps } from "./MinimapToggle";
 import { ZoomControls, type ZoomControlsProps } from "./ZoomControls";
 import { ToolbarOptions, type ToolbarOptionsProps } from "./ToolbarOptions";
+import { TidyUpToggle, type TidyUpToggleProps } from "./TidyUpToggle";
 
 export interface ToolbarGroupProps {
   panModeProps?: PanModeToggleProps;
   minimapProps?: MinimapToggleProps;
+  tidyUpProps?: TidyUpToggleProps;
   zoomProps?: ZoomControlsProps;
   optionsProps?: ToolbarOptionsProps;
   className?: string;
   showPanMode?: boolean;
   showMinimap?: boolean;
+  showTidyUp?: boolean;
   showZoom?: boolean;
   showOptions?: boolean;
 }
@@ -22,11 +25,13 @@ export interface ToolbarGroupProps {
 export function ToolbarGroup({
   panModeProps,
   minimapProps,
+  tidyUpProps,
   zoomProps,
   optionsProps,
   className = "",
   showPanMode = true,
   showMinimap = true,
+  showTidyUp = true,
   showZoom = true,
   showOptions = true,
 }: ToolbarGroupProps) {
@@ -46,9 +51,14 @@ export function ToolbarGroup({
 
       {showMinimap && <MinimapToggle {...minimapProps} />}
 
-      {(showPanMode || showZoom || showMinimap) && showOptions && (
+      {(showPanMode || showZoom || showMinimap) && showTidyUp && (
         <div className="h-6 w-px bg-border" />
       )}
+
+      {showTidyUp && <TidyUpToggle {...tidyUpProps} />}
+
+      {(showPanMode || showZoom || showMinimap || showTidyUp) &&
+        showOptions && <div className="h-6 w-px bg-border" />}
 
       {showOptions && <ToolbarOptions {...optionsProps} />}
     </footer>

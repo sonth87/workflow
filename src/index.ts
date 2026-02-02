@@ -50,6 +50,7 @@ export {
   ThemeSwitcher,
   ViewModeSwitcher,
   Shortcuts,
+  TidyUp,
 } from "./workflow/components";
 
 // ==================== Context ====================

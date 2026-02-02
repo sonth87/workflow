@@ -292,5 +292,7 @@
   "ui.viewMode.expand": "Mở rộng",
   "ui.viewMode.compactView": "Chế độ thu gọn",
   "ui.viewMode.expandView": "Chế độ mở rộng",
+  "ui.tidyUp.tidyUp": "Sắp xếp",
+  "ui.tidyUp.organizeWorkflow": "Sắp xếp bố cục workflow",
   "ui.poolNode.clickToAddLanes": "Nhấn + để thêm làn đường"
 }

@@ -110,10 +110,16 @@ export function useWorkflowLayout() {
     [nodes, fitView]
   );
 
+  /**
+   * Tidy up workflow layout (alias for applyAutoLayout)
+   */
+  const tidyUpWorkflow = applyAutoLayout;
+
   return {
     layoutDirection,
     setLayoutDirection,
     applyAutoLayout,
+    tidyUpWorkflow,
     fitToView,
     focusNode,
   };

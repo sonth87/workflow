@@ -15,25 +15,15 @@ export const useLanguage = () => {
         // Check if it's a translation key (contains "." and not a URL)
         // URLs must have "://" to be considered URLs (http://, https://, etc.)
         if (text.includes(".") && !text.includes("://")) {
-          // Try to resolve from TranslationRegistry
+          // Try to resolve from TranslationRegistry (with automatic English fallback)
           if (
             typeof window !== "undefined" &&
             window.__BPM_TRANSLATION_REGISTRY__
           ) {
             const registry = window.__BPM_TRANSLATION_REGISTRY__;
-
-            // Try current language
-            const translation = registry.get(text, language);
+            const translation = registry.get(text, language, "en");
             if (translation) {
               return translation;
-            }
-
-            // Fallback to English
-            if (language !== "en") {
-              const enTranslation = registry.get(text, "en");
-              if (enTranslation) {
-                return enTranslation;
-              }
             }
           }
         }
@@ -84,8 +74,8 @@ export const useLanguage = () => {
   const getUIText = useCallback(
     (path: string, params?: Record<string, string | number>): string => {
       try {
-        // Get from TranslationRegistry (flat format)
-        const translatedText = translationRegistry.get(path, language);
+        // Get from TranslationRegistry (flat format) with automatic English fallback
+        const translatedText = translationRegistry.get(path, language, "en");
 
         if (!translatedText) {
           console.warn(`Translation key not found: ${path}`);

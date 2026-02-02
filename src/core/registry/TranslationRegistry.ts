@@ -46,10 +46,26 @@ class TranslationRegistryClass {
    * Get translation for a specific key and language
    * @param key - Translation key (e.g., "sendEmailTask.name")
    * @param language - Language code
+   * @param fallbackLanguage - Optional fallback language (defaults to "en")
    * @returns Translated string or undefined if not found
    */
-  get(key: string, language: string): string | undefined {
-    return this.translations[language]?.[key];
+  get(
+    key: string,
+    language: string,
+    fallbackLanguage: string = "en"
+  ): string | undefined {
+    // Try requested language first
+    const translation = this.translations[language]?.[key];
+    if (translation) {
+      return translation;
+    }
+
+    // Fallback to fallback language if different from requested language
+    if (language !== fallbackLanguage) {
+      return this.translations[fallbackLanguage]?.[key];
+    }
+
+    return undefined;
   }
 
   /**

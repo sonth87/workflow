@@ -4,6 +4,8 @@
 
 import { Map } from "lucide-react";
 
+import { useLanguage } from "@/workflow/hooks/useLanguage";
+
 export interface MinimapToggleProps {
   show?: boolean;
   onChange?: (show: boolean) => void;
@@ -15,9 +17,10 @@ export function MinimapToggle({
   onChange,
   className = "",
 }: MinimapToggleProps) {
+  const { getUIText } = useLanguage();
   return (
     <button
-      title="Toggle minimap"
+      title={getUIText("ui.toolbar.minimap")}
       onClick={() => onChange?.(!show)}
       className={`rounded p-2 transition-colors ${
         show

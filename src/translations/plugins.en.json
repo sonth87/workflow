@@ -292,5 +292,7 @@
   "ui.viewMode.expand": "Expand",
   "ui.viewMode.compactView": "Compact View",
   "ui.viewMode.expandView": "Expand View",
+  "ui.tidyUp.tidyUp": "Tidy Up",
+  "ui.tidyUp.organizeWorkflow": "Organize workflow layout",
   "ui.poolNode.clickToAddLanes": "Press + to add lanes"
 }
