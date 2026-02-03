@@ -25,12 +25,18 @@ export function SelectControl({
   const { getText } = useLanguage();
 
   // Get options from either old or new format
-  const opts =
-    "options" in definition && definition.options
-      ? Array.isArray(definition.options)
-        ? definition.options
-        : definition.options.options || []
-      : [];
+  const opts: Array<{ label: any; value: unknown; [key: string]: unknown }> = (() => {
+    if (!("options" in definition) || !definition.options) return [];
+    
+    if (Array.isArray(definition.options)) return definition.options;
+    
+    // For PropertyFieldDefinition, options is FieldOptions with options property
+    if ("options" in (definition.options as any) && Array.isArray((definition.options as any).options)) {
+      return (definition.options as any).options;
+    }
+    
+    return [];
+  })();
 
   return (
     <div className="space-y-1.5">
