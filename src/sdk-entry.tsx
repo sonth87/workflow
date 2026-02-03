@@ -82,18 +82,22 @@ class BPMCore {
       },
     };
     // Initialize from localStorage first (to match LanguageProvider behavior)
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("bpm-language");
-      this.currentLanguage = stored || config.defaultLanguage || "en";
-    } else {
-      this.currentLanguage = config.defaultLanguage || "en";
-    }
+    this.currentLanguage = config.defaultLanguage || "en";
     this.eventBus = globalEventBus;
     this.init();
   }
 
   private async init() {
     try {
+      // Load language from centralized storage
+      if (typeof window !== "undefined") {
+        const { getSetting } = await import("./utils/storage");
+        const stored = getSetting("language");
+        if (stored) {
+          this.currentLanguage = stored as string;
+        }
+      }
+
       // Process JSON configurations first
       await this.loadJSONConfigs();
 
@@ -307,7 +311,9 @@ Error:`,
         `[BPM SDK] Language setter not registered yet, saving to localStorage`
       );
       if (typeof window !== "undefined") {
-        localStorage.setItem("bpm-language", language);
+        import("./utils/storage").then(({ setSetting }) => {
+          setSetting("language", language);
+        });
       }
     }
   }

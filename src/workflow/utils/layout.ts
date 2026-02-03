@@ -11,6 +11,15 @@ import type { LayoutDirection } from "../components/Header";
 const nodeWidth = 150;
 const nodeHeight = 60;
 
+// Dagre node includes additional properties beyond the base definition
+type DagreNode = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rank?: number; // Dagre assigns rank during layout
+};
+
 export const getLayoutedElements = (
   nodes: Node[],
   edges: Edge[],
@@ -23,7 +32,11 @@ export const getLayoutedElements = (
   // Horizontal orientation = LR (left to right), Vertical orientation = TB (top to bottom)
   const dagreDirection = layoutHorizontal ? "LR" : "TB";
   // nodesep: spacing between nodes in the same rank, ranksep: spacing between ranks
-  dagreGraph.setGraph({ rankdir: dagreDirection, nodesep: 100, ranksep: 100 });
+  dagreGraph.setGraph({
+    rankdir: dagreDirection,
+    nodesep: 100,
+    ranksep: 100,
+  });
 
   // Filter out container and annotation nodes - only layout actual process nodes
   const processNodes = nodes.filter(
@@ -60,6 +73,68 @@ export const getLayoutedElements = (
 
   dagre.layout(dagreGraph);
 
+  // Alignment logic based on orientation
+  // Group nodes by their rank (which dagre assigns based on graph structure)
+  const nodesByRank = new Map<
+    number,
+    Array<{ id: string; width: number; height: number; x: number; y: number }>
+  >();
+
+  sortedNodes.forEach(node => {
+    const nodeWithPosition = dagreGraph.node(node.id) as DagreNode;
+    const width = node.measured?.width || node.width || nodeWidth;
+    const height = node.measured?.height || node.height || nodeHeight;
+
+    // Group nodes by position with tolerance
+    // For horizontal (LR): group by Y position (same row) to align tops
+    // For vertical (TB): group by X position (same column) to align centers
+    // Use Math.floor with division to create buckets for grouping
+    const tolerance = 50; // Nodes within 50px are considered same rank
+    const rankKey = layoutHorizontal
+      ? Math.floor(nodeWithPosition.y / tolerance) // Horizontal: group by row (Y) for top alignment
+      : Math.floor(nodeWithPosition.x / tolerance); // Vertical: group by column (X) for center alignment
+
+    if (!nodesByRank.has(rankKey)) {
+      nodesByRank.set(rankKey, []);
+    }
+    const rankNodes = nodesByRank.get(rankKey);
+    if (rankNodes) {
+      rankNodes.push({
+        id: node.id,
+        width,
+        height,
+        x: nodeWithPosition.x,
+        y: nodeWithPosition.y,
+      });
+    }
+  });
+
+  // Apply alignment based on orientation
+  nodesByRank.forEach(nodesInRank => {
+    if (nodesInRank.length > 1) {
+      if (layoutHorizontal) {
+        // Horizontal layout (LR): align by TOP edge
+        // Calculate top edge for each node (y - height/2, since dagre uses center position)
+        const minTop = Math.min(...nodesInRank.map(n => n.y - n.height / 2));
+
+        // Set each node's center Y so that all have the same top edge
+        nodesInRank.forEach(({ id, height }) => {
+          const nodeData = dagreGraph.node(id) as DagreNode;
+          // Center Y = top edge + half height
+          nodeData.y = minTop + height / 2;
+        });
+      } else {
+        // Vertical layout (TB): align by CENTER (average X position)
+        const avgX =
+          nodesInRank.reduce((sum, n) => sum + n.x, 0) / nodesInRank.length;
+        nodesInRank.forEach(({ id }) => {
+          const nodeData = dagreGraph.node(id) as DagreNode;
+          nodeData.x = avgX;
+        });
+      }
+    }
+  });
+
   // Calculate offset to preserve original workflow position
   // Find the first process node's current position and dagre's calculated position
   const firstProcessNode = processNodes[0];
@@ -67,7 +142,7 @@ export const getLayoutedElements = (
   let offsetY = 0;
 
   if (firstProcessNode) {
-    const dagrePos = dagreGraph.node(firstProcessNode.id);
+    const dagrePos = dagreGraph.node(firstProcessNode.id) as DagreNode;
     const width =
       firstProcessNode.measured?.width || firstProcessNode.width || nodeWidth;
     const height =
@@ -94,7 +169,7 @@ export const getLayoutedElements = (
       return node;
     }
 
-    const nodeWithPosition = dagreGraph.node(node.id);
+    const nodeWithPosition = dagreGraph.node(node.id) as DagreNode;
     // Use same dimension logic as when adding to dagre
     const width = node.measured?.width || node.width || nodeWidth;
     const height = node.measured?.height || node.height || nodeHeight;

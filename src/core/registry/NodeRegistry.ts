@@ -196,6 +196,10 @@ export class NodeRegistry extends BaseRegistry<BaseNodeConfig> {
       ...defaultConfig,
       ...overrides,
       id: overrides?.id || `${nodeType}-${Date.now()}`,
+      // Ensure nodeType is always set correctly (don't allow overrides)
+      nodeType: nodeType,
+      // Ensure type matches nodeType for ReactFlow
+      type: nodeType,
       data: {
         ...defaultConfig.data,
         ...overrides?.data,

@@ -17,14 +17,14 @@ export const createHistorySlice: StateCreator<
   [],
   [],
   HistorySlice
-> = (set) => ({
+> = set => ({
   history: {
     past: [],
     future: [],
   },
 
   undo: () => {
-    set((state) => {
+    set(state => {
       const { past, future } = state.history;
       if (past.length === 0) return state;
 
@@ -44,7 +44,7 @@ export const createHistorySlice: StateCreator<
   },
 
   redo: () => {
-    set((state) => {
+    set(state => {
       const { past, future } = state.history;
       if (future.length === 0) return state;
 
@@ -64,7 +64,7 @@ export const createHistorySlice: StateCreator<
   },
 
   saveToHistory: () => {
-    set((state) => ({
+    set(state => ({
       history: {
         past: [
           ...state.history.past,

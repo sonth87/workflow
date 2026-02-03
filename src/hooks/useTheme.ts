@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { getSetting, setSetting } from "@/utils/storage";
 
 type Theme = "light" | "dark" | "system";
 
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === "undefined") return "system";
-    return (localStorage.getItem("theme") as Theme) || "system";
+    return (getSetting("theme") as Theme) || "system";
   });
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export function useTheme() {
     }
 
     // Save to localStorage
-    localStorage.setItem("theme", theme);
+    setSetting("theme", theme);
   }, [theme]);
 
   // Listen to system theme changes

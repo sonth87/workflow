@@ -149,6 +149,12 @@ const NODE_ICON_CONFIG: Record<NodeType | string, IconConfig> = {
     bgColor: "#FFEBEB",
     label: "End",
   },
+  [NodeType.END_EVENT_ERROR]: {
+    icon: END_EVENT_ICONS.default,
+    color: "#FF6262",
+    bgColor: "#FFEBEB",
+    label: "Error End",
+  },
   [NodeType.TASK_DEFAULT]: {
     icon: TASK_ICONS.default,
     color: "#3B82F6",
@@ -299,9 +305,13 @@ const NODE_ICON_CONFIG: Record<NodeType | string, IconConfig> = {
 export function getIconConfig(
   type: NodeType,
   startVariant?: StartEventVariant
-): IconConfig {
-  const config =
-    NODE_ICON_CONFIG[type] || NODE_ICON_CONFIG[NodeType.TASK_DEFAULT];
+): IconConfig | undefined {
+  const config = NODE_ICON_CONFIG[type];
+
+  // Only return config if it exists for this specific type
+  if (!config) {
+    return undefined;
+  }
 
   if (type === NodeType.START_EVENT_DEFAULT && startVariant) {
     return {

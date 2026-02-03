@@ -56,9 +56,10 @@ To generate a workflow, the AI must produce a JSON object with the following str
 
 Before generating, the AI should be provided with the "Capabilities Schema". This is a JSON description of all registered nodes.
 
-*Note: A utility `getRegistryCapabilities()` is available in `src/core/utils/aiUtils.ts` to generate this.*
+_Note: A utility `getRegistryCapabilities()` is available in `src/core/utils/aiUtils.ts` to generate this._
 
 **Format of Capabilities Schema:**
+
 ```json
 {
   "nodeTypes": [
@@ -67,7 +68,11 @@ Before generating, the AI should be provided with the "Capabilities Schema". Thi
       "description": "A task assigned to a human user",
       "category": "Task",
       "properties": [
-        { "name": "assignee", "type": "string", "description": "User ID to assign" },
+        {
+          "name": "assignee",
+          "type": "string",
+          "description": "User ID to assign"
+        },
         { "name": "dueDate", "type": "date", "description": "Deadline" }
       ]
     }
@@ -81,15 +86,20 @@ Before generating, the AI should be provided with the "Capabilities Schema". Thi
 The system now supports real-time generation using LLMs (OpenAI, Gemini).
 
 ### Configuration
+
 Users must configure their API Key in the UI (Settings in AI Modal). This key is stored in `localStorage`.
 
 ### Prompt Engineering
+
 The `AIService` constructs a prompt that includes:
+
 1.  **System Prompt:** Defines the role, rules, and includes the `Capabilities Schema` (Context).
 2.  **User Prompt:** The specific request (e.g., "Leave request process").
 
 ### Validation
+
 The output from the LLM is parsed and validated by `validateGeneratedWorkflow`:
+
 - Checks if node types exist in registry.
 - Checks if edges connect existing nodes.
 - Checks for basic BPMN rules (e.g., presence of Start Event).
@@ -97,7 +107,7 @@ The output from the LLM is parsed and validated by `validateGeneratedWorkflow`:
 ## 5. Integration Steps
 
 1.  **User Prompt:** "Create a leave request process where a manager approves."
-2.  **Context Loading:** Fetch the *Capabilities Schema*.
+2.  **Context Loading:** Fetch the _Capabilities Schema_.
 3.  **LLM Generation:** Send [System Prompt + User Prompt] to LLM. Request JSON output.
 4.  **Parsing & Validation:**
     - Parse JSON.

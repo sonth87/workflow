@@ -17,11 +17,11 @@ export const createSelectionSlice: StateCreator<
   [],
   [],
   SelectionSlice
-> = (set) => ({
+> = set => ({
   selectedNodeId: null,
   selectedEdgeId: null,
 
-  selectNode: (nodeId) => {
+  selectNode: nodeId => {
     set({
       selectedNodeId: nodeId,
       selectedEdgeId: null,
@@ -35,7 +35,7 @@ export const createSelectionSlice: StateCreator<
     set({ selectedNodeId: null });
   },
 
-  selectEdge: (edgeId) => {
+  selectEdge: edgeId => {
     set({
       selectedEdgeId: edgeId,
       selectedNodeId: null,

@@ -10,9 +10,9 @@ import {
   useContext,
   useState,
   useCallback,
-  useEffect,
   type ReactNode,
 } from "react";
+import { getSetting, setSetting } from "@/utils/storage";
 
 // Support any language dynamically - not limited to en/vi
 export type LanguageType = string;
@@ -46,7 +46,7 @@ export function LanguageProvider({
   const [language, setLanguageState] = useState<LanguageType>(() => {
     // Load from localStorage if available
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("bpm-language") as LanguageType;
+      const stored = getSetting("language") as LanguageType;
       return stored || defaultLanguage;
     }
     return defaultLanguage;
@@ -56,7 +56,7 @@ export function LanguageProvider({
     if (newLanguage && typeof newLanguage === "string" && newLanguage.trim()) {
       setLanguageState(newLanguage);
       if (typeof window !== "undefined") {
-        localStorage.setItem("bpm-language", newLanguage);
+        setSetting("language", newLanguage);
       }
     }
   }, []);

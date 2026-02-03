@@ -5,7 +5,7 @@
 
 import { useWorkflowStore } from "@/core/store/workflowStore";
 import { X } from "lucide-react";
-import { memo, useState } from "react";
+import { memo, useState, useEffect } from "react";
 import IconConfig from "../IconConfig";
 import { ResizeHandle } from "../ResizeHandle";
 import type { NodeType } from "@/enum/workflow.enum";
@@ -13,12 +13,47 @@ import { PropertyTabs } from "./PropertyTabs";
 import { usePropertyGroups, useVisibleGroups } from "./hooks";
 import type { BaseNodeConfig, BaseEdgeConfig } from "@/core/types/base.types";
 import { useLanguage } from "@/workflow/hooks/useLanguage";
+import { getSetting, setSetting } from "@/utils/storage";
+
+const DEFAULT_WIDTH = 320;
+const MIN_WIDTH = 320;
+const MAX_WIDTH = 600;
 
 export const PropertiesPanel = memo(function PropertiesPanel() {
   const { nodes, edges, selectedNodeId, selectedEdgeId, clearSelection } =
     useWorkflowStore();
 
-  const [width, setWidth] = useState(320);
+  // Load width from localStorage on mount
+  const [width, setWidth] = useState(() => {
+    try {
+      const stored = getSetting("propertyPanelWidth");
+      if (
+        typeof stored === "number" &&
+        stored >= MIN_WIDTH &&
+        stored <= MAX_WIDTH
+      ) {
+        return stored;
+      }
+    } catch (error) {
+      console.warn(
+        "Failed to load property panel width from localStorage:",
+        error
+      );
+    }
+    return DEFAULT_WIDTH;
+  });
+
+  // Save width to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      setSetting("propertyPanelWidth", width);
+    } catch (error) {
+      console.warn(
+        "Failed to save property panel width to localStorage:",
+        error
+      );
+    }
+  }, [width]);
 
   const { getText } = useLanguage();
 
@@ -51,7 +86,9 @@ export const PropertiesPanel = memo(function PropertiesPanel() {
       <ResizeHandle
         direction="left"
         onResize={delta =>
-          setWidth(prev => Math.max(320, Math.min(600, prev + delta)))
+          setWidth(prev =>
+            Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, prev + delta))
+          )
         }
       />
       {/* Header */}

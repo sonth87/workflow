@@ -171,27 +171,28 @@ export function createChangeTypeSubmenuItems(
 
   // Create menu items for each node type
   return nodesInCategory.map(item => {
-    // Get icon with fallback from iconConfig
+    // Get icon from iconConfig based on node type (not id)
+    // This ensures we get the correct icon even for inherited nodes
     let icon: any = item.config?.icon || item.icon;
-    if (!icon) {
-      const config = getIconConfig(item.id as any);
 
-      if (config?.icon) {
-        if (typeof config.icon === "string") {
-          icon = {
-            type: "image",
-            value: config.icon,
-            color: config.color,
-            backgroundColor: config.bgColor,
-          } as IconConfig;
-        } else {
-          icon = {
-            type: "lucide",
-            value: config.icon,
-            color: config.color,
-            backgroundColor: config.bgColor,
-          } as IconConfig;
-        }
+    // Always try to get the specific icon for this node type
+    const config = getIconConfig(item.type as any);
+
+    if (config?.icon) {
+      if (typeof config.icon === "string") {
+        icon = {
+          type: "image",
+          value: config.icon,
+          color: config.color,
+          backgroundColor: config.bgColor,
+        } as IconConfig;
+      } else {
+        icon = {
+          type: "lucide",
+          value: config.icon,
+          color: config.color,
+          backgroundColor: config.bgColor,
+        } as IconConfig;
       }
     }
 

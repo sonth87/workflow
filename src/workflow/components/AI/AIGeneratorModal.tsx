@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Sparkles, Loader2, Settings } from "lucide-react";
 import { AIService } from "../../../core/services/AIService";
 import { useWorkflowStore } from "../../../core/store/workflowStore";
+import { getNestedSetting, setNestedSetting } from "@/utils/storage";
 import {
   Button,
   Dialog,
@@ -30,15 +31,15 @@ export const AIGeneratorModal: React.FC<AIGeneratorModalProps> = ({
 
   useEffect(() => {
     // Load settings from local storage
-    const storedKey = localStorage.getItem("bpm_ai_api_key");
-    const storedProvider = localStorage.getItem("bpm_ai_provider");
+    const storedKey = getNestedSetting<string>("ai.apiKey");
+    const storedProvider = getNestedSetting<string>("ai.provider");
     if (storedKey) setApiKey(storedKey);
     if (storedProvider) setProvider(storedProvider as "openai" | "gemini");
   }, []);
 
   const handleSaveSettings = () => {
-    localStorage.setItem("bpm_ai_api_key", apiKey);
-    localStorage.setItem("bpm_ai_provider", provider);
+    setNestedSetting("ai.apiKey", apiKey);
+    setNestedSetting("ai.provider", provider);
     setShowSettings(false);
   };
 

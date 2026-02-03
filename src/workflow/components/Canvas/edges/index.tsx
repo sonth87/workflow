@@ -43,14 +43,22 @@ function generateCustomPath(
 ): [string, number, number, number, number] {
   const dx = targetX - sourceX;
   const dy = targetY - sourceY;
-  
+
   // Detect complex routing scenario: output opposite to target direction
   const needsComplexRouting =
-    (sourcePosition === Position.Right && targetPosition === Position.Left && dx < 0) ||
-    (sourcePosition === Position.Left && targetPosition === Position.Right && dx > 0) ||
-    (sourcePosition === Position.Bottom && targetPosition === Position.Top && dy < 0) ||
-    (sourcePosition === Position.Top && targetPosition === Position.Bottom && dy > 0);
-  
+    (sourcePosition === Position.Right &&
+      targetPosition === Position.Left &&
+      dx < 0) ||
+    (sourcePosition === Position.Left &&
+      targetPosition === Position.Right &&
+      dx > 0) ||
+    (sourcePosition === Position.Bottom &&
+      targetPosition === Position.Top &&
+      dy < 0) ||
+    (sourcePosition === Position.Top &&
+      targetPosition === Position.Bottom &&
+      dy > 0);
+
   if (!needsComplexRouting) {
     // Use standard smooth step for simple cases
     return getSmoothStepPath({
@@ -63,21 +71,24 @@ function generateCustomPath(
       borderRadius,
     });
   }
-  
+
   // Complex routing with waypoints
   const waypoints: Array<{ x: number; y: number }> = [];
   const offset = 50; // Distance to route around nodes horizontally
   const minStepDistance = 60; // Minimum distance to ensure clearing the node
   const verticalStepRatio = 0.25; // Go 25% of vertical distance before turning
-  
+
   if (sourcePosition === Position.Right && dx < 0) {
     // A's output on right, B is to the left
     // Path: Right → Down/Up a bit → Left (past B) → Down/Up → Right into B
-    
+
     // Use the larger of: minimum distance OR 25% of total distance
-    const stepDistance = Math.max(minStepDistance, Math.abs(dy) * verticalStepRatio);
+    const stepDistance = Math.max(
+      minStepDistance,
+      Math.abs(dy) * verticalStepRatio
+    );
     const firstStepY = dy > 0 ? sourceY + stepDistance : sourceY - stepDistance; // Go down if B below, up if B above
-    
+
     waypoints.push({ x: sourceX, y: sourceY }); // Start
     waypoints.push({ x: sourceX + offset, y: sourceY }); // Go right
     waypoints.push({ x: sourceX + offset, y: firstStepY }); // Go down/up from source
@@ -86,9 +97,12 @@ function generateCustomPath(
     waypoints.push({ x: targetX, y: targetY }); // Go right into target
   } else if (sourcePosition === Position.Left && dx > 0) {
     // Mirror case: output left, target is to the right
-    const stepDistance = Math.max(minStepDistance, Math.abs(dy) * verticalStepRatio);
+    const stepDistance = Math.max(
+      minStepDistance,
+      Math.abs(dy) * verticalStepRatio
+    );
     const firstStepY = dy > 0 ? sourceY + stepDistance : sourceY - stepDistance;
-    
+
     waypoints.push({ x: sourceX, y: sourceY });
     waypoints.push({ x: sourceX - offset, y: sourceY });
     waypoints.push({ x: sourceX - offset, y: firstStepY }); // Go down/up from source
@@ -97,9 +111,12 @@ function generateCustomPath(
     waypoints.push({ x: targetX, y: targetY });
   } else if (sourcePosition === Position.Bottom && dy < 0) {
     // Vertical case: output bottom, target is above
-    const stepDistance = Math.max(minStepDistance, Math.abs(dx) * verticalStepRatio);
+    const stepDistance = Math.max(
+      minStepDistance,
+      Math.abs(dx) * verticalStepRatio
+    );
     const firstStepX = dx > 0 ? sourceX + stepDistance : sourceX - stepDistance; // Go right if B right, left if B left
-    
+
     waypoints.push({ x: sourceX, y: sourceY });
     waypoints.push({ x: sourceX, y: sourceY + offset });
     waypoints.push({ x: firstStepX, y: sourceY + offset }); // Go horizontally from source
@@ -108,9 +125,12 @@ function generateCustomPath(
     waypoints.push({ x: targetX, y: targetY });
   } else if (sourcePosition === Position.Top && dy > 0) {
     // Vertical mirror: output top, target is below
-    const stepDistance = Math.max(minStepDistance, Math.abs(dx) * verticalStepRatio);
+    const stepDistance = Math.max(
+      minStepDistance,
+      Math.abs(dx) * verticalStepRatio
+    );
     const firstStepX = dx > 0 ? sourceX + stepDistance : sourceX - stepDistance;
-    
+
     waypoints.push({ x: sourceX, y: sourceY });
     waypoints.push({ x: sourceX, y: sourceY - offset });
     waypoints.push({ x: firstStepX, y: sourceY - offset }); // Go horizontally from source
@@ -118,43 +138,47 @@ function generateCustomPath(
     waypoints.push({ x: targetX, y: targetY + offset });
     waypoints.push({ x: targetX, y: targetY });
   }
-  
+
   // Generate smooth path through waypoints
   let pathD = `M ${waypoints[0].x} ${waypoints[0].y}`;
-  
+
   for (let i = 1; i < waypoints.length; i++) {
     const prev = waypoints[i - 1];
     const curr = waypoints[i];
     const next = waypoints[i + 1];
-    
+
     if (!next) {
       // Last point - straight line
       pathD += ` L ${curr.x} ${curr.y}`;
     } else {
       // Create rounded corner
-      const distToCurr = Math.sqrt(Math.pow(curr.x - prev.x, 2) + Math.pow(curr.y - prev.y, 2));
-      const distToNext = Math.sqrt(Math.pow(next.x - curr.x, 2) + Math.pow(next.y - curr.y, 2));
+      const distToCurr = Math.sqrt(
+        Math.pow(curr.x - prev.x, 2) + Math.pow(curr.y - prev.y, 2)
+      );
+      const distToNext = Math.sqrt(
+        Math.pow(next.x - curr.x, 2) + Math.pow(next.y - curr.y, 2)
+      );
       const radius = Math.min(borderRadius, distToCurr / 2, distToNext / 2);
-      
+
       // Calculate points for rounded corner
       const prevAngle = Math.atan2(curr.y - prev.y, curr.x - prev.x);
       const nextAngle = Math.atan2(next.y - curr.y, next.x - curr.x);
-      
+
       const x1 = curr.x - Math.cos(prevAngle) * radius;
       const y1 = curr.y - Math.sin(prevAngle) * radius;
       const x2 = curr.x + Math.cos(nextAngle) * radius;
       const y2 = curr.y + Math.sin(nextAngle) * radius;
-      
+
       pathD += ` L ${x1} ${y1}`;
       pathD += ` Q ${curr.x} ${curr.y} ${x2} ${y2}`;
     }
   }
-  
+
   // Calculate label position (center of path)
   const centerIdx = Math.floor(waypoints.length / 2);
   const labelX = waypoints[centerIdx].x;
   const labelY = waypoints[centerIdx].y;
-  
+
   // Return format matching getSmoothStepPath: [path, labelX, labelY, offsetX, offsetY]
   return [pathD, labelX, labelY, 0, 0];
 }
@@ -173,23 +197,23 @@ function calculateSmartOffset(
 ): number {
   const dx = Math.abs(targetX - sourceX);
   const dy = Math.abs(targetY - sourceY);
-  
+
   // Base offset - minimum space needed to route around nodes
   const baseOffset = 40;
-  
+
   // Calculate offset based on distance and direction
   // For tight spaces, need larger offset to route around nodes
   const distanceBasedOffset = Math.min(dx, dy) < 150 ? 60 : baseOffset;
-  
+
   // If routing requires turning back (opposite directions), need more space
-  const isOppositeDirection = 
+  const isOppositeDirection =
     (sourcePosition === Position.Right && targetPosition === Position.Left) ||
     (sourcePosition === Position.Left && targetPosition === Position.Right) ||
     (sourcePosition === Position.Top && targetPosition === Position.Bottom) ||
     (sourcePosition === Position.Bottom && targetPosition === Position.Top);
-  
+
   const oppositeDirectionOffset = isOppositeDirection ? 30 : 0;
-  
+
   return distanceBasedOffset + oppositeDirectionOffset;
 }
 
@@ -208,14 +232,16 @@ function getSmartHandlePositions(
   // Calculate relative position differences
   const dx = targetX - sourceX;
   const dy = targetY - sourceY;
-  
+
   // Determine if target is in the "wrong" direction relative to source handle
-  const isHorizontalHandle = sourcePosition === Position.Left || sourcePosition === Position.Right;
-  const isVerticalHandle = sourcePosition === Position.Top || sourcePosition === Position.Bottom;
-  
+  const isHorizontalHandle =
+    sourcePosition === Position.Left || sourcePosition === Position.Right;
+  const isVerticalHandle =
+    sourcePosition === Position.Top || sourcePosition === Position.Bottom;
+
   let newSourcePosition = sourcePosition;
   let newTargetPosition = targetPosition;
-  
+
   if (isHorizontalHandle) {
     // If source handle is on the right but target is to the left (dx < 0)
     if (sourcePosition === Position.Right && dx < -100) {
@@ -230,7 +256,8 @@ function getSmartHandlePositions(
       newTargetPosition = Position.Left;
     }
     // Also consider vertical positioning for better routing
-    else if (Math.abs(dy) > Math.abs(dx) * 2) { // Increased from 1.5 to 2 to be less aggressive
+    else if (Math.abs(dy) > Math.abs(dx) * 2) {
+      // Increased from 1.5 to 2 to be less aggressive
       // If vertical distance is much larger than horizontal, use vertical handles
       if (dy > 0) {
         newSourcePosition = Position.Bottom;
@@ -252,7 +279,8 @@ function getSmartHandlePositions(
       newTargetPosition = Position.Top;
     }
     // Consider horizontal positioning
-    else if (Math.abs(dx) > Math.abs(dy) * 2) { // Increased from 1.5 to 2
+    else if (Math.abs(dx) > Math.abs(dy) * 2) {
+      // Increased from 1.5 to 2
       // If horizontal distance is much larger than vertical, use horizontal handles
       if (dx > 0) {
         newSourcePosition = Position.Right;
@@ -263,8 +291,11 @@ function getSmartHandlePositions(
       }
     }
   }
-  
-  return { sourcePosition: newSourcePosition, targetPosition: newTargetPosition };
+
+  return {
+    sourcePosition: newSourcePosition,
+    targetPosition: newTargetPosition,
+  };
 }
 
 /**
@@ -288,21 +319,21 @@ function getEdgePath(
   const effectiveEdgeType = edgeType;
   const smartOffset = 0;
   let useCustomPath = false;
-  
+
   // Apply smart routing if enabled
   if (useSmartRouting && edgeType !== EdgePathType.Straight) {
     // IMPORTANT: Check for complex routing BEFORE flipping handles
     const dx = targetX - sourceX;
     const dy = targetY - sourceY;
-    
+
     // Detect if we need complex routing with original positions
     // Only trigger for CLEARLY opposite directions with strict thresholds
     const needsComplexRouting =
       (sourcePosition === Position.Right && dx < -150) || // Output right but target is significantly left
-      (sourcePosition === Position.Left && dx > 150) ||   // Output left but target is significantly right
+      (sourcePosition === Position.Left && dx > 150) || // Output left but target is significantly right
       (sourcePosition === Position.Bottom && dy < -150) || // Output bottom but target is significantly above
-      (sourcePosition === Position.Top && dy > 150);      // Output top but target is significantly below
-    
+      (sourcePosition === Position.Top && dy > 150); // Output top but target is significantly below
+
     if (needsComplexRouting) {
       // Use custom path with waypoints for complex opposite-direction routing
       useCustomPath = true;
@@ -376,7 +407,7 @@ export function DynamicEdge({
   // Get path type (rendering type) from data, fallback to bezier
   const pathType = (data?.pathType as string) || EdgePathType.Bezier;
   const pathStyle = (data?.pathStyle as string) || "solid";
-  
+
   // Smart routing is enabled by default, can be disabled via data.disableSmartRouting
   const useSmartRouting = data?.disableSmartRouting !== true;
 

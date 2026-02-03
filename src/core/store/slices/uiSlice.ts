@@ -29,7 +29,7 @@ export const createUISlice: StateCreator<
   [],
   [],
   UISlice
-> = (set) => ({
+> = set => ({
   layoutDirection: DEFAULT_LAYOUT_DIRECTION,
   compactView: false,
   panelStates: {
@@ -41,17 +41,17 @@ export const createUISlice: StateCreator<
   isSaving: false,
   viewport: { x: 0, y: 0, zoom: 1 },
 
-  setLayoutDirection: (direction) => {
+  setLayoutDirection: direction => {
     set({ layoutDirection: direction });
     globalEventBus.emit(WorkflowEventTypes.LAYOUT_CHANGED, { direction });
   },
 
   toggleCompactView: () => {
-    set((state) => ({ compactView: !state.compactView }));
+    set(state => ({ compactView: !state.compactView }));
   },
 
-  togglePanel: (panel) => {
-    set((state) => ({
+  togglePanel: panel => {
+    set(state => ({
       panelStates: {
         ...state.panelStates,
         [panel]: !state.panelStates[panel],
@@ -59,15 +59,15 @@ export const createUISlice: StateCreator<
     }));
   },
 
-  setLoading: (isLoading) => {
+  setLoading: isLoading => {
     set({ isLoading });
   },
 
-  setSaving: (isSaving) => {
+  setSaving: isSaving => {
     set({ isSaving });
   },
 
-  setViewport: (viewport) => {
+  setViewport: viewport => {
     set({ viewport });
   },
 });

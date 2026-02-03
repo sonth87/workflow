@@ -9,12 +9,19 @@ import type { BaseEdgeConfig, BaseNodeConfig } from "../types/base.types";
 import type { ValidationError } from "../validation/ValidationEngine";
 
 // Import Slices
-import { createSelectionSlice, type SelectionSlice } from "./slices/selectionSlice";
-import { createSimulationSlice, type SimulationSlice } from "./slices/simulationSlice";
+import {
+  createSelectionSlice,
+  type SelectionSlice,
+} from "./slices/selectionSlice";
+import {
+  createSimulationSlice,
+  type SimulationSlice,
+} from "./slices/simulationSlice";
 import { createHistorySlice, type HistorySlice } from "./slices/historySlice";
 import { createUISlice, type UISlice } from "./slices/uiSlice";
 
-export interface WorkflowState extends SelectionSlice, SimulationSlice, HistorySlice, UISlice {
+export interface WorkflowState
+  extends SelectionSlice, SimulationSlice, HistorySlice, UISlice {
   // Workflow metadata
   workflowId: string | null;
   workflowName: string;
@@ -87,12 +94,12 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
     clipboard: null,
 
     // Workflow actions
-    setWorkflowName: (name) => set({ workflowName: name }),
+    setWorkflowName: name => set({ workflowName: name }),
 
-    setWorkflowDescription: (description) =>
+    setWorkflowDescription: description =>
       set({ workflowDescription: description }),
 
-    loadWorkflow: (workflow) => {
+    loadWorkflow: workflow => {
       set({ ...workflow });
       globalEventBus.emit(WorkflowEventTypes.WORKFLOW_LOADED, workflow);
     },
@@ -120,11 +127,11 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
     },
 
     // Node actions
-    addNode: (node) => {
+    addNode: node => {
       get().saveToHistory();
       const nodeWithZIndex =
         node.type === "note" ? { ...node, zIndex: -1 } : node;
-      set((state) => ({ nodes: [...state.nodes, nodeWithZIndex] }));
+      set(state => ({ nodes: [...state.nodes, nodeWithZIndex] }));
       globalEventBus.emit(WorkflowEventTypes.NODE_ADDED, {
         node: nodeWithZIndex,
       });
@@ -132,8 +139,8 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
 
     updateNode: (nodeId, updates) => {
       get().saveToHistory();
-      set((state) => ({
-        nodes: state.nodes.map((node) => {
+      set(state => ({
+        nodes: state.nodes.map(node => {
           if (node.id === nodeId) {
             const updatedNode = {
               ...node,
@@ -156,15 +163,15 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
       globalEventBus.emit(WorkflowEventTypes.NODE_UPDATED, { nodeId, updates });
     },
 
-    deleteNode: (nodeId) => {
+    deleteNode: nodeId => {
       get().saveToHistory();
-      set((state) => {
-        const nodeToDelete = state.nodes.find((node) => node.id === nodeId);
+      set(state => {
+        const nodeToDelete = state.nodes.find(node => node.id === nodeId);
 
         // If deleting a pool, also delete all child nodes
         const nodesToDelete = new Set([nodeId]);
         if (nodeToDelete?.type === "pool") {
-          state.nodes.forEach((node) => {
+          state.nodes.forEach(node => {
             if (node.parentId === nodeId) {
               nodesToDelete.add(node.id);
             }
@@ -172,9 +179,9 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
         }
 
         return {
-          nodes: state.nodes.filter((node) => !nodesToDelete.has(node.id)),
+          nodes: state.nodes.filter(node => !nodesToDelete.has(node.id)),
           edges: state.edges.filter(
-            (edge) =>
+            edge =>
               !nodesToDelete.has(edge.source) && !nodesToDelete.has(edge.target)
           ),
         };
@@ -182,24 +189,24 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
       globalEventBus.emit(WorkflowEventTypes.NODE_DELETED, { nodeId });
     },
 
-    setNodes: (nodes) => {
-      const nodesWithZIndex = nodes.map((node) =>
+    setNodes: nodes => {
+      const nodesWithZIndex = nodes.map(node =>
         node.type === "note" ? { ...node, zIndex: -1 } : node
       );
       set({ nodes: nodesWithZIndex });
     },
 
     // Edge actions
-    addEdge: (edge) => {
+    addEdge: edge => {
       get().saveToHistory();
-      set((state) => ({ edges: [...state.edges, edge] }));
+      set(state => ({ edges: [...state.edges, edge] }));
       globalEventBus.emit(WorkflowEventTypes.EDGE_ADDED, { edge });
     },
 
     updateEdge: (edgeId, updates) => {
       get().saveToHistory();
-      set((state) => ({
-        edges: state.edges.map((edge) => {
+      set(state => ({
+        edges: state.edges.map(edge => {
           if (edge.id !== edgeId) return edge;
 
           // Deep merge data and properties to ensure nested properties are preserved
@@ -218,20 +225,20 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>(
       globalEventBus.emit(WorkflowEventTypes.EDGE_UPDATED, { edgeId, updates });
     },
 
-    deleteEdge: (edgeId) => {
+    deleteEdge: edgeId => {
       get().saveToHistory();
-      set((state) => ({
-        edges: state.edges.filter((edge) => edge.id !== edgeId),
+      set(state => ({
+        edges: state.edges.filter(edge => edge.id !== edgeId),
       }));
       globalEventBus.emit(WorkflowEventTypes.EDGE_DELETED, { edgeId });
     },
 
-    setEdges: (edges) => {
+    setEdges: edges => {
       set({ edges });
     },
 
     // Validation actions
-    setValidationErrors: (errors) => {
+    setValidationErrors: errors => {
       set({ validationErrors: errors });
     },
 

@@ -49,8 +49,9 @@ const wrapWithBaseNode = (
       | NodeVisualConfig
       | undefined;
 
+    // Important: Spread props first, then override type to ensure correct nodeType
     return (
-      <BaseNode {...props} type={nodeType} visualConfig={visualConfig}>
+      <BaseNode {...props} visualConfig={visualConfig} type={nodeType}>
         <Component {...props} />
       </BaseNode>
     );

@@ -42,37 +42,51 @@ export default function IconConfig(props: Props) {
     iconColor: colorConfig?.iconColor,
   };
 
-  // Priority: type icon (iconConfig.ts) > node icon (plugin config)
-  // This allows specific SVG icons to override generic plugin icons
-  // while still supporting inheritance for custom nodes
+  /**
+   * Priority for icon selection:
+   * 1. iconConfig.ts - Default icons for each node type (highest priority)
+   * 2. Node config - Icons from plugin/registry (may be inherited or custom)
+   *
+   * This ensures:
+   * - Standard node types use their designated icons from iconConfig.ts
+   * - Nodes without iconConfig definition use plugin config (with inheritance)
+   * - Custom nodes can override via iconConfig.ts
+   */
   let Icon: any = null;
   let iconBgColor: string | undefined;
   let iconColor: string | undefined;
 
-  // First, try type-based icon from iconConfig.ts
+  // Priority 1: Check iconConfig.ts for type-specific icon
   if (type) {
-    const iconConfig = getIconConfig(type);
-    if (iconConfig?.icon) {
-      Icon = iconConfig.icon;
-      iconBgColor = finalVisualConfig.iconBackgroundColor || iconConfig.bgColor;
-      iconColor = finalVisualConfig.iconColor || iconConfig.color;
+    const typeIconConfig = getIconConfig(type);
+    if (typeIconConfig?.icon) {
+      Icon = typeIconConfig.icon;
+      // Use colors from iconConfig.ts directly (don't allow visualConfig to override)
+      iconBgColor = typeIconConfig.bgColor;
+      iconColor = typeIconConfig.color;
     }
   }
 
-  // Fallback to node icon from plugin config (for inheritance & custom nodes)
+  // Priority 2: Fallback to node icon from plugin config (supports inheritance)
   if (!Icon && nodeIcon) {
     if (typeof nodeIcon === "string") {
       // Handle base64 string icon
       Icon = nodeIcon;
       iconBgColor = finalVisualConfig.iconBackgroundColor;
       iconColor = finalVisualConfig.iconColor;
+    } else if (nodeIcon.type === "lucide" && nodeIcon.value) {
+      // Handle Lucide icon component from plugin
+      Icon = nodeIcon.value;
+      iconBgColor =
+        nodeIcon.backgroundColor || finalVisualConfig.iconBackgroundColor;
+      iconColor = nodeIcon.color || finalVisualConfig.iconColor;
     } else if (nodeIcon.type === "image" || nodeIcon.type === "svg") {
       // Handle image or svg from node config
       Icon = nodeIcon.value;
       iconBgColor = finalVisualConfig.iconBackgroundColor;
       iconColor = finalVisualConfig.iconColor;
-    } else {
-      // Use icon from node config (from plugin)
+    } else if (nodeIcon.value) {
+      // Generic icon value
       Icon = nodeIcon.value;
       iconBgColor =
         nodeIcon.backgroundColor || finalVisualConfig.iconBackgroundColor;
@@ -83,8 +97,6 @@ export default function IconConfig(props: Props) {
   if (!Icon) return null;
 
   // Validate Icon to prevent "Element type is invalid" error
-  // If Icon is an object but has no keys (and isn't a special React object),
-  // it's likely a serialized component which is invalid to render.
   if (
     typeof Icon === "object" &&
     Icon !== null &&
@@ -114,6 +126,7 @@ export default function IconConfig(props: Props) {
         >
           <Icon
             size={compactView ? 32 : size || 18}
+            color={!compactView ? iconColor : iconBgColor || defaultColor}
             style={{
               color: !compactView ? iconColor : iconBgColor || defaultColor,
             }}

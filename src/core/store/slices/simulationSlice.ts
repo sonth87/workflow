@@ -29,12 +29,12 @@ export const createSimulationSlice: StateCreator<
     history: [],
   },
 
-  startSimulation: (startNodeId) => {
+  startSimulation: startNodeId => {
     const { nodes } = get();
     // If no startNodeId, find the first Start Event
     const startNode = startNodeId
-      ? nodes.find((n) => n.id === startNodeId)
-      : nodes.find((n) => n.category === "start");
+      ? nodes.find(n => n.id === startNodeId)
+      : nodes.find(n => n.category === "start");
 
     if (!startNode) {
       alert("No start node found for simulation");
@@ -69,7 +69,7 @@ export const createSimulationSlice: StateCreator<
     const { simulation, nodes, edges } = get();
     if (!simulation.active || !simulation.currentNodeId) return;
 
-    const currentNode = nodes.find((n) => n.id === simulation.currentNodeId);
+    const currentNode = nodes.find(n => n.id === simulation.currentNodeId);
     if (!currentNode) return;
 
     // 1. Evaluate logic of current node (if any)
@@ -89,11 +89,11 @@ export const createSimulationSlice: StateCreator<
     }
 
     // 2. Find outgoing edges
-    const outgoingEdges = edges.filter((e) => e.source === currentNode.id);
+    const outgoingEdges = edges.filter(e => e.source === currentNode.id);
 
     if (outgoingEdges.length === 0) {
       // End of process
-      set((state) => ({
+      set(state => ({
         simulation: {
           ...state.simulation,
           currentNodeId: null,
@@ -129,7 +129,7 @@ export const createSimulationSlice: StateCreator<
       // If no condition met, look for default flow
       if (!nextNodeId) {
         const defaultEdge = outgoingEdges.find(
-          (e) => e.properties?.isDefault || e.data?.isDefault
+          e => e.properties?.isDefault || e.data?.isDefault
         );
         if (defaultEdge) nextNodeId = defaultEdge.target;
       }
@@ -139,7 +139,7 @@ export const createSimulationSlice: StateCreator<
     }
 
     if (nextNodeId) {
-      set((state) => ({
+      set(state => ({
         simulation: {
           ...state.simulation,
           currentNodeId: nextNodeId,
@@ -149,7 +149,7 @@ export const createSimulationSlice: StateCreator<
       }));
     } else {
       // Stuck or end
-      set((state) => ({
+      set(state => ({
         simulation: {
           ...state.simulation,
           currentNodeId: null,
@@ -160,7 +160,7 @@ export const createSimulationSlice: StateCreator<
   },
 
   setSimulationVariable: (name, value) => {
-    set((state) => ({
+    set(state => ({
       simulation: {
         ...state.simulation,
         variables: {
