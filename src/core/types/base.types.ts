@@ -42,7 +42,7 @@ export function isTranslationKey(value: unknown): value is string {
  * Thông tin metadata cơ bản có thể mở rộng
  */
 export interface BaseMetadata {
-  id: string;
+  id?: string; // Optional - will be auto-generated if not provided
   title: MultilingualText;
   description?: MultilingualText;
   version?: string;
@@ -315,7 +315,9 @@ export interface PropertyDefinition {
   visible?: boolean | any; // Use any to support both simple and complex conditions
   disabled?: boolean | any;
   validation?: ValidationRule[];
-  options?: Array<{ label: MultilingualText; value: unknown }>; // For select/multiselect
+  options?:
+    | Array<{ label: MultilingualText; value: unknown; [key: string]: unknown }>
+    | { [key: string]: unknown }; // For select/multiselect (array) or number constraints (object)
   placeholder?: MultilingualText;
   group?: string; // Để group các properties lại
   order?: number;

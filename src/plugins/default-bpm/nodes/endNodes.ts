@@ -1,7 +1,8 @@
 import { NodeType, CategoryType } from "@/enum/workflow.enum";
 import { createDefaultNodeConfig } from "../constants/nodeDefaults";
+import type { BaseNodeConfig, RegistryItem } from "@/core";
 
-export const endNodes = [
+export const endNodes: RegistryItem<Partial<BaseNodeConfig>>[] = [
   {
     id: NodeType.END_EVENT_DEFAULT,
     type: NodeType.END_EVENT_DEFAULT,

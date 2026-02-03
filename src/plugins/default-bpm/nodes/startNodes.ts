@@ -1,8 +1,9 @@
 import { NodeType, CategoryType } from "@/enum/workflow.enum";
 import { Circle, Clock, MessageSquare, Globe, Radio } from "lucide-react";
 import { createDefaultNodeConfig } from "../constants/nodeDefaults";
+import type { BaseNodeConfig, RegistryItem } from "@/core";
 
-export const startNodes = [
+export const startNodes: RegistryItem<Partial<BaseNodeConfig>>[] = [
   {
     id: NodeType.START_EVENT_DEFAULT,
     type: NodeType.START_EVENT_DEFAULT,

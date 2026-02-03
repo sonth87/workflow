@@ -1,8 +1,9 @@
 import { NodeType, CategoryType } from "@/enum/workflow.enum";
 import { PanelTopBottomDashed } from "lucide-react";
 import { createDefaultNodeConfig } from "../constants/nodeDefaults";
+import type { BaseNodeConfig, RegistryItem } from "@/core";
 
-export const otherNodes = [
+export const otherNodes: RegistryItem<Partial<BaseNodeConfig>>[] = [
   {
     id: NodeType.NOTE,
     type: NodeType.NOTE,

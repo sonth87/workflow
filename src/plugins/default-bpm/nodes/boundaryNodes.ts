@@ -1,8 +1,9 @@
 import { NodeType, CategoryType } from "@/enum/workflow.enum";
 import { MessageSquare, AlertTriangle, Clock, Radio } from "lucide-react";
 import { createDefaultNodeConfig } from "../constants/nodeDefaults";
+import type { BaseNodeConfig, RegistryItem } from "@/core";
 
-export const boundaryNodes = [
+export const boundaryNodes: RegistryItem<Partial<BaseNodeConfig>>[] = [
   {
     id: NodeType.BOUNDARY_MESSAGE,
     type: NodeType.BOUNDARY_MESSAGE,

@@ -2,8 +2,9 @@ import { NodeType, CategoryType } from "@/enum/workflow.enum";
 import { Mail, AlarmClock, Radio, ListCheck } from "lucide-react";
 import { createDefaultNodeConfig } from "../constants/nodeDefaults";
 import { BaseNodeType } from "@/core/nodes/BaseNodeDefinitions";
+import type { BaseNodeConfig, RegistryItem } from "@/core";
 
-export const immediateNodes = [
+export const immediateNodes: RegistryItem<Partial<BaseNodeConfig>>[] = [
   {
     id: NodeType.IMMEDIATE_EMAIL,
     type: NodeType.IMMEDIATE_EMAIL,

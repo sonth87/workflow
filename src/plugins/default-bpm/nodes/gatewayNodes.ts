@@ -1,8 +1,9 @@
 import { NodeType, CategoryType } from "@/enum/workflow.enum";
 import { DiamondPlus } from "lucide-react";
 import { createDefaultNodeConfig } from "../constants/nodeDefaults";
+import type { BaseNodeConfig, RegistryItem } from "@/core";
 
-export const gatewayNodes = [
+export const gatewayNodes: RegistryItem<Partial<BaseNodeConfig>>[] = [
   {
     id: NodeType.EXCLUSIVE_GATEWAY,
     type: NodeType.EXCLUSIVE_GATEWAY,

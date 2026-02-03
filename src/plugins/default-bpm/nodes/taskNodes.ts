@@ -1,8 +1,9 @@
 import { NodeType, CategoryType } from "@/enum/workflow.enum";
 import { ClipboardList } from "lucide-react";
 import { createDefaultNodeConfig } from "../constants/nodeDefaults";
+import type { BaseNodeConfig, RegistryItem } from "@/core/types/base.types";
 
-export const taskNodes = [
+export const taskNodes: RegistryItem<Partial<BaseNodeConfig>>[] = [
   {
     id: NodeType.TASK_DEFAULT,
     type: NodeType.TASK_DEFAULT,
