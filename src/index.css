@@ -148,10 +148,17 @@ body {
   fill-opacity: 0.3;
 }
 
-.react-flow__handle:not(.connectionindicator):not(.connectingfrom)
-  > .indicator-glow {
+.react-flow__handle:not(.connectionindicator):not(.connectingfrom)>.indicator-glow {
   box-shadow: none;
   background-color: var(--color-border);
+}
+
+/* Disable handles when connecting from the same node (prevent self-loops) */
+.react-flow__handle.connecting-same-node>.indicator-glow {
+  box-shadow: none;
+  background-color: var(--color-border);
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .indicator-glow {
